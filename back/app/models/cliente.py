@@ -1,5 +1,5 @@
 from app.extensions import db
-from app.models.base import BaseModel
+from app.models.Base import BaseModel
 
 
 class Cliente(BaseModel):

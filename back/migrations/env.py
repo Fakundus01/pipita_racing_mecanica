@@ -1,6 +1,6 @@
 from logging.config import fileConfig
 
-from alembic import context
+from alembic import context #type: ignore
 from flask import current_app
 from sqlalchemy import engine_from_config, pool
 
