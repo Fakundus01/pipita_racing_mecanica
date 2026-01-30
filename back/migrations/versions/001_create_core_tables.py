@@ -5,7 +5,7 @@ Revises:
 Create Date: 2025-02-14 00:00:00.000000
 
 """
-from alembic import op
+from alembic import op #type: ignore
 import sqlalchemy as sa
 
 revision = '001_create_core_tables'

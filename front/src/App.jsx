@@ -1,9 +1,11 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import Home from './pages/Home'
 import Clientes from './pages/Clientes'
 import Vehiculos from './pages/Vehiculos'
 import Partes from './pages/Partes'
 import Reportes from './pages/Reportes'
+import Login from './components/Login'
+import { getSession, login, logout } from './api'
 import './App.css'
 
 const navigation = [
@@ -25,9 +27,73 @@ const views = {
 function App() {
   const [activeView, setActiveView] = useState('home')
   const [message, setMessage] = useState('Listo para registrar una nueva venta.')
+  const [auth, setAuth] = useState({ loading: true, authenticated: false })
+  const [authError, setAuthError] = useState('')
 
   const ActiveComponent = useMemo(() => views[activeView], [activeView])
   const activeNav = navigation.find((item) => item.key === activeView)
+
+  useEffect(() => {
+    let cancelled = false
+    const loadSession = async () => {
+      try {
+        const data = await getSession()
+        if (!cancelled) {
+          setAuth({ loading: false, authenticated: data.authenticated })
+        }
+      } catch (error) {
+        if (!cancelled) {
+          setAuth({ loading: false, authenticated: false })
+        }
+      }
+    }
+    loadSession()
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  const handleLogin = async (payload) => {
+    setAuthError('')
+    setAuth((prev) => ({ ...prev, loading: true }))
+    try {
+      await login(payload)
+      setAuth({ loading: false, authenticated: true })
+      setMessage('Sesión iniciada. Bienvenido/a.')
+    } catch (error) {
+      setAuth({ loading: false, authenticated: false })
+      setAuthError(error.message)
+    }
+  }
+
+  const handleLogout = async () => {
+    try {
+      await logout()
+    } catch (error) {
+      // Ignorar errores de cierre de sesión
+    }
+    setAuth({ loading: false, authenticated: false })
+    setMessage('Sesión cerrada.')
+  }
+
+  const handleAuthError = () => {
+    setAuth({ loading: false, authenticated: false })
+    setMessage('Sesión expirada. Ingresa nuevamente.')
+  }
+
+  if (auth.loading) {
+    return (
+      <div className="auth-shell">
+        <p>Verificando sesión...</p>
+      </div>
+    )
+  }
+
+  if (!auth.authenticated) {
+    return (
+      <Login onSubmit={handleLogin} error={authError} loading={auth.loading} />
+    )
+  }
 
   return (
     <div className="app-shell">
@@ -67,6 +133,9 @@ function App() {
             Configurar API
           </button>
         </div>
+        <button className="secondary" onClick={handleLogout}>
+          Cerrar sesión
+        </button>
       </aside>
 
       <main className="main">
@@ -80,7 +149,7 @@ function App() {
             Actualizar estado
           </button>
         </div>
-        <ActiveComponent onAction={setMessage} />
+        <ActiveComponent onAction={setMessage} onAuthError={handleAuthError} />
       </main>
     </div>
   )
