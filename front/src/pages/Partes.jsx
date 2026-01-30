@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
-import { createParte, listPartes } from '../api'
+import { createParte, deleteParte, listPartes, updateParte } from '../services/api'
 
 function Partes({ onAction, onAuthError }) {
   const [partes, setPartes] = useState([])
   const [form, setForm] = useState({ nombre: '', stock: '', costo: '' })
+  const [editingId, setEditingId] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
@@ -45,14 +46,48 @@ function Partes({ onAction, onAuthError }) {
     event.preventDefault()
     setError('')
     try {
-      const nuevo = await createParte({
+      const payload = {
         ...form,
         stock: form.stock ? Number(form.stock) : 0,
         costo: form.costo ? Number(form.costo) : 0,
-      })
-      setPartes((prev) => [nuevo, ...prev])
-      setForm({ nombre: '', stock: '', costo: '' })
-      onAction(`Parte ${nuevo.nombre} registrada.`)
+      }
+      if (editingId) {
+        const actualizada = await updateParte(editingId, payload)
+        setPartes((prev) =>
+          prev.map((parte) => (parte.id === editingId ? actualizada : parte))
+        )
+        setEditingId(null)
+        setForm({ nombre: '', stock: '', costo: '' })
+        onAction(`Parte ${actualizada.nombre} actualizada.`)
+      } else {
+        const nuevo = await createParte(payload)
+        setPartes((prev) => [nuevo, ...prev])
+        setForm({ nombre: '', stock: '', costo: '' })
+        onAction(`Parte ${nuevo.nombre} registrada.`)
+      }
+    } catch (err) {
+      setError(err.message)
+      if (err.status === 401) {
+        onAuthError()
+      }
+    }
+  }
+
+  const handleEdit = (parte) => {
+    setEditingId(parte.id)
+    setForm({
+      nombre: parte.nombre || '',
+      stock: parte.stock ?? '',
+      costo: parte.costo ?? '',
+    })
+  }
+
+  const handleDelete = async (parteId) => {
+    setError('')
+    try {
+      await deleteParte(parteId)
+      setPartes((prev) => prev.filter((parte) => parte.id !== parteId))
+      onAction('Parte eliminada.')
     } catch (err) {
       setError(err.message)
       if (err.status === 401) {
@@ -68,13 +103,13 @@ function Partes({ onAction, onAuthError }) {
           <h1>Partes & accesorios</h1>
           <p>Controla stock, costos y partes vinculadas a cada venta.</p>
         </div>
-        <button className="primary" onClick={() => onAction('Completa el formulario para agregar un repuesto.')}>
+         <button className="primary" onClick={() => onAction('Completa el formulario para agregar un repuesto.')}>
           Agregar repuesto
         </button>
       </header>
       <div className="page-grid">
         <article className="page-card">
-          <h3>Registrar repuesto</h3>
+          <h3>{editingId ? 'Editar repuesto' : 'Registrar repuesto'}</h3>
           <form className="mini-form" onSubmit={handleSubmit}>
             <input
               name="nombre"
@@ -100,7 +135,23 @@ function Partes({ onAction, onAuthError }) {
               min="0"
               step="0.01"
             />
-            <button className="secondary" type="submit">Guardar</button>
+            <div className="form-actions-inline">
+              <button className="secondary" type="submit">
+                {editingId ? 'Actualizar' : 'Guardar'}
+              </button>
+              {editingId ? (
+                <button
+                  className="secondary"
+                  type="button"
+                  onClick={() => {
+                    setEditingId(null)
+                    setForm({ nombre: '', stock: '', costo: '' })
+                  }}
+                >
+                  Cancelar
+                </button>
+              ) : null}
+            </div>
           </form>
           {error ? <p className="inline-error">{error}</p> : null}
         </article>
@@ -117,7 +168,17 @@ function Partes({ onAction, onAuthError }) {
                     <strong>{parte.nombre}</strong>
                     <span>Stock: {parte.stock}</span>
                   </div>
-                  <span>${Number(parte.costo || 0).toFixed(2)}</span>
+                  <div className="list-actions">
+                    <span>${Number(parte.costo || 0).toFixed(2)}</span>
+                    <div className="list-buttons">
+                      <button className="secondary" type="button" onClick={() => handleEdit(parte)}>
+                        Editar
+                      </button>
+                      <button className="secondary" type="button" onClick={() => handleDelete(parte.id)}>
+                        Eliminar
+                      </button>
+                    </div>
+                  </div>
                 </li>
               ))}
             </ul>

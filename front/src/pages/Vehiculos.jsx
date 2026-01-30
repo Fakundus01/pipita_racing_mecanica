@@ -1,9 +1,16 @@
 import { useEffect, useState } from 'react'
-import { createVehiculo, decodeVin, listVehiculos } from '../api'
+import {
+  createVehiculo,
+  decodeVin,
+  deleteVehiculo,
+  listVehiculos,
+  updateVehiculo,
+} from '../services/api'
 
 function Vehiculos({ onAction, onAuthError }) {
   const [vehiculos, setVehiculos] = useState([])
   const [form, setForm] = useState({ marca: '', modelo: '', anio: '' })
+  const [editingId, setEditingId] = useState(null)
   const [vin, setVin] = useState('')
   const [vinInfo, setVinInfo] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -48,13 +55,47 @@ function Vehiculos({ onAction, onAuthError }) {
     event.preventDefault()
     setError('')
     try {
-      const nuevo = await createVehiculo({
+      const payload = {
         ...form,
         anio: form.anio ? Number(form.anio) : null,
-      })
-      setVehiculos((prev) => [nuevo, ...prev])
-      setForm({ marca: '', modelo: '', anio: '' })
-      onAction(`Vehículo ${nuevo.marca} ${nuevo.modelo} guardado.`)
+      }
+      if (editingId) {
+        const actualizado = await updateVehiculo(editingId, payload)
+        setVehiculos((prev) =>
+          prev.map((vehiculo) => (vehiculo.id === editingId ? actualizado : vehiculo))
+        )
+        setEditingId(null)
+        setForm({ marca: '', modelo: '', anio: '' })
+        onAction(`Vehículo ${actualizado.marca} actualizado.`)
+      } else {
+        const nuevo = await createVehiculo(payload)
+        setVehiculos((prev) => [nuevo, ...prev])
+        setForm({ marca: '', modelo: '', anio: '' })
+        onAction(`Vehículo ${nuevo.marca} ${nuevo.modelo} guardado.`)
+      }
+    } catch (err) {
+      setError(err.message)
+      if (err.status === 401) {
+        onAuthError()
+      }
+    }
+  }
+
+  const handleEdit = (vehiculo) => {
+    setEditingId(vehiculo.id)
+    setForm({
+      marca: vehiculo.marca || '',
+      modelo: vehiculo.modelo || '',
+      anio: vehiculo.anio || '',
+    })
+  }
+
+  const handleDelete = async (vehiculoId) => {
+    setError('')
+    try {
+      await deleteVehiculo(vehiculoId)
+      setVehiculos((prev) => prev.filter((vehiculo) => vehiculo.id !== vehiculoId))
+      onAction('Vehículo eliminado.')
     } catch (err) {
       setError(err.message)
       if (err.status === 401) {
@@ -92,7 +133,7 @@ function Vehiculos({ onAction, onAuthError }) {
       </header>
       <div className="page-grid">
         <article className="page-card">
-          <h3>Registrar vehículo</h3>
+          <h3>{editingId ? 'Editar vehículo' : 'Registrar vehículo'}</h3>
           <form className="mini-form" onSubmit={handleSubmit}>
             <input
               name="marca"
@@ -117,7 +158,23 @@ function Vehiculos({ onAction, onAuthError }) {
               min="1900"
               max="2100"
             />
-            <button className="secondary" type="submit">Guardar</button>
+            <div className="form-actions-inline">
+              <button className="secondary" type="submit">
+                {editingId ? 'Actualizar' : 'Guardar'}
+              </button>
+              {editingId ? (
+                <button
+                  className="secondary"
+                  type="button"
+                  onClick={() => {
+                    setEditingId(null)
+                    setForm({ marca: '', modelo: '', anio: '' })
+                  }}
+                >
+                  Cancelar
+                </button>
+              ) : null}
+            </div>
           </form>
           {error ? <p className="inline-error">{error}</p> : null}
         </article>
@@ -154,7 +211,17 @@ function Vehiculos({ onAction, onAuthError }) {
                     <strong>{vehiculo.marca} {vehiculo.modelo}</strong>
                     <span>Estado: {vehiculo.estado}</span>
                   </div>
-                  <span>{vehiculo.anio || 'Año N/D'}</span>
+                  <div className="list-actions">
+                    <span>{vehiculo.anio || 'Año N/D'}</span>
+                    <div className="list-buttons">
+                      <button className="secondary" type="button" onClick={() => handleEdit(vehiculo)}>
+                        Editar
+                      </button>
+                      <button className="secondary" type="button" onClick={() => handleDelete(vehiculo.id)}>
+                        Eliminar
+                      </button>
+                    </div>
+                  </div>
                 </li>
               ))}
             </ul>

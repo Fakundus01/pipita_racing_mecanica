@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { createCliente, listClientes } from '../api'
+import { createCliente, listClientes } from '../services/api'
 
 function Clientes({ onAction, onAuthError }) {
   const [clientes, setClientes] = useState([])

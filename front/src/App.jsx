@@ -5,7 +5,7 @@ import Vehiculos from './pages/Vehiculos'
 import Partes from './pages/Partes'
 import Reportes from './pages/Reportes'
 import Login from './components/Login'
-import { getSession, login, logout } from './api'
+import { getSession, login, logout } from './services/api'
 import './App.css'
 
 const navigation = [

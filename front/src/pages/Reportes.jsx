@@ -1,9 +1,16 @@
 import { useEffect, useState } from 'react'
-import { createReporte, listReportes } from '../api'
+import {
+  createReporte,
+  deleteReporte,
+  listReportes,
+  printReporteUrl,
+  updateReporte,
+} from '../services/api'
 
 function Reportes({ onAction, onAuthError }) {
   const [reportes, setReportes] = useState([])
   const [form, setForm] = useState({ titulo: '', periodo: '' })
+  const [editingId, setEditingId] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
@@ -45,10 +52,20 @@ function Reportes({ onAction, onAuthError }) {
     event.preventDefault()
     setError('')
     try {
-      const nuevo = await createReporte(form)
-      setReportes((prev) => [nuevo, ...prev])
-      setForm({ titulo: '', periodo: '' })
-      onAction(`Reporte ${nuevo.titulo} generado.`)
+      if (editingId) {
+        const actualizado = await updateReporte(editingId, form)
+        setReportes((prev) =>
+          prev.map((reporte) => (reporte.id === editingId ? actualizado : reporte))
+        )
+        setEditingId(null)
+        setForm({ titulo: '', periodo: '' })
+        onAction(`Reporte ${actualizado.titulo} actualizado.`)
+      } else {
+        const nuevo = await createReporte(form)
+        setReportes((prev) => [nuevo, ...prev])
+        setForm({ titulo: '', periodo: '' })
+        onAction(`Reporte ${nuevo.titulo} generado.`)
+      }
     } catch (err) {
       setError(err.message)
       if (err.status === 401) {
@@ -57,8 +74,27 @@ function Reportes({ onAction, onAuthError }) {
     }
   }
 
-  const handlePrint = () => {
-    window.print()
+  const handleEdit = (reporte) => {
+    setEditingId(reporte.id)
+    setForm({ titulo: reporte.titulo || '', periodo: reporte.periodo || '' })
+  }
+
+  const handleDelete = async (reporteId) => {
+    setError('')
+    try {
+      await deleteReporte(reporteId)
+      setReportes((prev) => prev.filter((reporte) => reporte.id !== reporteId))
+      onAction('Reporte eliminado.')
+    } catch (err) {
+      setError(err.message)
+      if (err.status === 401) {
+        onAuthError()
+      }
+    }
+  }
+
+  const handlePrint = (reporteId) => {
+    window.open(printReporteUrl(reporteId), '_blank', 'noopener,noreferrer')
     onAction('Enviamos el reporte a impresión.')
   }
 
@@ -69,11 +105,16 @@ function Reportes({ onAction, onAuthError }) {
           <h1>Reportes y planillas</h1>
           <p>Genera PDFs listos para imprimir y compartir.</p>
         </div>
-        <button className="primary" onClick={handlePrint}>Imprimir</button>
+        <button
+          className="primary"
+          onClick={() => onAction('Selecciona un reporte para imprimir.')}
+        >
+          Imprimir
+        </button>
       </header>
       <div className="page-grid">
         <article className="page-card">
-          <h3>Generar reporte</h3>
+          <h3>{editingId ? 'Editar reporte' : 'Generar reporte'}</h3>
           <form className="mini-form" onSubmit={handleSubmit}>
             <input
               name="titulo"
@@ -88,7 +129,23 @@ function Reportes({ onAction, onAuthError }) {
               onChange={handleChange}
               placeholder="Periodo (ej. Marzo 2025)"
             />
-            <button className="secondary" type="submit">Guardar</button>
+            <div className="form-actions-inline">
+              <button className="secondary" type="submit">
+                {editingId ? 'Actualizar' : 'Guardar'}
+              </button>
+              {editingId ? (
+                <button
+                  className="secondary"
+                  type="button"
+                  onClick={() => {
+                    setEditingId(null)
+                    setForm({ titulo: '', periodo: '' })
+                  }}
+                >
+                  Cancelar
+                </button>
+              ) : null}
+            </div>
           </form>
           {error ? <p className="inline-error">{error}</p> : null}
         </article>
@@ -105,7 +162,20 @@ function Reportes({ onAction, onAuthError }) {
                     <strong>{reporte.titulo}</strong>
                     <span>{reporte.periodo || 'Sin periodo'}</span>
                   </div>
-                  <span>{reporte.generado_el}</span>
+                  <div className="list-actions">
+                    <span>{reporte.generado_el}</span>
+                    <div className="list-buttons">
+                      <button className="secondary" type="button" onClick={() => handlePrint(reporte.id)}>
+                        Imprimir
+                      </button>
+                      <button className="secondary" type="button" onClick={() => handleEdit(reporte)}>
+                        Editar
+                      </button>
+                      <button className="secondary" type="button" onClick={() => handleDelete(reporte.id)}>
+                        Eliminar
+                      </button>
+                    </div>
+                  </div>
                 </li>
               ))}
             </ul>
