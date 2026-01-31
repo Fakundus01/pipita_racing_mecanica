@@ -1,4 +1,9 @@
-from flask import Blueprint, current_app, jsonify, make_response, request, session
+from decimal import Decimal
+from io import BytesIO
+from datetime import date, datetime
+
+from flask import Blueprint, current_app, jsonify, make_response, request, send_file, session
+from openpyxl import Workbook #type: ignore
 
 from app.extensions import db
 from app.models import Cliente, Parte, Reporte, Vehiculo
@@ -23,6 +28,27 @@ def is_authenticated():
 
 def vehiculos_api():
   return VehiculosApiService(current_app.config['VEHICULOS_API_BASE'])
+
+
+def serialize_excel_value(value):
+  if isinstance(value, (datetime, date)):
+    return value.isoformat()
+  if isinstance(value, Decimal):
+    return float(value)
+  return value
+
+
+def add_sheet(workbook, title, records):
+  worksheet = workbook.create_sheet(title=title)
+  if not records:
+    worksheet.append(['Sin datos'])
+    return
+
+  columns = [column.name for column in records[0].__table__.columns]
+  worksheet.append(columns)
+  for record in records:
+    row = [serialize_excel_value(getattr(record, column)) for column in columns]
+    worksheet.append(row)
 
 
 @api.before_request
@@ -304,4 +330,26 @@ def dashboard():
       'recent_vehiculos': [vehiculo.to_dict() for vehiculo in recent_vehiculos],
       'recent_reportes': [reporte.to_dict() for reporte in recent_reportes],
     }
+  )
+
+
+@api.get('/export/excel')
+def export_excel():
+  workbook = Workbook()
+  workbook.remove(workbook.active)
+
+  add_sheet(workbook, 'Clientes', clientes_service.list())
+  add_sheet(workbook, 'Vehiculos', vehiculos_service.list())
+  add_sheet(workbook, 'Partes', partes_service.list())
+  add_sheet(workbook, 'Reportes', reportes_service.list())
+
+  output = BytesIO()
+  workbook.save(output)
+  output.seek(0)
+
+  return send_file(
+    output,
+    mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    as_attachment=True,
+    download_name='pipita-datos.xlsx',
   )

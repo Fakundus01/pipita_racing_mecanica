@@ -121,3 +121,15 @@ export const deleteReporte = (id) =>
 export const printReporteUrl = (id) => `${API_BASE_URL}/reportes/${id}/imprimir`
 
 export const getDashboard = () => apiFetch('/dashboard')
+
+export const downloadExcel = async () => {
+  const response = await fetch(`${API_BASE_URL}/export/excel`, {
+    credentials: 'include',
+  })
+
+  if (!response.ok) {
+    throw await buildError(response)
+  }
+
+  return response.blob()
+}

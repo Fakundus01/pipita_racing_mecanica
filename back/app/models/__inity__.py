@@ -1,11 +1,11 @@
-from app.models.Cliente import Cliente
-from app.models.Pago import Pago
-from app.models.Parte import Parte
-from app.models.Reporte import Reporte
-from app.models.Stock_movimiento import StockMovimiento
-from app.models.Vehiculo import Vehiculo
-from app.models.Venta import Venta
-from app.models.Venta_parte import VentaParte
+from app.models.cliente import Cliente
+from app.models.pago import Pago
+from app.models.parte import Parte
+from app.models.reporte import Reporte
+from app.models.stock_movimiento import StockMovimiento
+from app.models.vehiculo import Vehiculo
+from app.models.venta import Venta
+from app.models.venta_parte import VentaParte
 
 
 __all__ = [

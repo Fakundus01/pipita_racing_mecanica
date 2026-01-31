@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react'
-import { getDashboard } from '../services/api'
+import { downloadExcel, getDashboard } from '../services/api'
 
 function Home({ onAction, onAuthError }) {
   const [dashboard, setDashboard] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [exporting, setExporting] = useState(false)
+  const [exportError, setExportError] = useState('')
 
   useEffect(() => {
       let cancelled = false
@@ -34,6 +36,30 @@ function Home({ onAction, onAuthError }) {
         cancelled = true
       }
     }, [onAuthError])
+
+    const handleExport = async () => {
+      setExportError('')
+      setExporting(true)
+      try {
+        const blob = await downloadExcel()
+        const url = window.URL.createObjectURL(blob)
+        const link = document.createElement('a')
+        link.href = url
+        link.download = 'pipita-datos.xlsx'
+        document.body.appendChild(link)
+        link.click()
+        link.remove()
+        window.URL.revokeObjectURL(url)
+        onAction('Exportación generada en Excel.')
+      } catch (err) {
+        setExportError(err.message)
+        if (err.status === 401) {
+          onAuthError()
+        }
+      } finally {
+        setExporting(false)
+      }
+    }
 
     const stats = [
       {
@@ -68,9 +94,17 @@ function Home({ onAction, onAuthError }) {
           </div>
           <div className="header-actions">
             <button className="secondary" onClick={() => onAction('Plantilla abierta.')}>Ver plantilla</button>
+            <button
+              className="secondary"
+              onClick={handleExport}
+              disabled={exporting}
+            >
+              {exporting ? 'Exportando...' : 'Exportar Excel'}
+            </button>
             <button className="primary" onClick={() => onAction('Nueva venta creada.')}>Nueva venta</button>
           </div>
         </header>
+        {exportError ? <p className="inline-error">{exportError}</p> : null}
 
         <section className="stats">
           {stats.map((stat) => (

@@ -1,5 +1,5 @@
 from app.extensions import db
-from app.models.Base import BaseModel
+from app.models.base import BaseModel
 
 
 class Parte(BaseModel):
