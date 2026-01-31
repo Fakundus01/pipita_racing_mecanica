@@ -1,5 +1,5 @@
 from app.extensions import db
-from app.models import StockMovimiento
+from app.models.stock_movimiento import StockMovimiento
 
 
 class StockMovimientosService:

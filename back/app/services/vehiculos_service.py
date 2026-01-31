@@ -1,5 +1,5 @@
 from app.extensions import db
-from app.models import Vehiculo
+from app.models.vehiculo import Vehiculo
 
 
 class VehiculosService:

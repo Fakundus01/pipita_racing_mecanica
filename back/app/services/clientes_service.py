@@ -1,6 +1,5 @@
 from app.extensions import db
-from app.models import Cliente
-
+from app.models.cliente import Cliente
 
 class ClientesService:
   def list(self):

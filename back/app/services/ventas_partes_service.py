@@ -1,5 +1,5 @@
 from app.extensions import db
-from app.models import VentaParte
+from app.models.venta_parte import VentaParte
 
 
 class VentasPartesService:

@@ -1,5 +1,5 @@
 from app.extensions import db
-from app.models import Reporte
+from app.models.reporte import Reporte
 
 
 class ReportesService:

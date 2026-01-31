@@ -6,7 +6,10 @@ from flask import Blueprint, current_app, jsonify, make_response, request, send_
 from openpyxl import Workbook #type: ignore
 
 from app.extensions import db
-from app.models import Cliente, Parte, Reporte, Vehiculo
+from app.models.cliente import Cliente
+from app.models.parte import Parte
+from app.models.reporte import Reporte
+from app.models.vehiculo import Vehiculo
 
 from app.services.clientes_service import ClientesService
 from app.services.partes_service import PartesService

@@ -1,5 +1,5 @@
 from app.extensions import db
-from app.models import Pago
+from app.models.pago import Pago
 
 
 class PagosService:

@@ -1,5 +1,5 @@
 from app.extensions import db
-from app.models import Parte
+from app.models.parte import Parte
 
 
 class PartesService:
