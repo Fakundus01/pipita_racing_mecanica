@@ -10,6 +10,12 @@ class Cliente(BaseModel):
   telefono = db.Column(db.String(40))
   email = db.Column(db.String(120))
   estado = db.Column(db.String(40), default='activo')
+  vehiculos = db.relationship(
+    'Vehiculo',
+    backref='cliente',
+    lazy='select',
+    cascade='all, delete-orphan',
+  )
 
   def __repr__(self):
     return f'<Cliente {self.nombre}>'

@@ -89,6 +89,20 @@ export const decodeVehiculo = ({ marca, modelo, version }) => {
   return apiFetch(`/vehiculos/decodificar?${params.toString()}`)
 }
 
+export const getVehiculoPorPatente = (patente) =>
+  apiFetch(`/vehiculos/patente/${encodeURIComponent(patente)}`)
+
+export const listCatalogoMarcas = () => apiFetch('/vehiculos/catalogo/marcas')
+export const listCatalogoModelos = (marca) =>
+  apiFetch(`/vehiculos/catalogo/modelos?marca=${encodeURIComponent(marca)}`)
+export const listCatalogoVersiones = (marca, modelo) => {
+  const params = new URLSearchParams()
+  params.set('marca', marca)
+  params.set('modelo', modelo)
+  return apiFetch(`/vehiculos/catalogo/versiones?${params.toString()}`)
+}
+export const listCatalogoAnios = () => apiFetch('/vehiculos/catalogo/anios')
+
 export const listPartes = () => apiFetch('/partes')
 export const getParte = (id) => apiFetch(`/partes/${id}`)
 export const createParte = (payload) =>

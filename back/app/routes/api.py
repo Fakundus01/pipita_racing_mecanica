@@ -3,6 +3,7 @@ from io import BytesIO
 from datetime import date, datetime
 
 from flask import Blueprint, current_app, jsonify, make_response, request, send_file, session
+from sqlalchemy import func #type: ignore
 from openpyxl import Workbook #type: ignore
 
 from app.extensions import db
@@ -53,6 +54,17 @@ def add_sheet(workbook, title, records):
   for record in records:
     row = [serialize_excel_value(getattr(record, column)) for column in columns]
     worksheet.append(row)
+
+
+def normalize_vehiculo_payload(payload):
+  payload = dict(payload)
+  if payload.get('patente') == '':
+    payload['patente'] = None
+  if payload.get('version') == '':
+    payload['version'] = None
+  if payload.get('anio') == '':
+    payload['anio'] = None
+  return payload
 
 
 @api.before_request
@@ -107,10 +119,16 @@ def me():
   )
 
 
+def serialize_cliente(cliente):
+  data = cliente.to_dict()
+  data['vehiculos'] = [vehiculo.to_dict() for vehiculo in cliente.vehiculos]
+  return data
+
+
 @api.get('/clientes')
 def list_clientes():
   clientes = clientes_service.list()
-  return jsonify([cliente.to_dict() for cliente in clientes])
+  return jsonify([serialize_cliente(cliente) for cliente in clientes])
 
 
 @api.get('/clientes/<int:cliente_id>')
@@ -118,14 +136,26 @@ def get_cliente(cliente_id):
   cliente = clientes_service.get(cliente_id)
   if not cliente:
     return jsonify({'error': 'Cliente no encontrado'}), 404
-  return jsonify(cliente.to_dict())
+  return jsonify(serialize_cliente(cliente))
 
 
 @api.post('/clientes')
 def create_cliente():
   payload = request.get_json(force=True)
-  cliente = clientes_service.create(payload)
-  return jsonify(cliente.to_dict()), 201
+  vehiculo_payload = payload.pop('vehiculo', None)
+
+  cliente = Cliente(**payload)
+  db.session.add(cliente)
+  db.session.flush()
+
+  if vehiculo_payload:
+    vehiculo_payload = normalize_vehiculo_payload(vehiculo_payload)
+    vehiculo_payload = {**vehiculo_payload, 'cliente_id': cliente.id}
+    vehiculo = Vehiculo(**vehiculo_payload)
+    db.session.add(vehiculo)
+
+  db.session.commit()
+  return jsonify(serialize_cliente(cliente)), 201
 
 
 @api.put('/clientes/<int:cliente_id>')
@@ -136,7 +166,7 @@ def update_cliente(cliente_id):
     return jsonify({'error': 'Cliente no encontrado'}), 404
   payload = request.get_json(force=True)
   cliente = clientes_service.update(cliente, payload)
-  return jsonify(cliente.to_dict())
+  return jsonify(serialize_cliente(cliente))
 
 
 @api.delete('/clientes/<int:cliente_id>')
@@ -162,9 +192,52 @@ def get_vehiculo(vehiculo_id):
   return jsonify(vehiculo.to_dict())
 
 
+@api.get('/vehiculos/patente/<string:patente>')
+def get_vehiculo_by_patente(patente):
+  vehiculo = Vehiculo.query.filter(
+    func.lower(Vehiculo.patente) == patente.lower()
+  ).first()
+  if not vehiculo:
+    return jsonify({'error': 'Vehículo no encontrado'}), 404
+  return jsonify(vehiculo.to_dict())
+
+
+@api.get('/vehiculos/catalogo/marcas')
+def list_catalogo_marcas():
+  marcas = vehiculos_api().list_brands()
+  return jsonify({'marcas': marcas})
+
+
+@api.get('/vehiculos/catalogo/modelos')
+def list_catalogo_modelos():
+  marca = request.args.get('marca', '').strip()
+  if not marca:
+    return jsonify({'error': 'Marca requerida'}), 400
+  modelos = vehiculos_api().list_models(marca)
+  return jsonify({'modelos': modelos})
+
+
+@api.get('/vehiculos/catalogo/versiones')
+def list_catalogo_versiones():
+  marca = request.args.get('marca', '').strip()
+  modelo = request.args.get('modelo', '').strip()
+  if not marca or not modelo:
+    return jsonify({'error': 'Marca y modelo requeridos'}), 400
+  versiones = vehiculos_api().list_versions(marca, modelo)
+  return jsonify({'versiones': versiones})
+
+
+@api.get('/vehiculos/catalogo/anios')
+def list_catalogo_anios():
+  current_year = datetime.utcnow().year
+  anios = list(range(current_year, 1989, -1))
+  return jsonify({'anios': anios})
+
+
 @api.post('/vehiculos')
 def create_vehiculo():
   payload = request.get_json(force=True)
+  payload = normalize_vehiculo_payload(payload)
   vehiculo = vehiculos_service.create(payload)
   return jsonify(vehiculo.to_dict()), 201
 
@@ -176,6 +249,7 @@ def update_vehiculo(vehiculo_id):
   if not vehiculo:
     return jsonify({'error': 'Vehículo no encontrado'}), 404
   payload = request.get_json(force=True)
+  payload = normalize_vehiculo_payload(payload)
   vehiculo = vehiculos_service.update(vehiculo, payload)
   return jsonify(vehiculo.to_dict())
 

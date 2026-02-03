@@ -1,5 +1,12 @@
 import { useEffect, useState } from 'react'
-import { createCliente, listClientes } from '../services/api'
+import {
+  createCliente,
+  listCatalogoAnios,
+  listCatalogoMarcas,
+  listCatalogoModelos,
+  listCatalogoVersiones,
+  listClientes,
+} from '../services/api'
 
 function Clientes({ onAction, onAuthError }) {
   const [clientes, setClientes] = useState([])
@@ -7,7 +14,16 @@ function Clientes({ onAction, onAuthError }) {
     nombre: '',
     telefono: '',
     email: '',
+    patente: '',
+    marca: '',
+    modelo: '',
+    version: '',
+    anio: '',
   })
+  const [catalogoMarcas, setCatalogoMarcas] = useState([])
+  const [catalogoModelos, setCatalogoModelos] = useState([])
+  const [catalogoVersiones, setCatalogoVersiones] = useState([])
+  const [catalogoAnios, setCatalogoAnios] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
@@ -40,6 +56,91 @@ function Clientes({ onAction, onAuthError }) {
     }
   }, [onAuthError])
 
+  useEffect(() => {
+    let cancelled = false
+    const loadCatalogo = async () => {
+      try {
+        const [marcasData, aniosData] = await Promise.all([
+          listCatalogoMarcas(),
+          listCatalogoAnios(),
+        ])
+        if (!cancelled) {
+          setCatalogoMarcas(marcasData.marcas || [])
+          setCatalogoAnios(aniosData.anios || [])
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setError(err.message)
+          if (err.status === 401) {
+            onAuthError()
+          }
+        }
+      }
+    }
+    loadCatalogo()
+    return () => {
+      cancelled = true
+    }
+  }, [onAuthError])
+
+  useEffect(() => {
+    let cancelled = false
+    const loadModelos = async () => {
+      if (!form.marca) {
+        setCatalogoModelos([])
+        setCatalogoVersiones([])
+        return
+      }
+      try {
+        const data = await listCatalogoModelos(form.marca)
+        if (!cancelled) {
+          setCatalogoModelos(data.modelos || [])
+          setForm((prev) => ({ ...prev, modelo: '', version: '' }))
+          setCatalogoVersiones([])
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setError(err.message)
+          if (err.status === 401) {
+            onAuthError()
+          }
+        }
+      }
+    }
+    loadModelos()
+    return () => {
+      cancelled = true
+    }
+  }, [form.marca, onAuthError])
+
+  useEffect(() => {
+    let cancelled = false
+    const loadVersiones = async () => {
+      if (!form.marca || !form.modelo) {
+        setCatalogoVersiones([])
+        return
+      }
+      try {
+        const data = await listCatalogoVersiones(form.marca, form.modelo)
+        if (!cancelled) {
+          setCatalogoVersiones(data.versiones || [])
+          setForm((prev) => ({ ...prev, version: '' }))
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setError(err.message)
+          if (err.status === 401) {
+            onAuthError()
+          }
+        }
+      }
+    }
+    loadVersiones()
+    return () => {
+      cancelled = true
+    }
+  }, [form.marca, form.modelo, onAuthError])
+
   const handleChange = (event) => {
     const { name, value } = event.target
     setForm((prev) => ({ ...prev, [name]: value }))
@@ -49,9 +150,32 @@ function Clientes({ onAction, onAuthError }) {
     event.preventDefault()
     setError('')
     try {
-      const nuevo = await createCliente(form)
+      const payload = {
+        nombre: form.nombre,
+        telefono: form.telefono,
+        email: form.email,
+        vehiculo: form.marca && form.modelo
+          ? {
+            patente: form.patente || null,
+            marca: form.marca,
+            modelo: form.modelo,
+            version: form.version || null,
+            anio: form.anio ? Number(form.anio) : null,
+          }
+          : null,
+      }
+      const nuevo = await createCliente(payload)
       setClientes((prev) => [nuevo, ...prev])
-      setForm({ nombre: '', telefono: '', email: '' })
+       setForm({
+        nombre: '',
+        telefono: '',
+        email: '',
+        patente: '',
+        marca: '',
+        modelo: '',
+        version: '',
+        anio: '',
+      })
       onAction(`Cliente ${nuevo.nombre} creado.`)
     } catch (err) {
       setError(err.message)
@@ -95,6 +219,54 @@ function Clientes({ onAction, onAuthError }) {
               onChange={handleChange}
               placeholder="Email"
             />
+            <input
+              name="patente"
+              value={form.patente}
+              onChange={handleChange}
+              placeholder="Patente"
+            />
+            <select
+              name="marca"
+              value={form.marca}
+              onChange={handleChange}
+            >
+              <option value="">Selecciona marca</option>
+              {catalogoMarcas.map((marca) => (
+                <option key={marca} value={marca}>{marca}</option>
+              ))}
+            </select>
+            <select
+              name="modelo"
+              value={form.modelo}
+              onChange={handleChange}
+              disabled={!form.marca}
+            >
+              <option value="">Selecciona modelo</option>
+              {catalogoModelos.map((modelo) => (
+                <option key={modelo} value={modelo}>{modelo}</option>
+              ))}
+            </select>
+            <select
+              name="version"
+              value={form.version}
+              onChange={handleChange}
+              disabled={!form.modelo}
+            >
+              <option value="">Selecciona versión</option>
+              {catalogoVersiones.map((version) => (
+                <option key={version} value={version}>{version}</option>
+              ))}
+            </select>
+            <select
+              name="anio"
+              value={form.anio}
+              onChange={handleChange}
+            >
+              <option value="">Selecciona año</option>
+              {catalogoAnios.map((anio) => (
+                <option key={anio} value={anio}>{anio}</option>
+              ))}
+            </select>
             <button className="secondary" type="submit">Guardar</button>
           </form>
           {error ? <p className="inline-error">{error}</p> : null}
@@ -112,7 +284,14 @@ function Clientes({ onAction, onAuthError }) {
                     <strong>{cliente.nombre}</strong>
                     <span>{cliente.email || 'Sin email'}</span>
                   </div>
-                  <span>{cliente.telefono || 'Sin teléfono'}</span>
+                  <div>
+                    <span>{cliente.telefono || 'Sin teléfono'}</span>
+                    <span>
+                      {cliente.vehiculos?.length
+                        ? `${cliente.vehiculos[0].patente || 'Sin patente'} · ${cliente.vehiculos[0].marca} ${cliente.vehiculos[0].modelo}`
+                        : 'Sin vehículo asociado'}
+                    </span>
+                  </div>
                 </li>
               ))}
             </ul>

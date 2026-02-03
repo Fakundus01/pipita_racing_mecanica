@@ -72,3 +72,40 @@ class VehiculosApiService:
       'atributos': [],
       'estado': None,
     }
+  
+  def list_brands(self):
+    data = self._load_data()
+    brands = data.get('brands', [])
+    return sorted(
+      {brand.get('brand') for brand in brands if brand.get('brand')}
+    )
+
+  def list_models(self, make):
+    data = self._load_data()
+    make_key = self._normalize(make)
+    for brand in data.get('brands', []):
+      if self._normalize(brand.get('brand')) != make_key and self._normalize(brand.get('brand_id')) != make_key:
+        continue
+      models = brand.get('markets', {}).get('AR', {}).get('models', [])
+      return sorted({item.get('name') for item in models if item.get('name')})
+    return []
+
+  def list_versions(self, make, model):
+    if not make or not model:
+      return []
+    data = self._load_data()
+    make_key = self._normalize(make)
+    model_key = self._normalize(model)
+    for brand in data.get('brands', []):
+      if self._normalize(brand.get('brand')) != make_key and self._normalize(brand.get('brand_id')) != make_key:
+        continue
+      models = brand.get('markets', {}).get('AR', {}).get('models', [])
+      for item in models:
+        if self._normalize(item.get('name')) != model_key and self._normalize(item.get('model_id')) != model_key:
+          continue
+        attributes = item.get('attributes') or []
+        versions = [attr for attr in attributes if isinstance(attr, str)]
+        if not versions:
+          versions = ['Sin versión']
+        return sorted(set(versions))
+    return ['Sin versión']
