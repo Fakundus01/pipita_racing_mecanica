@@ -1,0 +1,44 @@
+{
+  "_meta": {
+    "schema": "partes_catalogo_v1",
+    "generated_at": "2026-02-03",
+    "notes": "Catálogo base de piezas para sugerencias rápidas."
+  },
+  "partes": [
+    {
+      "nombre": "Filtro de aceite",
+      "categoria": "Motor",
+      "descripcion": "Filtro estándar para cambios de aceite."
+    },
+    {
+      "nombre": "Pastillas de freno delanteras",
+      "categoria": "Frenos",
+      "descripcion": "Juego completo para eje delantero."
+    },
+    {
+      "nombre": "Bujías",
+      "categoria": "Encendido",
+      "descripcion": "Juego de 4 bujías estándar."
+    },
+    {
+      "nombre": "Amortiguadores delanteros",
+      "categoria": "Suspensión",
+      "descripcion": "Par de amortiguadores para eje delantero."
+    },
+    {
+      "nombre": "Batería 12V",
+      "categoria": "Eléctrico",
+      "descripcion": "Batería estándar de 12 voltios."
+    },
+    {
+      "nombre": "Kit distribución",
+      "categoria": "Motor",
+      "descripcion": "Correa, tensores y accesorios."
+    },
+    {
+      "nombre": "Aceite sintético 5W-30",
+      "categoria": "Lubricantes",
+      "descripcion": "Bidón de 4 litros."
+    }
+  ]
+}

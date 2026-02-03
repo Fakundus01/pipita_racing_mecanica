@@ -102,8 +102,13 @@ export const listCatalogoVersiones = (marca, modelo) => {
   return apiFetch(`/vehiculos/catalogo/versiones?${params.toString()}`)
 }
 export const listCatalogoAnios = () => apiFetch('/vehiculos/catalogo/anios')
-
+export const addCatalogoVehiculo = (payload) =>
+  apiFetch('/vehiculos/catalogo/entrada', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  })
 export const listPartes = () => apiFetch('/partes')
+export const listCatalogoPartes = () => apiFetch('/partes/catalogo')
 export const getParte = (id) => apiFetch(`/partes/${id}`)
 export const createParte = (payload) =>
   apiFetch('/partes', {
@@ -120,6 +125,25 @@ export const deleteParte = (id) =>
     method: 'DELETE',
   })
 
+
+export const listServicios = () => apiFetch('/servicios')
+export const listServiciosPorVehiculo = (vehiculoId) =>
+  apiFetch(`/vehiculos/${vehiculoId}/servicios`)
+export const createServicio = (payload) =>
+  apiFetch('/servicios', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  })
+export const updateServicio = (id, payload) =>
+  apiFetch(`/servicios/${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify(payload),
+  })
+export const deleteServicio = (id) =>
+  apiFetch(`/servicios/${id}`, {
+    method: 'DELETE',
+  })
+  
 export const listReportes = () => apiFetch('/reportes')
 export const getReporte = (id) => apiFetch(`/reportes/${id}`)
 export const createReporte = (payload) =>

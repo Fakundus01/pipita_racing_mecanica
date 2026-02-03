@@ -14,9 +14,11 @@ from app.models.vehiculo import Vehiculo
 
 from app.services.clientes_service import ClientesService
 from app.services.partes_service import PartesService
+from app.services.partes_catalogo_service import PartesCatalogoService
 from app.services.reportes_service import ReportesService
 from app.services.vehiculos_service import VehiculosService
 from app.services.vehiculos_api_service import VehiculosApiService
+from app.services.servicios_service import ServiciosService
 
 api = Blueprint('api', __name__)
 
@@ -24,6 +26,7 @@ clientes_service = ClientesService()
 vehiculos_service = VehiculosService()
 partes_service = PartesService()
 reportes_service = ReportesService()
+servicios_service = ServiciosService()
 
 
 def is_authenticated():
@@ -33,6 +36,11 @@ def is_authenticated():
 def vehiculos_api():
   return VehiculosApiService(
     current_app.config['VEHICULOS_API_JSON_PATH'],
+  )
+
+def partes_catalogo():
+  return PartesCatalogoService(
+    current_app.config['PARTES_CATALOGO_JSON_PATH'],
   )
 
 def serialize_excel_value(value):
@@ -67,6 +75,17 @@ def normalize_vehiculo_payload(payload):
   return payload
 
 
+def parse_iso_date(value):
+  if not value:
+    return None
+  if isinstance(value, date):
+    return value
+  try:
+    return date.fromisoformat(value)
+  except (TypeError, ValueError):
+    return None
+  
+
 @api.before_request
 def require_authentication():
   public_paths = {
@@ -74,8 +93,15 @@ def require_authentication():
     '/api/auth/login',
     '/api/auth/logout',
     '/api/auth/me',
+    '/api/vehiculos/catalogo/marcas',
+    '/api/vehiculos/catalogo/modelos',
+    '/api/vehiculos/catalogo/versiones',
+    '/api/vehiculos/catalogo/anios',
+    '/api/vehiculos/decodificar'
   }
-  if request.method == 'OPTIONS' or request.path in public_paths:
+  if request.method == 'OPTIONS':
+    return current_app.make_default_options_response()
+  if request.path in public_paths:
     return None
   if not is_authenticated():
     return jsonify({'error': 'No autorizado'}), 401
@@ -122,6 +148,18 @@ def me():
 def serialize_cliente(cliente):
   data = cliente.to_dict()
   data['vehiculos'] = [vehiculo.to_dict() for vehiculo in cliente.vehiculos]
+  return data
+
+
+def serialize_servicio(servicio):
+  data = servicio.to_dict()
+  if servicio.vehiculo:
+    data['vehiculo'] = {
+      'id': servicio.vehiculo.id,
+      'marca': servicio.vehiculo.marca,
+      'modelo': servicio.vehiculo.modelo,
+      'patente': servicio.vehiculo.patente,
+    }
   return data
 
 
@@ -234,6 +272,27 @@ def list_catalogo_anios():
   return jsonify({'anios': anios})
 
 
+@api.post('/vehiculos/catalogo/entrada')
+def add_catalogo_entry():
+  payload = request.get_json(force=True)
+  marca = payload.get('marca', '').strip()
+  modelo = payload.get('modelo', '').strip()
+  version = payload.get('version', '').strip() or None
+  anio = payload.get('anio')
+  if anio in ('', None):
+    anio = None
+  if anio is not None:
+    try:
+      anio = int(anio)
+    except (TypeError, ValueError):
+      return jsonify({'error': 'Año inválido'}), 400
+  try:
+    entry = vehiculos_api().add_catalog_entry(marca, modelo, version, anio)
+  except ValueError as exc:
+    return jsonify({'error': str(exc)}), 400
+  return jsonify({'updated': True, 'entry': entry}), 201
+
+
 @api.post('/vehiculos')
 def create_vehiculo():
   payload = request.get_json(force=True)
@@ -284,6 +343,12 @@ def list_partes():
   return jsonify([parte.to_dict() for parte in partes])
 
 
+@api.get('/partes/catalogo')
+def list_partes_catalogo():
+  partes = partes_catalogo().list()
+  return jsonify({'partes': partes})
+
+
 @api.get('/partes/<int:parte_id>')
 def get_parte(parte_id):
   parte = partes_service.get(parte_id)
@@ -316,6 +381,60 @@ def delete_parte(parte_id):
   if not parte:
     return jsonify({'error': 'Parte no encontrada'}), 404
   partes_service.delete(parte)
+  return jsonify({'deleted': True})
+
+
+@api.get('/servicios')
+def list_servicios():
+  servicios = servicios_service.list()
+  return jsonify([serialize_servicio(servicio) for servicio in servicios])
+
+
+@api.get('/vehiculos/<int:vehiculo_id>/servicios')
+def list_servicios_por_vehiculo(vehiculo_id):
+  servicios = servicios_service.list_by_vehiculo(vehiculo_id)
+  return jsonify([serialize_servicio(servicio) for servicio in servicios])
+
+
+@api.post('/servicios')
+def create_servicio():
+  payload = request.get_json(force=True)
+  descripcion = payload.get('descripcion', '').strip()
+  if not descripcion:
+    return jsonify({'error': 'Descripción requerida'}), 400
+  payload['descripcion'] = descripcion
+  payload['fecha'] = parse_iso_date(payload.get('fecha')) or date.today()
+  vehiculo_id = payload.get('vehiculo_id')
+  if not vehiculo_id:
+    return jsonify({'error': 'Vehículo requerido'}), 400
+  servicio = servicios_service.create(payload)
+  return jsonify(serialize_servicio(servicio)), 201
+
+
+@api.put('/servicios/<int:servicio_id>')
+@api.patch('/servicios/<int:servicio_id>')
+def update_servicio(servicio_id):
+  servicio = servicios_service.get(servicio_id)
+  if not servicio:
+    return jsonify({'error': 'Servicio no encontrado'}), 404
+  payload = request.get_json(force=True)
+  if 'fecha' in payload:
+    payload['fecha'] = parse_iso_date(payload.get('fecha')) or servicio.fecha
+  if 'descripcion' in payload:
+    descripcion = payload.get('descripcion', '').strip()
+    if not descripcion:
+      return jsonify({'error': 'Descripción requerida'}), 400
+    payload['descripcion'] = descripcion
+  servicio = servicios_service.update(servicio, payload)
+  return jsonify(serialize_servicio(servicio))
+
+
+@api.delete('/servicios/<int:servicio_id>')
+def delete_servicio(servicio_id):
+  servicio = servicios_service.get(servicio_id)
+  if not servicio:
+    return jsonify({'error': 'Servicio no encontrado'}), 404
+  servicios_service.delete(servicio)
   return jsonify({'deleted': True})
 
 

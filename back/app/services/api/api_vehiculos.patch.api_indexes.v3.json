@@ -51,7 +51,7 @@
           "attributes": "{attributes}",
           "model_years": "{model_years}"
         }
-      },
+      },    
       "search_index_models": {
         "key": "model_id_v3",
         "value": {

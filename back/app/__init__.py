@@ -15,6 +15,8 @@ def create_app(config_class=Config):
       app,
       supports_credentials=True,
       origins=app.config['CORS_ORIGINS'],
+      allow_headers=['Content-Type'],
+      methods=['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     )
 
   db.init_app(app)

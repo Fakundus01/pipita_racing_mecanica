@@ -27,6 +27,16 @@ class VehiculosApiService:
       return 'Híbrido'
     return None
 
+  def _slugify(self, value):
+    value = re.sub(r'[^a-z0-9]+', '_', str(value or '').lower())
+    return value.strip('_') or 'unknown'
+
+  def _save_data(self, data):
+    self.data_path.parent.mkdir(parents=True, exist_ok=True)
+    with self.data_path.open('w', encoding='utf-8') as handle:
+      json.dump(data, handle, ensure_ascii=False, indent=2)
+    self._load_data.cache_clear()
+
   def search_cars(self, make, model, trim=None):
     if not make or not model:
       raise ValueError('Marca y modelo requeridos')
@@ -109,3 +119,61 @@ class VehiculosApiService:
           versions = ['Sin versión']
         return sorted(set(versions))
     return ['Sin versión']
+
+  def add_catalog_entry(self, marca, modelo, version=None, anio=None):
+    if not marca or not modelo:
+      raise ValueError('Marca y modelo requeridos')
+
+    data = self._load_data()
+    brands = data.setdefault('brands', [])
+    marca_key = self._normalize(marca)
+    brand = next(
+      (
+        item for item in brands
+        if self._normalize(item.get('brand')) == marca_key
+        or self._normalize(item.get('brand_id')) == marca_key
+      ),
+      None,
+    )
+    if not brand:
+      brand = {
+        'brand': marca,
+        'brand_id': self._slugify(marca),
+        'markets': {'AR': {'models': []}},
+      }
+      brands.append(brand)
+
+    models = brand.setdefault('markets', {}).setdefault('AR', {}).setdefault('models', [])
+    modelo_key = self._normalize(modelo)
+    model_entry = next(
+      (
+        item for item in models
+        if self._normalize(item.get('name')) == modelo_key
+        or self._normalize(item.get('model_id')) == modelo_key
+      ),
+      None,
+    )
+    if not model_entry:
+      model_entry = {
+        'model_id': self._slugify(modelo),
+        'name': modelo,
+        'body': None,
+        'segment': None,
+        'attributes': [],
+        'status': 'unknown',
+        'origin': 'unknown',
+      }
+      models.append(model_entry)
+
+    if version:
+      attributes = model_entry.setdefault('attributes', [])
+      if version not in attributes:
+        attributes.append(version)
+
+    if anio:
+      years = model_entry.setdefault('years', [])
+      if anio not in years:
+        years.append(anio)
+
+    self._save_data(data)
+    return model_entry

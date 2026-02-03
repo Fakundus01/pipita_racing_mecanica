@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react'
-import { createParte, deleteParte, listPartes, updateParte } from '../services/api'
+import { createParte, deleteParte, listCatalogoPartes, listPartes, updateParte } from '../services/api'
 
 function Partes({ onAction, onAuthError }) {
   const [partes, setPartes] = useState([])
   const [form, setForm] = useState({ nombre: '', stock: '', costo: '' })
   const [editingId, setEditingId] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [catalogoLoading, setCatalogoLoading] = useState(true)
+  const [catalogoPartes, setCatalogoPartes] = useState([])
   const [error, setError] = useState('')
 
   useEffect(() => {
@@ -32,6 +34,33 @@ function Partes({ onAction, onAuthError }) {
       }
     }
     loadPartes()
+    return () => {
+      cancelled = true
+    }
+  }, [onAuthError])
+
+  useEffect(() => {
+    let cancelled = false
+    const loadCatalogo = async () => {
+      setCatalogoLoading(true)
+      try {
+        const data = await listCatalogoPartes()
+        if (!cancelled) {
+          setCatalogoPartes(data.partes || [])
+        }
+      } catch (err) {
+        if (!cancelled) {
+          if (err.status === 401) {
+            onAuthError()
+          }
+        }
+      } finally {
+        if (!cancelled) {
+          setCatalogoLoading(false)
+        }
+      }
+    }
+    loadCatalogo()
     return () => {
       cancelled = true
     }
@@ -80,6 +109,12 @@ function Partes({ onAction, onAuthError }) {
       stock: parte.stock ?? '',
       costo: parte.costo ?? '',
     })
+  }
+
+  const handleCatalogoPick = (parte) => {
+    setEditingId(null)
+    setForm({ nombre: parte.nombre || '', stock: '', costo: '' })
+    onAction(`Parte sugerida "${parte.nombre}" preparada para cargar.`)
   }
 
   const handleDelete = async (parteId) => {
@@ -154,6 +189,36 @@ function Partes({ onAction, onAuthError }) {
             </div>
           </form>
           {error ? <p className="inline-error">{error}</p> : null}
+        </article>
+         <article className="page-card">
+          <h3>Catálogo sugerido</h3>
+          {catalogoLoading ? <p>Cargando catálogo...</p> : null}
+          {!catalogoLoading && catalogoPartes.length === 0 ? (
+            <p>No hay piezas sugeridas.</p>
+          ) : (
+            <ul className="data-list">
+              {catalogoPartes.map((parte, index) => (
+                <li key={`${parte.nombre}-${index}`}>
+                  <div>
+                    <strong>{parte.nombre}</strong>
+                    <span>{parte.categoria || 'Sin categoría'}</span>
+                  </div>
+                  <div className="list-actions">
+                    <span>{parte.descripcion || 'Sin descripción'}</span>
+                    <div className="list-buttons">
+                      <button
+                        className="secondary"
+                        type="button"
+                        onClick={() => handleCatalogoPick(parte)}
+                      >
+                        Usar
+                      </button>
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
         </article>
         <article className="page-card">
           <h3>Inventario actual</h3>

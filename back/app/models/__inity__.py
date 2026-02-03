@@ -2,6 +2,7 @@ from app.models.cliente import Cliente
 from app.models.pago import Pago
 from app.models.parte import Parte
 from app.models.reporte import Reporte
+from app.models.servicio import Servicio
 from app.models.stock_movimiento import StockMovimiento
 from app.models.vehiculo import Vehiculo
 from app.models.venta import Venta
@@ -13,6 +14,7 @@ __all__ = [
   'Vehiculo',
   'Parte',
   'Reporte',
+  'Servicio',
   'Venta',
   'Pago',
   'VentaParte',

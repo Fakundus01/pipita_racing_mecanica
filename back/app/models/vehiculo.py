@@ -12,6 +12,12 @@ class Vehiculo(BaseModel):
   patente = db.Column(db.String(20), unique=True)
   estado = db.Column(db.String(40), default='disponible')
   cliente_id = db.Column(db.Integer, db.ForeignKey('clientes.id'))
+  servicios = db.relationship(
+    'Servicio',
+    back_populates='vehiculo',
+    lazy='select',
+    cascade='all, delete-orphan',
+  )
 
   def __repr__(self):
     return f'<Vehiculo {self.marca} {self.modelo}>'

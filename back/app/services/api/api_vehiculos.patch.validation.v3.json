@@ -1,5 +1,4 @@
 {
-  "_file": "api_vehiculos.patch.validation.v3.json",
   "catalog_patch": {
     "version": "car_catalog_api_v1_patch_2026-02-03_validation_v3_ar",
     "applies_to_schema": "api_vehiculos_base_v0",

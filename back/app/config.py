@@ -23,6 +23,10 @@ class Config:
     'VEHICULOS_API_JSON_PATH',
     os.path.join(os.path.dirname(__file__), 'services', 'api', 'api_vehiculos.json'),
   )
+  PARTES_CATALOGO_JSON_PATH = os.getenv(
+    'PARTES_CATALOGO_JSON_PATH',
+    os.path.join(os.path.dirname(__file__), 'services', 'api', 'partes_auto.json'),
+  )
   SESSION_COOKIE_HTTPONLY = True
   SESSION_COOKIE_SAMESITE = os.getenv('SESSION_COOKIE_SAMESITE', 'Lax')
   SESSION_COOKIE_DOMAIN = os.getenv('SESSION_COOKIE_DOMAIN')
