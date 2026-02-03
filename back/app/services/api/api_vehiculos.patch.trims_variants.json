@@ -1,0 +1,300 @@
+{
+    "catalog_patch": {
+    "version": "car_catalog_api_v1_patch_2026-02-03_trims_variants_v1",
+    "applies_to_schema": "car_catalog_api_v1",
+    "notes": {
+      "scope": "Argentina",
+      "description": "Variantes (trims) y motorizaciones a nivel modelo. Dataset incremental: se completa por marca/modelo. Los trims son ejemplos comunes en AR y pueden variar por año."
+    },
+    "enums": {
+      "powertrain": ["ice", "hybrid", "phev", "ev", "unknown"],
+      "transmission": ["mt", "at", "cvt", "dct", "unknown"],
+      "drive": ["fwd", "rwd", "awd", "4x4", "unknown"]
+    },
+    "overrides": {
+      "toyota": {
+        "corolla": {
+          "variants": [
+            {
+              "variant_id": "corolla_xli",
+              "name": "XLi",
+              "powertrain": "ice",
+              "drive": "fwd",
+              "transmission": "unknown"
+            },
+            {
+              "variant_id": "corolla_xei",
+              "name": "XEi",
+              "powertrain": "ice",
+              "drive": "fwd",
+              "transmission": "unknown"
+            },
+            {
+              "variant_id": "corolla_seg",
+              "name": "SEG",
+              "powertrain": "ice",
+              "drive": "fwd",
+              "transmission": "unknown"
+            }
+          ]
+        },
+        "corolla_cross": {
+          "variants": [
+            {
+              "variant_id": "corolla_cross_xli",
+              "name": "XLi",
+              "powertrain": "ice",
+              "drive": "fwd",
+              "transmission": "unknown"
+            },
+            {
+              "variant_id": "corolla_cross_xei",
+              "name": "XEi",
+              "powertrain": "ice",
+              "drive": "fwd",
+              "transmission": "unknown"
+            },
+            {
+              "variant_id": "corolla_cross_seg",
+              "name": "SEG",
+              "powertrain": "ice",
+              "drive": "fwd",
+              "transmission": "unknown"
+            },
+            {
+              "variant_id": "corolla_cross_hybrid",
+              "name": "Hybrid",
+              "powertrain": "hybrid",
+              "drive": "fwd",
+              "transmission": "cvt"
+            }
+          ]
+        },
+        "hilux": {
+          "variants": [
+            {
+              "variant_id": "hilux_dx",
+              "name": "DX",
+              "powertrain": "ice",
+              "drive": "4x4",
+              "transmission": "unknown"
+            },
+            {
+              "variant_id": "hilux_sr",
+              "name": "SR",
+              "powertrain": "ice",
+              "drive": "4x4",
+              "transmission": "unknown"
+            },
+            {
+              "variant_id": "hilux_srx",
+              "name": "SRX",
+              "powertrain": "ice",
+              "drive": "4x4",
+              "transmission": "unknown"
+            },
+            {
+              "variant_id": "hilux_gr_sport",
+              "name": "GR-Sport",
+              "powertrain": "ice",
+              "drive": "4x4",
+              "transmission": "unknown"
+            }
+          ]
+        }
+      },
+      "volkswagen": {
+        "polo": {
+          "variants": [
+            {
+              "variant_id": "polo_track",
+              "name": "Track",
+              "powertrain": "ice",
+              "drive": "fwd",
+              "transmission": "mt"
+            },
+            {
+              "variant_id": "polo_comfortline",
+              "name": "Comfortline",
+              "powertrain": "ice",
+              "drive": "fwd",
+              "transmission": "unknown"
+            },
+            {
+              "variant_id": "polo_highline",
+              "name": "Highline",
+              "powertrain": "ice",
+              "drive": "fwd",
+              "transmission": "unknown"
+            },
+            {
+              "variant_id": "polo_gts",
+              "name": "GTS",
+              "powertrain": "ice",
+              "drive": "fwd",
+              "transmission": "at"
+            }
+          ]
+        },
+        "t_cross": {
+          "variants": [
+            {
+              "variant_id": "t_cross_trendline",
+              "name": "Trendline",
+              "powertrain": "ice",
+              "drive": "fwd",
+              "transmission": "unknown"
+            },
+            {
+              "variant_id": "t_cross_comfortline",
+              "name": "Comfortline",
+              "powertrain": "ice",
+              "drive": "fwd",
+              "transmission": "unknown"
+            },
+            {
+              "variant_id": "t_cross_highline",
+              "name": "Highline",
+              "powertrain": "ice",
+              "drive": "fwd",
+              "transmission": "unknown"
+            }
+          ]
+        },
+        "taos": {
+          "variants": [
+            {
+              "variant_id": "taos_comfortline",
+              "name": "Comfortline",
+              "powertrain": "ice",
+              "drive": "fwd",
+              "transmission": "at"
+            },
+            {
+              "variant_id": "taos_highline",
+              "name": "Highline",
+              "powertrain": "ice",
+              "drive": "fwd",
+              "transmission": "at"
+            }
+          ]
+        },
+        "amarok": {
+          "variants": [
+            {
+              "variant_id": "amarok_comfortline",
+              "name": "Comfortline",
+              "powertrain": "ice",
+              "drive": "4x4",
+              "transmission": "unknown"
+            },
+            {
+              "variant_id": "amarok_highline",
+              "name": "Highline",
+              "powertrain": "ice",
+              "drive": "4x4",
+              "transmission": "unknown"
+            },
+            {
+              "variant_id": "amarok_v6",
+              "name": "V6",
+              "powertrain": "ice",
+              "drive": "4x4",
+              "transmission": "at"
+            }
+          ]
+        }
+      },
+      "fiat": {
+        "cronos": {
+          "variants": [
+            {
+              "variant_id": "cronos_like",
+              "name": "Like",
+              "powertrain": "ice",
+              "drive": "fwd",
+              "transmission": "mt"
+            },
+            {
+              "variant_id": "cronos_drive",
+              "name": "Drive",
+              "powertrain": "ice",
+              "drive": "fwd",
+              "transmission": "mt"
+            },
+            {
+              "variant_id": "cronos_precision",
+              "name": "Precision",
+              "powertrain": "ice",
+              "drive": "fwd",
+              "transmission": "unknown"
+            }
+          ]
+        },
+        "pulse": {
+          "variants": [
+            {
+              "variant_id": "pulse_drive",
+              "name": "Drive",
+              "powertrain": "ice",
+              "drive": "fwd",
+              "transmission": "mt"
+            },
+            {
+              "variant_id": "pulse_audace",
+              "name": "Audace",
+              "powertrain": "ice",
+              "drive": "fwd",
+              "transmission": "unknown"
+            },
+            {
+              "variant_id": "pulse_impetus",
+              "name": "Impetus",
+              "powertrain": "ice",
+              "drive": "fwd",
+              "transmission": "at"
+            }
+          ]
+        }
+      },
+      "chevrolet": {
+        "onix": {
+          "variants": [
+            {
+              "variant_id": "onix_lt",
+              "name": "LT",
+              "powertrain": "ice",
+              "drive": "fwd",
+              "transmission": "mt"
+            },
+            {
+              "variant_id": "onix_premier",
+              "name": "Premier",
+              "powertrain": "ice",
+              "drive": "fwd",
+              "transmission": "at"
+            }
+          ]
+        },
+        "tracker": {
+          "variants": [
+            {
+              "variant_id": "tracker_lt",
+              "name": "LT",
+              "powertrain": "ice",
+              "drive": "fwd",
+              "transmission": "at"
+            },
+            {
+              "variant_id": "tracker_premier",
+              "name": "Premier",
+              "powertrain": "ice",
+              "drive": "fwd",
+              "transmission": "at"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

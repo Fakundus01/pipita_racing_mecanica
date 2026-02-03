@@ -1,0 +1,268 @@
+{
+  "_file": "api_vehiculos.patch.generations.v2.json",
+  "catalog_patch": {
+    "version": "car_catalog_api_v1_patch_2026-02-03_generations_v2_ar_expand_new_brands",
+    "applies_to_schema": "car_catalog_api_v1",
+    "notes": {
+      "scope": "Argentina",
+      "description": "Extensión de generaciones para marcas/modelos agregados en AR. En muchos casos se define una única generación (Gen 1) por falta de despiece público claro; se irá refinando luego.",
+      "data_quality": "conservative_single_generation"
+    },
+    "rules": {
+      "generation_id_format": "{model_id}_g{n}",
+      "years_are_inclusive": true,
+      "ignore_unknown_model_refs": true
+    },
+    "overrides": {
+      "mg": {
+        "mg3_hybrid": {
+          "generations": [
+            { "generation_id": "mg3_hybrid_g1", "name": "Gen 1", "years": [2024, 2026], "facelift": false }
+          ]
+        },
+        "mg4": {
+          "generations": [
+            { "generation_id": "mg4_g1", "name": "Gen 1", "years": [2024, 2026], "facelift": false }
+          ]
+        },
+        "zs": {
+          "generations": [
+            { "generation_id": "zs_g1", "name": "Gen 1", "years": [2021, 2026], "facelift": true }
+          ]
+        },
+        "zs_hybrid": {
+          "generations": [
+            { "generation_id": "zs_hybrid_g1", "name": "Gen 1", "years": [2024, 2026], "facelift": false }
+          ]
+        },
+        "gt": {
+          "generations": [
+            { "generation_id": "gt_g1", "name": "Gen 1", "years": [2022, 2026], "facelift": true }
+          ]
+        },
+        "rx5": {
+          "generations": [
+            { "generation_id": "rx5_g1", "name": "Gen 1", "years": [2021, 2026], "facelift": true }
+          ]
+        },
+        "cyberster": {
+          "generations": [
+            { "generation_id": "cyberster_g1", "name": "Gen 1", "years": [2025, 2026], "facelift": false }
+          ]
+        }
+      },
+      "jetour": {
+        "x50": {
+          "generations": [
+            { "generation_id": "x50_g1", "name": "Gen 1", "years": [2024, 2026], "facelift": false }
+          ]
+        },
+        "x70": {
+          "generations": [
+            { "generation_id": "x70_g1", "name": "Gen 1", "years": [2023, 2026], "facelift": true }
+          ]
+        },
+        "x70_plus": {
+          "generations": [
+            { "generation_id": "x70_plus_g1", "name": "Gen 1", "years": [2024, 2026], "facelift": false }
+          ]
+        },
+        "dashing": {
+          "generations": [
+            { "generation_id": "dashing_g1", "name": "Gen 1", "years": [2024, 2026], "facelift": false }
+          ]
+        },
+        "t1": {
+          "generations": [
+            { "generation_id": "t1_g1", "name": "Gen 1", "years": [2025, 2026], "facelift": false }
+          ]
+        }
+      },
+      "gac": {
+        "emzoom": {
+          "generations": [
+            { "generation_id": "emzoom_g1", "name": "Gen 1", "years": [2024, 2026], "facelift": false }
+          ]
+        },
+        "emkoo": {
+          "generations": [
+            { "generation_id": "emkoo_g1", "name": "Gen 1", "years": [2024, 2026], "facelift": false }
+          ]
+        },
+        "gs8": {
+          "generations": [
+            { "generation_id": "gs8_g2", "name": "Gen 2", "years": [2024, 2026], "facelift": false }
+          ]
+        },
+        "aion_es": {
+          "generations": [
+            { "generation_id": "aion_es_g1", "name": "Gen 1", "years": [2024, 2026], "facelift": false }
+          ]
+        },
+        "empow": {
+          "generations": [
+            { "generation_id": "empow_g1", "name": "Gen 1", "years": [2024, 2026], "facelift": false }
+          ]
+        }
+      },
+      "jmc": {
+        "grand_avenue": {
+          "generations": [
+            { "generation_id": "grand_avenue_g1", "name": "Gen 1", "years": [2024, 2026], "facelift": false }
+          ]
+        },
+        "grand_avenue_plus": {
+          "generations": [
+            { "generation_id": "grand_avenue_plus_g1", "name": "Gen 1", "years": [2024, 2026], "facelift": false }
+          ]
+        },
+        "grand_avenue_dadao_pro": {
+          "generations": [
+            { "generation_id": "grand_avenue_dadao_pro_g1", "name": "Gen 1", "years": [2024, 2026], "facelift": false }
+          ]
+        },
+        "n900": {
+          "generations": [
+            { "generation_id": "n900_g1", "name": "Gen 1", "years": [2023, 2026], "facelift": false }
+          ]
+        },
+        "n800": {
+          "generations": [
+            { "generation_id": "n800_g1", "name": "Gen 1", "years": [2023, 2026], "facelift": false }
+          ]
+        }
+      },
+      "forthing": {
+        "t5_evo": {
+          "generations": [
+            { "generation_id": "t5_evo_g1", "name": "Gen 1", "years": [2024, 2026], "facelift": false }
+          ]
+        },
+        "t5_hev": {
+          "generations": [
+            { "generation_id": "t5_hev_g1", "name": "Gen 1", "years": [2024, 2026], "facelift": false }
+          ]
+        },
+        "friday": {
+          "generations": [
+            { "generation_id": "friday_g1", "name": "Gen 1", "years": [2024, 2026], "facelift": false }
+          ]
+        },
+        "u_tour": {
+          "generations": [
+            { "generation_id": "u_tour_g1", "name": "Gen 1", "years": [2024, 2026], "facelift": false }
+          ]
+        }
+      },
+      "skywell": {
+        "et5": {
+          "generations": [
+            { "generation_id": "et5_g1", "name": "Gen 1", "years": [2024, 2026], "facelift": false }
+          ]
+        },
+        "be11": {
+          "generations": [
+            { "generation_id": "be11_g1", "name": "Gen 1", "years": [2024, 2026], "facelift": false }
+          ]
+        }
+      },
+      "kaiyi": {
+        "x3": {
+          "generations": [
+            { "generation_id": "x3_g1", "name": "Gen 1", "years": [2024, 2026], "facelift": false }
+          ]
+        }
+      },
+      "kyc": {
+        "mamut_cabina_simple": {
+          "generations": [
+            { "generation_id": "mamut_cabina_simple_g1", "name": "Gen 1", "years": [2024, 2026], "facelift": false }
+          ]
+        },
+        "mamut_cabina_doble": {
+          "generations": [
+            { "generation_id": "mamut_cabina_doble_g1", "name": "Gen 1", "years": [2024, 2026], "facelift": false }
+          ]
+        },
+        "mamut_box": {
+          "generations": [
+            { "generation_id": "mamut_box_g1", "name": "Gen 1", "years": [2024, 2026], "facelift": false }
+          ]
+        }
+      },
+      "shineray": {
+        "t30": {
+          "generations": [
+            { "generation_id": "t30_g1", "name": "Gen 1", "years": [2023, 2026], "facelift": false }
+          ]
+        },
+        "t32": {
+          "generations": [
+            { "generation_id": "t32_g1", "name": "Gen 1", "years": [2023, 2026], "facelift": false }
+          ]
+        },
+        "x30_furgon": {
+          "generations": [
+            { "generation_id": "x30_furgon_g1", "name": "Gen 1", "years": [2023, 2026], "facelift": false }
+          ]
+        },
+        "x30_pasajeros": {
+          "generations": [
+            { "generation_id": "x30_pasajeros_g1", "name": "Gen 1", "years": [2023, 2026], "facelift": false }
+          ]
+        },
+        "srm_m7": {
+          "generations": [
+            { "generation_id": "srm_m7_g1", "name": "Gen 1", "years": [2024, 2026], "facelift": false }
+          ]
+        }
+      },
+      "jmev": {
+        "easy_3": {
+          "generations": [
+            { "generation_id": "easy_3_g1", "name": "Gen 1", "years": [2024, 2026], "facelift": false }
+          ]
+        }
+      },
+      "coradir": {
+        "tito": {
+          "generations": [
+            { "generation_id": "tito_g1", "name": "Gen 1", "years": [2022, 2026], "facelift": true }
+          ]
+        },
+        "tito_s5": {
+          "generations": [
+            { "generation_id": "tito_s5_g1", "name": "Gen 1", "years": [2024, 2026], "facelift": false }
+          ]
+        },
+        "tita": {
+          "generations": [
+            { "generation_id": "tita_g1", "name": "Gen 1", "years": [2023, 2026], "facelift": false }
+          ]
+        }
+      },
+      "scania": {
+        "p_series": {
+          "generations": [
+            { "generation_id": "p_series_g1", "name": "Series", "years": [2005, 2026], "facelift": true }
+          ]
+        },
+        "g_series": {
+          "generations": [
+            { "generation_id": "g_series_g1", "name": "Series", "years": [2005, 2026], "facelift": true }
+          ]
+        },
+        "r_series": {
+          "generations": [
+            { "generation_id": "r_series_g1", "name": "Series", "years": [2005, 2026], "facelift": true }
+          ]
+        }
+      }
+    },
+    "status": {
+      "current_point": "5b_generations_full",
+      "progress": "expanded_to_new_brands_v2",
+      "next_point": "6b_variants_full"
+    }
+  }
+}

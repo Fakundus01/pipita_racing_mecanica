@@ -1,0 +1,143 @@
+{
+  "operation": "add_brands",
+  "target": "api_vehiculos.json::brands",
+  "market": "AR",
+  "brands_to_add": [
+    {
+      "brand": "MG",
+      "brand_id": "mg",
+      "market": "AR",
+      "models": [
+        { "name": "MG3 Hybrid", "segments": ["Car", "Hatchback", "Hybrid"] },
+        { "name": "MG4", "segments": ["Car", "Hatchback", "EV"] },
+        { "name": "ZS", "segments": ["SUV"] },
+        { "name": "ZS Hybrid", "segments": ["SUV", "Hybrid"] },
+        { "name": "GT", "segments": ["Car", "Sedan"] },
+        { "name": "RX5", "segments": ["SUV"] },
+        { "name": "Cyberster", "segments": ["Car", "Convertible", "EV"] }
+      ]
+    },
+    {
+      "brand": "Jetour",
+      "brand_id": "jetour",
+      "market": "AR",
+      "models": [
+        { "name": "X50", "segments": ["SUV"] },
+        { "name": "X70", "segments": ["SUV"] },
+        { "name": "X70 Plus", "segments": ["SUV"] },
+        { "name": "Dashing", "segments": ["SUV"] },
+        { "name": "T1", "segments": ["SUV", "OffRoad"] }
+      ]
+    },
+    {
+      "brand": "GAC",
+      "brand_id": "gac",
+      "market": "AR",
+      "models": [
+        { "name": "Emzoom", "segments": ["SUV"] },
+        { "name": "Emkoo", "segments": ["SUV", "Hybrid"] },
+        { "name": "GS8", "segments": ["SUV"] },
+        { "name": "Aion ES", "segments": ["Car", "Sedan", "EV"] },
+        { "name": "Empow", "segments": ["Car", "Sedan"] }
+      ]
+    },
+    {
+      "brand": "JMC",
+      "brand_id": "jmc",
+      "market": "AR",
+      "models": [
+        { "name": "Grand Avenue", "segments": ["Truck", "Pickup"] },
+        { "name": "Grand Avenue Plus", "segments": ["Truck", "Pickup"] },
+        { "name": "Grand Avenue Dadao Pro", "segments": ["Truck", "Pickup"] },
+        { "name": "N900", "segments": ["Van", "Commercial"] },
+        { "name": "N800", "segments": ["Van", "Commercial"] }
+      ]
+    },
+    {
+      "brand": "Forthing",
+      "brand_id": "forthing",
+      "market": "AR",
+      "models": [
+        { "name": "T5 EVO", "segments": ["SUV"] },
+        { "name": "T5 HEV", "segments": ["SUV", "Hybrid"] },
+        { "name": "Friday", "segments": ["SUV", "EV"] },
+        { "name": "U-Tour", "segments": ["MPV"] }
+      ]
+    },
+    {
+      "brand": "Skywell",
+      "brand_id": "skywell",
+      "market": "AR",
+      "models": [
+        { "name": "ET5", "segments": ["SUV", "EV"] },
+        { "name": "BE11", "segments": ["SUV", "EV"] }
+      ]
+    },
+    {
+      "brand": "Kaiyi",
+      "brand_id": "kaiyi",
+      "market": "AR",
+      "models": [
+        { "name": "X3", "segments": ["SUV"] }
+      ]
+    },
+    {
+      "brand": "KYC",
+      "brand_id": "kyc",
+      "market": "AR",
+      "models": [
+        { "name": "Mamut Cabina Simple", "segments": ["Van", "Commercial"] },
+        { "name": "Mamut Cabina Doble", "segments": ["Van", "Commercial"] },
+        { "name": "Mamut Box", "segments": ["Van", "Commercial"] }
+      ]
+    },
+    {
+      "brand": "Shineray",
+      "brand_id": "shineray",
+      "market": "AR",
+      "models": [
+        { "name": "T30", "segments": ["Van", "Commercial"] },
+        { "name": "T32", "segments": ["Van", "Commercial"] },
+        { "name": "X30 Furgón", "segments": ["Van", "Commercial"] },
+        { "name": "X30 Pasajeros", "segments": ["Van"] },
+        { "name": "SRM M7", "segments": ["Van", "Commercial"] }
+      ]
+    },
+    {
+      "brand": "JMEV",
+      "brand_id": "jmev",
+      "market": "AR",
+      "models": [
+        { "name": "Easy 3", "segments": ["Car", "Hatchback", "EV"] }
+      ]
+    },
+    {
+      "brand": "Coradir",
+      "brand_id": "coradir",
+      "market": "AR",
+      "models": [
+        { "name": "Tito", "segments": ["Car", "Hatchback", "EV"] },
+        { "name": "Tito S5", "segments": ["Car", "Hatchback", "EV"] },
+        { "name": "Tita", "segments": ["Van", "Commercial", "EV"] }
+      ]
+    },
+    {
+      "brand": "Scania",
+      "brand_id": "scania",
+      "market": "AR",
+      "models": [
+        { "name": "P Series", "segments": ["Truck", "Commercial"] },
+        { "name": "G Series", "segments": ["Truck", "Commercial"] },
+        { "name": "R Series", "segments": ["Truck", "Commercial"] }
+      ]
+    }
+  ],
+  "merge_notes": {
+    "where_to_paste": "Agregar estos objetos al final del array `brands` del archivo base (api_vehiculos.json).",
+    "dedupe_rule": "Si ya existe `brand_id` igual en tu base, NO lo agregues; en ese caso hay que hacer un patch por modelos."
+  },
+  "status": {
+    "point_3_missing_ar_brands_models": "COMPLETADO (v1, con marcas que aparecen como presentes en AR y no estaban en tu base).",
+    "next_point_after_this": "4b_model_years_full"
+  }
+}

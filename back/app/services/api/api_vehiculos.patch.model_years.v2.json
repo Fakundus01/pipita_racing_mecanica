@@ -1,0 +1,90 @@
+{
+  "catalog_patch": {
+    "version": "car_catalog_api_v1_patch_2026-02-03_model_years_v2_ar_expand_new_brands",
+    "applies_to_schema": "car_catalog_api_v1",
+    "notes": {
+      "scope": "Argentina",
+      "description": "Extensión de years por modelo para marcas agregadas (punto 3) + placeholder conservador. Si un modelo no existe en tu base, el validador debe ignorar el override.",
+      "data_quality": "conservative_ranges"
+    },
+    "rules": {
+      "years_definition": "Inclusive model-year range for availability in AR market (approx).",
+      "ignore_unknown_model_refs": true
+    },
+    "overrides": {
+      "mg": {
+        "mg3_hybrid": { "years": [2024, 2026] },
+        "mg4": { "years": [2024, 2026] },
+        "zs": { "years": [2021, 2026] },
+        "zs_hybrid": { "years": [2024, 2026] },
+        "gt": { "years": [2022, 2026] },
+        "rx5": { "years": [2021, 2026] },
+        "cyberster": { "years": [2025, 2026] }
+      },
+      "jetour": {
+        "x50": { "years": [2024, 2026] },
+        "x70": { "years": [2023, 2026] },
+        "x70_plus": { "years": [2024, 2026] },
+        "dashing": { "years": [2024, 2026] },
+        "t1": { "years": [2025, 2026] }
+      },
+      "gac": {
+        "emzoom": { "years": [2024, 2026] },
+        "emkoo": { "years": [2024, 2026] },
+        "gs8": { "years": [2024, 2026] },
+        "aion_es": { "years": [2024, 2026] },
+        "empow": { "years": [2024, 2026] }
+      },
+      "jmc": {
+        "grand_avenue": { "years": [2024, 2026] },
+        "grand_avenue_plus": { "years": [2024, 2026] },
+        "grand_avenue_dadao_pro": { "years": [2024, 2026] },
+        "n900": { "years": [2023, 2026] },
+        "n800": { "years": [2023, 2026] }
+      },
+      "forthing": {
+        "t5_evo": { "years": [2024, 2026] },
+        "t5_hev": { "years": [2024, 2026] },
+        "friday": { "years": [2024, 2026] },
+        "u_tour": { "years": [2024, 2026] }
+      },
+      "skywell": {
+        "et5": { "years": [2024, 2026] },
+        "be11": { "years": [2024, 2026] }
+      },
+      "kaiyi": {
+        "x3": { "years": [2024, 2026] }
+      },
+      "kyc": {
+        "mamut_cabina_simple": { "years": [2024, 2026] },
+        "mamut_cabina_doble": { "years": [2024, 2026] },
+        "mamut_box": { "years": [2024, 2026] }
+      },
+      "shineray": {
+        "t30": { "years": [2023, 2026] },
+        "t32": { "years": [2023, 2026] },
+        "x30_furgon": { "years": [2023, 2026] },
+        "x30_pasajeros": { "years": [2023, 2026] },
+        "srm_m7": { "years": [2024, 2026] }
+      },
+      "jmev": {
+        "easy_3": { "years": [2024, 2026] }
+      },
+      "coradir": {
+        "tito": { "years": [2022, 2026] },
+        "tito_s5": { "years": [2024, 2026] },
+        "tita": { "years": [2023, 2026] }
+      },
+      "scania": {
+        "p_series": { "years": [2005, 2026] },
+        "g_series": { "years": [2005, 2026] },
+        "r_series": { "years": [2005, 2026] }
+      }
+    },
+    "status": {
+      "current_point": "4b_model_years_full",
+      "progress": "expanded_to_new_brands_v2",
+      "next_point": "5b_generations_full"
+    }
+  }
+}

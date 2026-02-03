@@ -1,0 +1,125 @@
+{
+  "catalog_patch": {
+    "version": "car_catalog_api_v1_patch_2026-02-03_taxonomy_v2_ar_expand_common_models",
+    "applies_to_schema": "car_catalog_api_v1",
+    "notes": {
+      "scope": "Argentina",
+      "description": "Extiende normalización de taxonomía (body/segment/attributes) para modelos comunes AR y utilitarios. Mantiene reglas: 'Commercial' como atributo, no como segment."
+    },
+    "enums": {
+      "body": ["Car", "SUV", "Truck", "Van", "MPV"],
+      "segment": ["Hatchback", "Sedan", "Coupe", "Wagon", "Convertible", "Pickup", "Commercial", "OffRoad", null],
+      "attributes": [
+        "ev",
+        "hybrid",
+        "phev",
+        "commercial",
+        "crossover",
+        "sports",
+        "luxury",
+        "ultra_luxury",
+        "supercar",
+        "hypercar"
+      ]
+    },
+    "rules": {
+      "commercial_is_attribute": "Nunca usar segment='Commercial' como tipo de carrocería; usar attributes:['commercial'] y body Van/Truck/MPV según aplique.",
+      "pickup_mapping": "Si body=Truck y es pickup, segment=Pickup.",
+      "mpv_mapping": "Si es monovolumen (Spin, C4 Picasso, etc.), body=MPV.",
+      "offroad_mapping": "Si es 4x4 tipo offroad (Wrangler, Jimny), segment=OffRoad.",
+      "sports_luxury_tags": "sports/luxury/ultra_luxury/supercar/hypercar son attributes."
+    },
+    "overrides": {
+      "renault": {
+        "stepway": { "body": "Car", "segment": "Hatchback", "attributes": ["crossover"] },
+        "sandero_stepway": { "body": "Car", "segment": "Hatchback", "attributes": ["crossover"] },
+        "oroch": { "body": "Truck", "segment": "Pickup" },
+        "master": { "body": "Van", "segment": null, "attributes": ["commercial"] },
+        "trafic": { "body": "Van", "segment": null, "attributes": ["commercial"] }
+      },
+      "peugeot": {
+        "rifter": { "body": "Van", "segment": null, "attributes": ["commercial"] },
+        "expert": { "body": "Van", "segment": null, "attributes": ["commercial"] },
+        "boxer": { "body": "Van", "segment": null, "attributes": ["commercial"] }
+      },
+      "citroen": {
+        "c3_aircross": { "body": "SUV", "segment": null },
+        "c4_cactus": { "body": "SUV", "segment": null, "attributes": ["crossover"] },
+        "c4_picasso": { "body": "MPV", "segment": null },
+        "jumper": { "body": "Van", "segment": null, "attributes": ["commercial"] },
+        "jumpy": { "body": "Van", "segment": null, "attributes": ["commercial"] }
+      },
+      "chevrolet": {
+        "spin": { "body": "MPV", "segment": null },
+        "trailblazer": { "body": "SUV", "segment": null },
+        "silverado": { "body": "Truck", "segment": "Pickup" }
+      },
+      "fiat": {
+        "fiorino": { "body": "Van", "segment": null, "attributes": ["commercial"] },
+        "doblo": { "body": "Van", "segment": null, "attributes": ["commercial"] }
+      },
+      "ford": {
+        "ecosport": { "body": "SUV", "segment": null },
+        "bronco": { "body": "SUV", "segment": "OffRoad", "attributes": ["offroad"] }
+      },
+      "nissan": {
+        "frontier": { "body": "Truck", "segment": "Pickup" },
+        "kicks": { "body": "SUV", "segment": null },
+        "x_trail": { "body": "SUV", "segment": null }
+      },
+      "jeep": {
+        "renegade": { "body": "SUV", "segment": null },
+        "compass": { "body": "SUV", "segment": null },
+        "wrangler": { "body": "SUV", "segment": "OffRoad", "attributes": ["offroad"] },
+        "gladiator": { "body": "Truck", "segment": "Pickup", "attributes": ["offroad"] }
+      },
+      "ram": {
+        "rampage": { "body": "Truck", "segment": "Pickup" },
+        "1500": { "body": "Truck", "segment": "Pickup" },
+        "2500": { "body": "Truck", "segment": "Pickup" }
+      },
+      "hyundai": {
+        "hb20": { "body": "Car", "segment": "Hatchback" },
+        "hb20_sedan": { "body": "Car", "segment": "Sedan" },
+        "creta": { "body": "SUV", "segment": null },
+        "tucson": { "body": "SUV", "segment": null }
+      },
+      "kia": {
+        "rio": { "body": "Car", "segment": "Hatchback" },
+        "seltos": { "body": "SUV", "segment": null },
+        "sportage": { "body": "SUV", "segment": null },
+        "sorento": { "body": "SUV", "segment": null }
+      },
+      "honda": {
+        "fit": { "body": "Car", "segment": "Hatchback" },
+        "city": { "body": "Car", "segment": "Sedan" },
+        "civic": { "body": "Car", "segment": "Sedan" },
+        "hr_v": { "body": "SUV", "segment": null },
+        "cr_v": { "body": "SUV", "segment": null }
+      },
+      "byd": {
+        "dolphin": { "body": "Car", "segment": "Hatchback", "attributes": ["ev"] },
+        "atto_3": { "body": "SUV", "segment": null, "attributes": ["ev"] },
+        "seal": { "body": "Car", "segment": "Sedan", "attributes": ["ev"] }
+      },
+      "coradir": {
+        "tito": { "body": "Car", "segment": "Hatchback", "attributes": ["ev"] },
+        "tito_s5": { "body": "Car", "segment": "Hatchback", "attributes": ["ev"] },
+        "tita": { "body": "Van", "segment": null, "attributes": ["commercial", "ev"] }
+      },
+      "mg": {
+        "mg4": { "body": "Car", "segment": "Hatchback", "attributes": ["ev"] },
+        "mg3_hybrid": { "body": "Car", "segment": "Hatchback", "attributes": ["hybrid"] },
+        "zs": { "body": "SUV", "segment": null },
+        "zs_hybrid": { "body": "SUV", "segment": null, "attributes": ["hybrid"] },
+        "cyberster": { "body": "Car", "segment": "Convertible", "attributes": ["ev", "sports"] }
+      }
+    },
+    "status": {
+      "current_point": "2b_taxonomy_full",
+      "progress": "expanded_common_ar_models_v2",
+      "remaining_work": "Extender overrides al resto de modelos del base (v3+).",
+      "next_point": "4b_model_years_full"
+    }
+  }
+}

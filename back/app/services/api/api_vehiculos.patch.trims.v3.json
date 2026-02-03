@@ -1,0 +1,44 @@
+{
+  "catalog_patch": {
+    "version": "car_catalog_api_v1_patch_2026-02-03_trims_v3_ar_base_sets",
+    "applies_to_schema": "api_vehiculos_base_v0",
+    "notes": {
+      "scope": "Argentina",
+      "description": "Sets mínimos de trims/versions reutilizables por segmento. No exhaustivo; base para normalización."
+    },
+    "operation": "add_trim_sets",
+    "trim_sets": {
+      "base_entry": [
+        { "code": "base", "label": "Base" },
+        { "code": "mid", "label": "Intermedia" },
+        { "code": "full", "label": "Full" }
+      ],
+      "latam_common": [
+        { "code": "lxs", "label": "LXS" },
+        { "code": "lts", "label": "LTS" },
+        { "code": "ltz", "label": "LTZ" },
+        { "code": "xl", "label": "XL" },
+        { "code": "xls", "label": "XLS" },
+        { "code": "xlt", "label": "XLT" },
+        { "code": "highline", "label": "Highline" },
+        { "code": "comfortline", "label": "Comfortline" },
+        { "code": "trendline", "label": "Trendline" }
+      ],
+      "powertrain": [
+        { "code": "na", "label": "Nafta" },
+        { "code": "diesel", "label": "Diésel" },
+        { "code": "hybrid", "label": "Hybrid" },
+        { "code": "phev", "label": "PHEV" },
+        { "code": "ev", "label": "EV" }
+      ],
+      "sport_luxury": [
+        { "code": "sport", "label": "Sport" },
+        { "code": "gt", "label": "GT" },
+        { "code": "rs", "label": "RS" },
+        { "code": "amg", "label": "AMG" },
+        { "code": "m", "label": "M" },
+        { "code": "sline", "label": "S line" }
+      ]
+    }
+  }
+}

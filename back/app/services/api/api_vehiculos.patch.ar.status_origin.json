@@ -1,0 +1,57 @@
+{
+  "catalog_patch": {
+    "version": "car_catalog_api_v1_patch_2026-02-03_slugs_and_attribute_normalization",
+    "applies_to_schema": "car_catalog_api_v1",
+    "rules": {
+      "brand_slug": "lowercase(brand_id)",
+      "model_slug": "lowercase(model_id)",
+      "attributes_normalization": {
+        "Sports": "sports",
+        "Luxury": "luxury",
+        "Ultra Luxury": "ultra_luxury",
+        "UltraLuxury": "ultra_luxury",
+        "Supercar": "supercar",
+        "Hypercar": "hypercar",
+        "Commercial": "commercial",
+        "Crossover": "crossover",
+        "EV": "ev",
+        "Hybrid": "hybrid",
+        "PHEV": "phev"
+      }
+    },
+    "overrides": {
+      "rolls_royce": {
+        "cullinan": { "attributes": ["ultra_luxury"] },
+        "ghost": { "attributes": ["ultra_luxury"] },
+        "phantom": { "attributes": ["ultra_luxury"] }
+      },
+      "bentley": {
+        "bentayga": { "attributes": ["luxury"] },
+        "continental_gt": { "attributes": ["luxury"] },
+        "flying_spur": { "attributes": ["luxury"] }
+      },
+      "land_rover": {
+        "range_rover_evoque": { "attributes": [] },
+        "range_rover_sport": { "attributes": [] }
+      },
+      "citroen": {
+        "berlingo": { "attributes": ["commercial"] }
+      },
+      "iveco": {
+        "daily": { "attributes": ["commercial"] }
+      },
+      "peugeot": {
+        "partner": { "attributes": ["commercial"] }
+      },
+      "mercedes_benz": {
+        "sprinter": { "attributes": ["commercial"] }
+      },
+      "foton": {
+        "aumark": { "attributes": ["commercial"] }
+      },
+      "dongfeng": {
+        "captain_t": { "segment": "Commercial", "attributes": [] }
+      }
+    }
+  }
+}

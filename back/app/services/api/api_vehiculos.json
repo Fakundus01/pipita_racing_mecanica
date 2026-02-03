@@ -1,0 +1,2631 @@
+{
+  "_meta": {
+    "schema": "car_catalog_api_v1",
+    "generated_at": "2026-02-03",
+    "timezone": "America/Argentina/Buenos_Aires",
+    "notes": "Normalizado: marcas unificadas por brand_id (sin sufijo _ar), modelos con model_id estable, segments separados en body/segment/attributes. status/origin quedan 'unknown' para completar luego."
+  },
+  "brands": [
+    {
+      "brand": "Alfa Romeo",
+      "brand_id": "alfa_romeo",
+      "markets": {
+        "AR": {
+          "models": [
+            {
+              "model_id": "giulia",
+              "name": "Giulia",
+              "body": "Car",
+              "segment": "Sedan",
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "stelvio",
+              "name": "Stelvio",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "brand": "Aston Martin",
+      "brand_id": "aston_martin",
+      "markets": {
+        "AR": {
+          "models": [
+            {
+              "model_id": "db11",
+              "name": "DB11",
+              "body": "Car",
+              "segment": null,
+              "attributes": [
+                "Sports"
+              ],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "db12",
+              "name": "DB12",
+              "body": "Car",
+              "segment": null,
+              "attributes": [
+                "Sports"
+              ],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "dbx",
+              "name": "DBX",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [
+                "Luxury"
+              ],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "vantage",
+              "name": "Vantage",
+              "body": "Car",
+              "segment": null,
+              "attributes": [
+                "Sports"
+              ],
+              "status": "unknown",
+              "origin": "unknown"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "brand": "Audi",
+      "brand_id": "audi",
+      "markets": {
+        "AR": {
+          "models": [
+            {
+              "model_id": "a3",
+              "name": "A3",
+              "body": "Car",
+              "segment": "Sedan",
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "a4",
+              "name": "A4",
+              "body": "Car",
+              "segment": "Sedan",
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "q3",
+              "name": "Q3",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "q5",
+              "name": "Q5",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "brand": "BAIC",
+      "brand_id": "baic",
+      "markets": {
+        "AR": {
+          "models": [
+            {
+              "model_id": "eu5",
+              "name": "EU5",
+              "body": "Car",
+              "segment": "Sedan",
+              "attributes": [
+                "EV"
+              ],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "x35",
+              "name": "X35",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "x55",
+              "name": "X55",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "x65",
+              "name": "X65",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "brand": "Bentley",
+      "brand_id": "bentley",
+      "markets": {
+        "AR": {
+          "models": [
+            {
+              "model_id": "bentayga",
+              "name": "Bentayga",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [
+                "Luxury"
+              ],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "continental_gt",
+              "name": "Continental GT",
+              "body": "Car",
+              "segment": null,
+              "attributes": [
+                "Luxury"
+              ],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "flying_spur",
+              "name": "Flying Spur",
+              "body": "Car",
+              "segment": "Sedan",
+              "attributes": [
+                "Luxury"
+              ],
+              "status": "unknown",
+              "origin": "unknown"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "brand": "BMW",
+      "brand_id": "bmw",
+      "markets": {
+        "AR": {
+          "models": [
+            {
+              "model_id": "serie_1",
+              "name": "Serie 1",
+              "body": "Car",
+              "segment": "Hatchback",
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "serie_3",
+              "name": "Serie 3",
+              "body": "Car",
+              "segment": "Sedan",
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "x1",
+              "name": "X1",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "x3",
+              "name": "X3",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "x5",
+              "name": "X5",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "brand": "Bugatti",
+      "brand_id": "bugatti",
+      "markets": {
+        "AR": {
+          "models": [
+            {
+              "model_id": "chiron",
+              "name": "Chiron",
+              "body": "Car",
+              "segment": null,
+              "attributes": [
+                "Hypercar"
+              ],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "mistral",
+              "name": "Mistral",
+              "body": "Car",
+              "segment": null,
+              "attributes": [
+                "Hypercar"
+              ],
+              "status": "unknown",
+              "origin": "unknown"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "brand": "BYD",
+      "brand_id": "byd",
+      "markets": {
+        "AR": {
+          "models": [
+            {
+              "model_id": "atto_3",
+              "name": "Atto 3",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [
+                "EV"
+              ],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "dolphin",
+              "name": "Dolphin",
+              "body": "Car",
+              "segment": "Hatchback",
+              "attributes": [
+                "EV"
+              ],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "seal",
+              "name": "Seal",
+              "body": "Car",
+              "segment": "Sedan",
+              "attributes": [
+                "EV"
+              ],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "tang",
+              "name": "Tang",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [
+                "EV"
+              ],
+              "status": "unknown",
+              "origin": "unknown"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "brand": "Cadillac",
+      "brand_id": "cadillac",
+      "markets": {
+        "AR": {
+          "models": [
+            {
+              "model_id": "ct5",
+              "name": "CT5",
+              "body": "Car",
+              "segment": "Sedan",
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "escalade",
+              "name": "Escalade",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "xt4",
+              "name": "XT4",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "xt5",
+              "name": "XT5",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "brand": "Changan",
+      "brand_id": "changan",
+      "markets": {
+        "AR": {
+          "models": [
+            {
+              "model_id": "cs35_plus",
+              "name": "CS35 Plus",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "cs55_plus",
+              "name": "CS55 Plus",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "cs75_plus",
+              "name": "CS75 Plus",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "hunter",
+              "name": "Hunter",
+              "body": "Truck",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "brand": "Chery",
+      "brand_id": "chery",
+      "markets": {
+        "AR": {
+          "models": [
+            {
+              "model_id": "arrizo_5",
+              "name": "Arrizo 5",
+              "body": "Car",
+              "segment": "Sedan",
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "tiggo_2",
+              "name": "Tiggo 2",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "tiggo_4",
+              "name": "Tiggo 4",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "tiggo_7",
+              "name": "Tiggo 7",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "tiggo_8",
+              "name": "Tiggo 8",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "brand": "Chevrolet",
+      "brand_id": "chevrolet",
+      "markets": {
+        "AR": {
+          "models": [
+            {
+              "model_id": "cruze",
+              "name": "Cruze",
+              "body": "Car",
+              "segment": "Sedan",
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "montana",
+              "name": "Montana",
+              "body": "Truck",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "onix",
+              "name": "Onix",
+              "body": "Car",
+              "segment": "Hatchback",
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "onix_plus",
+              "name": "Onix Plus",
+              "body": "Car",
+              "segment": "Sedan",
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "s10",
+              "name": "S10",
+              "body": "Truck",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "spin",
+              "name": "Spin",
+              "body": "MPV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "tracker",
+              "name": "Tracker",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "brand": "Citroën",
+      "brand_id": "citroen",
+      "markets": {
+        "AR": {
+          "models": [
+            {
+              "model_id": "berlingo",
+              "name": "Berlingo",
+              "body": "Van",
+              "segment": null,
+              "attributes": [
+                "Commercial"
+              ],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "c3",
+              "name": "C3",
+              "body": "Car",
+              "segment": "Hatchback",
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "c3_aircross",
+              "name": "C3 Aircross",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "c4_cactus",
+              "name": "C4 Cactus",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "brand": "DFSK",
+      "brand_id": "dfsk",
+      "markets": {
+        "AR": {
+          "models": [
+            {
+              "model_id": "c31",
+              "name": "C31",
+              "body": "Truck",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "c32",
+              "name": "C32",
+              "body": "Truck",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "c35",
+              "name": "C35",
+              "body": "Van",
+              "segment": null,
+              "attributes": [
+                "Commercial"
+              ],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "glory_500",
+              "name": "Glory 500",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "glory_580",
+              "name": "Glory 580",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "brand": "Dongfeng",
+      "brand_id": "dongfeng",
+      "markets": {
+        "AR": {
+          "models": [
+            {
+              "model_id": "ax7",
+              "name": "AX7",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "captain_t",
+              "name": "Captain T",
+              "body": "Truck",
+              "segment": "Commercial",
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "rich_6",
+              "name": "Rich 6",
+              "body": "Truck",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "t5_evo",
+              "name": "T5 Evo",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "brand": "DS Automobiles",
+      "brand_id": "ds",
+      "markets": {
+        "AR": {
+          "models": [
+            {
+              "model_id": "ds_3",
+              "name": "DS 3",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "ds_4",
+              "name": "DS 4",
+              "body": "Car",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "ds_7",
+              "name": "DS 7",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "brand": "Dodge",
+      "brand_id": "dodge",
+      "markets": {
+        "AR": {
+          "models": [
+            {
+              "model_id": "challenger",
+              "name": "Challenger",
+              "body": "Car",
+              "segment": null,
+              "attributes": [
+                "Sports"
+              ],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "durango",
+              "name": "Durango",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "journey",
+              "name": "Journey",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "brand": "Ferrari",
+      "brand_id": "ferrari",
+      "markets": {
+        "AR": {
+          "models": [
+            {
+              "model_id": "296_gtb",
+              "name": "296 GTB",
+              "body": "Car",
+              "segment": null,
+              "attributes": [
+                "Sports"
+              ],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "roma",
+              "name": "Roma",
+              "body": "Car",
+              "segment": null,
+              "attributes": [
+                "Sports"
+              ],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "sf90_stradale",
+              "name": "SF90 Stradale",
+              "body": "Car",
+              "segment": null,
+              "attributes": [
+                "Sports"
+              ],
+              "status": "unknown",
+              "origin": "unknown"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "brand": "Fiat",
+      "brand_id": "fiat",
+      "markets": {
+        "AR": {
+          "models": [
+            {
+              "model_id": "argo",
+              "name": "Argo",
+              "body": "Car",
+              "segment": "Hatchback",
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "cronos",
+              "name": "Cronos",
+              "body": "Car",
+              "segment": "Sedan",
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "fastback",
+              "name": "Fastback",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "mobi",
+              "name": "Mobi",
+              "body": "Car",
+              "segment": "Hatchback",
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "pulse",
+              "name": "Pulse",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "strada",
+              "name": "Strada",
+              "body": "Truck",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "toro",
+              "name": "Toro",
+              "body": "Truck",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "brand": "Ford",
+      "brand_id": "ford",
+      "markets": {
+        "AR": {
+          "models": [
+            {
+              "model_id": "bronco",
+              "name": "Bronco",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "kuga",
+              "name": "Kuga",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "maverick",
+              "name": "Maverick",
+              "body": "Truck",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "mustang",
+              "name": "Mustang",
+              "body": "Car",
+              "segment": null,
+              "attributes": [
+                "Sports"
+              ],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "ranger",
+              "name": "Ranger",
+              "body": "Truck",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "territory",
+              "name": "Territory",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "brand": "Foton",
+      "brand_id": "foton",
+      "markets": {
+        "AR": {
+          "models": [
+            {
+              "model_id": "aumark",
+              "name": "Aumark",
+              "body": "Truck",
+              "segment": "Commercial",
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "tunland",
+              "name": "Tunland",
+              "body": "Truck",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "brand": "Geely",
+      "brand_id": "geely",
+      "markets": {
+        "AR": {
+          "models": [
+            {
+              "model_id": "emgrand_7",
+              "name": "Emgrand 7",
+              "body": "Car",
+              "segment": "Sedan",
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "gx3",
+              "name": "GX3",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "brand": "Genesis",
+      "brand_id": "genesis",
+      "markets": {
+        "AR": {
+          "models": [
+            {
+              "model_id": "g70",
+              "name": "G70",
+              "body": "Car",
+              "segment": "Sedan",
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "g80",
+              "name": "G80",
+              "body": "Car",
+              "segment": "Sedan",
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "gv70",
+              "name": "GV70",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "gv80",
+              "name": "GV80",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "brand": "Great Wall",
+      "brand_id": "great_wall",
+      "markets": {
+        "AR": {
+          "models": [
+            {
+              "model_id": "wingle_5",
+              "name": "Wingle 5",
+              "body": "Truck",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "wingle_6",
+              "name": "Wingle 6",
+              "body": "Truck",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "brand": "Haval",
+      "brand_id": "haval",
+      "markets": {
+        "AR": {
+          "models": [
+            {
+              "model_id": "h1",
+              "name": "H1",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "h2",
+              "name": "H2",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "h6",
+              "name": "H6",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "brand": "Hino",
+      "brand_id": "hino",
+      "markets": {
+        "AR": {
+          "models": [
+            {
+              "model_id": "300_series",
+              "name": "300 Series",
+              "body": "Truck",
+              "segment": "Commercial",
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "500_series",
+              "name": "500 Series",
+              "body": "Truck",
+              "segment": "Commercial",
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "brand": "Honda",
+      "brand_id": "honda",
+      "markets": {
+        "AR": {
+          "models": [
+            {
+              "model_id": "civic",
+              "name": "Civic",
+              "body": "Car",
+              "segment": "Sedan",
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "city",
+              "name": "City",
+              "body": "Car",
+              "segment": "Sedan",
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "cr_v",
+              "name": "CR-V",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "hr_v",
+              "name": "HR-V",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "brand": "Hyundai",
+      "brand_id": "hyundai",
+      "markets": {
+        "AR": {
+          "models": [
+            {
+              "model_id": "creta",
+              "name": "Creta",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "hb20",
+              "name": "HB20",
+              "body": "Car",
+              "segment": "Hatchback",
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "santa_fe",
+              "name": "Santa Fe",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "tucson",
+              "name": "Tucson",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "brand": "Infiniti",
+      "brand_id": "infiniti",
+      "markets": {
+        "AR": {
+          "models": [
+            {
+              "model_id": "q50",
+              "name": "Q50",
+              "body": "Car",
+              "segment": "Sedan",
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "q60",
+              "name": "Q60",
+              "body": "Car",
+              "segment": "Coupe",
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "qx50",
+              "name": "QX50",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "qx60",
+              "name": "QX60",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "brand": "Isuzu",
+      "brand_id": "isuzu",
+      "markets": {
+        "AR": {
+          "models": [
+            {
+              "model_id": "d_max",
+              "name": "D-Max",
+              "body": "Truck",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "brand": "Iveco",
+      "brand_id": "iveco",
+      "markets": {
+        "AR": {
+          "models": [
+            {
+              "model_id": "daily",
+              "name": "Daily",
+              "body": "Van",
+              "segment": null,
+              "attributes": [
+                "Commercial"
+              ],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "tector",
+              "name": "Tector",
+              "body": "Truck",
+              "segment": "Commercial",
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "brand": "JAC",
+      "brand_id": "jac",
+      "markets": {
+        "AR": {
+          "models": [
+            {
+              "model_id": "s2",
+              "name": "S2",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "s3",
+              "name": "S3",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "s4",
+              "name": "S4",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "t6",
+              "name": "T6",
+              "body": "Truck",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "t8",
+              "name": "T8",
+              "body": "Truck",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "brand": "Jaguar",
+      "brand_id": "jaguar",
+      "markets": {
+        "AR": {
+          "models": [
+            {
+              "model_id": "e_pace",
+              "name": "E-Pace",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "f_pace",
+              "name": "F-Pace",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "f_type",
+              "name": "F-Type",
+              "body": "Car",
+              "segment": null,
+              "attributes": [
+                "Sports"
+              ],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "xf",
+              "name": "XF",
+              "body": "Car",
+              "segment": "Sedan",
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "brand": "Jeep",
+      "brand_id": "jeep",
+      "markets": {
+        "AR": {
+          "models": [
+            {
+              "model_id": "compass",
+              "name": "Compass",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "grand_cherokee",
+              "name": "Grand Cherokee",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "renegade",
+              "name": "Renegade",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "wrangler",
+              "name": "Wrangler",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "brand": "Kia",
+      "brand_id": "kia",
+      "markets": {
+        "AR": {
+          "models": [
+            {
+              "model_id": "carnival",
+              "name": "Carnival",
+              "body": "MPV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "cerato",
+              "name": "Cerato",
+              "body": "Car",
+              "segment": "Sedan",
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "seltos",
+              "name": "Seltos",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "sportage",
+              "name": "Sportage",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "brand": "Lamborghini",
+      "brand_id": "lamborghini",
+      "markets": {
+        "AR": {
+          "models": [
+            {
+              "model_id": "huracan",
+              "name": "Huracán",
+              "body": "Car",
+              "segment": null,
+              "attributes": [
+                "Sports"
+              ],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "urus",
+              "name": "Urus",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "brand": "Land Rover",
+      "brand_id": "land_rover",
+      "markets": {
+        "AR": {
+          "models": [
+            {
+              "model_id": "defender",
+              "name": "Defender",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "discovery",
+              "name": "Discovery",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "range_rover_evoque",
+              "name": "Range Rover Evoque",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "range_rover_sport",
+              "name": "Range Rover Sport",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "brand": "Lexus",
+      "brand_id": "lexus",
+      "markets": {
+        "AR": {
+          "models": [
+            {
+              "model_id": "nx",
+              "name": "NX",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "rx",
+              "name": "RX",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "ux",
+              "name": "UX",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "brand": "Maserati",
+      "brand_id": "maserati",
+      "markets": {
+        "AR": {
+          "models": [
+            {
+              "model_id": "ghibli",
+              "name": "Ghibli",
+              "body": "Car",
+              "segment": "Sedan",
+              "attributes": [
+                "Sports"
+              ],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "grecale",
+              "name": "Grecale",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "levante",
+              "name": "Levante",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [
+                "Luxury"
+              ],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "mc20",
+              "name": "MC20",
+              "body": "Car",
+              "segment": null,
+              "attributes": [
+                "Supercar"
+              ],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "quattroporte",
+              "name": "Quattroporte",
+              "body": "Car",
+              "segment": "Sedan",
+              "attributes": [
+                "Luxury"
+              ],
+              "status": "unknown",
+              "origin": "unknown"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "brand": "Mazda",
+      "brand_id": "mazda",
+      "markets": {
+        "AR": {
+          "models": [
+            {
+              "model_id": "cx_30",
+              "name": "CX-30",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "cx_5",
+              "name": "CX-5",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "brand": "McLaren",
+      "brand_id": "mclaren",
+      "markets": {
+        "AR": {
+          "models": [
+            {
+              "model_id": "artura",
+              "name": "Artura",
+              "body": "Car",
+              "segment": null,
+              "attributes": [
+                "Supercar"
+              ],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "gt",
+              "name": "GT",
+              "body": "Car",
+              "segment": null,
+              "attributes": [
+                "Sports"
+              ],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "720s",
+              "name": "720S",
+              "body": "Car",
+              "segment": null,
+              "attributes": [
+                "Supercar"
+              ],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "750s",
+              "name": "750S",
+              "body": "Car",
+              "segment": null,
+              "attributes": [
+                "Supercar"
+              ],
+              "status": "unknown",
+              "origin": "unknown"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "brand": "Mercedes-Benz",
+      "brand_id": "mercedes_benz",
+      "markets": {
+        "AR": {
+          "models": [
+            {
+              "model_id": "clase_a",
+              "name": "Clase A",
+              "body": "Car",
+              "segment": "Hatchback",
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "clase_c",
+              "name": "Clase C",
+              "body": "Car",
+              "segment": "Sedan",
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "gla",
+              "name": "GLA",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "glc",
+              "name": "GLC",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "sprinter",
+              "name": "Sprinter",
+              "body": "Van",
+              "segment": null,
+              "attributes": [
+                "Commercial"
+              ],
+              "status": "unknown",
+              "origin": "unknown"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "brand": "Mini",
+      "brand_id": "mini",
+      "markets": {
+        "AR": {
+          "models": [
+            {
+              "model_id": "cooper_3_puertas",
+              "name": "Cooper 3 Puertas",
+              "body": "Car",
+              "segment": "Hatchback",
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "cooper_5_puertas",
+              "name": "Cooper 5 Puertas",
+              "body": "Car",
+              "segment": "Hatchback",
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "countryman",
+              "name": "Countryman",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "brand": "Mitsubishi",
+      "brand_id": "mitsubishi",
+      "markets": {
+        "AR": {
+          "models": [
+            {
+              "model_id": "asx",
+              "name": "ASX",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "l200",
+              "name": "L200",
+              "body": "Truck",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "outlander",
+              "name": "Outlander",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "brand": "Nissan",
+      "brand_id": "nissan",
+      "markets": {
+        "AR": {
+          "models": [
+            {
+              "model_id": "frontier",
+              "name": "Frontier",
+              "body": "Truck",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "kicks",
+              "name": "Kicks",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "sentra",
+              "name": "Sentra",
+              "body": "Car",
+              "segment": "Sedan",
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "x_trail",
+              "name": "X-Trail",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "brand": "Peugeot",
+      "brand_id": "peugeot",
+      "markets": {
+        "AR": {
+          "models": [
+            {
+              "model_id": "2008",
+              "name": "2008",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "208",
+              "name": "208",
+              "body": "Car",
+              "segment": "Hatchback",
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "3008",
+              "name": "3008",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "5008",
+              "name": "5008",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "partner",
+              "name": "Partner",
+              "body": "Van",
+              "segment": null,
+              "attributes": [
+                "Commercial"
+              ],
+              "status": "unknown",
+              "origin": "unknown"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "brand": "Porsche",
+      "brand_id": "porsche",
+      "markets": {
+        "AR": {
+          "models": [
+            {
+              "model_id": "911",
+              "name": "911",
+              "body": "Car",
+              "segment": null,
+              "attributes": [
+                "Sports"
+              ],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "cayenne",
+              "name": "Cayenne",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "macan",
+              "name": "Macan",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "panamera",
+              "name": "Panamera",
+              "body": "Car",
+              "segment": "Sedan",
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "brand": "RAM",
+      "brand_id": "ram",
+      "markets": {
+        "AR": {
+          "models": [
+            {
+              "model_id": "1500",
+              "name": "1500",
+              "body": "Truck",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "2500",
+              "name": "2500",
+              "body": "Truck",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "rampage",
+              "name": "Rampage",
+              "body": "Truck",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "brand": "Renault",
+      "brand_id": "renault",
+      "markets": {
+        "AR": {
+          "models": [
+            {
+              "model_id": "alaskan",
+              "name": "Alaskan",
+              "body": "Truck",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "duster",
+              "name": "Duster",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "kangoo",
+              "name": "Kangoo",
+              "body": "Van",
+              "segment": null,
+              "attributes": [
+                "Commercial"
+              ],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "kardian",
+              "name": "Kardian",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "logan",
+              "name": "Logan",
+              "body": "Car",
+              "segment": "Sedan",
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "sandero",
+              "name": "Sandero",
+              "body": "Car",
+              "segment": "Hatchback",
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "stepway",
+              "name": "Stepway",
+              "body": "Car",
+              "segment": null,
+              "attributes": [
+                "Crossover"
+              ],
+              "status": "unknown",
+              "origin": "unknown"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "brand": "Rolls-Royce",
+      "brand_id": "rolls_royce",
+      "markets": {
+        "AR": {
+          "models": [
+            {
+              "model_id": "cullinan",
+              "name": "Cullinan",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [
+                "UltraLuxury"
+              ],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "ghost",
+              "name": "Ghost",
+              "body": "Car",
+              "segment": "Sedan",
+              "attributes": [
+                "UltraLuxury"
+              ],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "phantom",
+              "name": "Phantom",
+              "body": "Car",
+              "segment": "Sedan",
+              "attributes": [
+                "UltraLuxury"
+              ],
+              "status": "unknown",
+              "origin": "unknown"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "brand": "SEAT",
+      "brand_id": "seat",
+      "markets": {
+        "AR": {
+          "models": [
+            {
+              "model_id": "arona",
+              "name": "Arona",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "ateca",
+              "name": "Ateca",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "ibiza",
+              "name": "Ibiza",
+              "body": "Car",
+              "segment": "Hatchback",
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "leon",
+              "name": "León",
+              "body": "Car",
+              "segment": "Hatchback",
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "brand": "Škoda",
+      "brand_id": "skoda",
+      "markets": {
+        "AR": {
+          "models": [
+            {
+              "model_id": "fabia",
+              "name": "Fabia",
+              "body": "Car",
+              "segment": "Hatchback",
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "kamiq",
+              "name": "Kamiq",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "karoq",
+              "name": "Karoq",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "kodiaq",
+              "name": "Kodiaq",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "octavia",
+              "name": "Octavia",
+              "body": "Car",
+              "segment": "Sedan",
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "brand": "Subaru",
+      "brand_id": "subaru",
+      "markets": {
+        "AR": {
+          "models": [
+            {
+              "model_id": "forester",
+              "name": "Forester",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "outback",
+              "name": "Outback",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "xv",
+              "name": "XV",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "brand": "Suzuki",
+      "brand_id": "suzuki",
+      "markets": {
+        "AR": {
+          "models": [
+            {
+              "model_id": "jimny",
+              "name": "Jimny",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "swift",
+              "name": "Swift",
+              "body": "Car",
+              "segment": "Hatchback",
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "vitara",
+              "name": "Vitara",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "brand": "Toyota",
+      "brand_id": "toyota",
+      "markets": {
+        "AR": {
+          "models": [
+            {
+              "model_id": "corolla",
+              "name": "Corolla",
+              "body": "Car",
+              "segment": "Sedan",
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "corolla_cross",
+              "name": "Corolla Cross",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "etios",
+              "name": "Etios",
+              "body": "Car",
+              "segment": "Hatchback",
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "hilux",
+              "name": "Hilux",
+              "body": "Truck",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "sw4",
+              "name": "SW4",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "yaris",
+              "name": "Yaris",
+              "body": "Car",
+              "segment": "Hatchback",
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "brand": "Volkswagen",
+      "brand_id": "volkswagen",
+      "markets": {
+        "AR": {
+          "models": [
+            {
+              "model_id": "amarok",
+              "name": "Amarok",
+              "body": "Truck",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "gol_trend",
+              "name": "Gol Trend",
+              "body": "Car",
+              "segment": "Hatchback",
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "nivus",
+              "name": "Nivus",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "polo",
+              "name": "Polo",
+              "body": "Car",
+              "segment": "Hatchback",
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "t_cross",
+              "name": "T-Cross",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "taos",
+              "name": "Taos",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "virtus",
+              "name": "Virtus",
+              "body": "Car",
+              "segment": "Sedan",
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "brand": "Volvo",
+      "brand_id": "volvo",
+      "markets": {
+        "AR": {
+          "models": [
+            {
+              "model_id": "s60",
+              "name": "S60",
+              "body": "Car",
+              "segment": "Sedan",
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "xc40",
+              "name": "XC40",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "xc60",
+              "name": "XC60",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            },
+            {
+              "model_id": "xc90",
+              "name": "XC90",
+              "body": "SUV",
+              "segment": null,
+              "attributes": [],
+              "status": "unknown",
+              "origin": "unknown"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

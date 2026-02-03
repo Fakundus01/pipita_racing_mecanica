@@ -30,7 +30,10 @@ def is_authenticated():
 
 
 def vehiculos_api():
-  return VehiculosApiService(current_app.config['VEHICULOS_API_BASE'])
+  return VehiculosApiService(
+    current_app.config['NINJA_CARS_API_BASE'],
+    current_app.config['NINJA_CARS_API_KEY'],
+  )
 
 
 def serialize_excel_value(value):
@@ -191,12 +194,15 @@ def delete_vehiculo(vehiculo_id):
 @api.get('/vehiculos/decodificar')
 def decode_vehiculo_vin():
   vin = request.args.get('vin', '').strip()
-  if not vin:
-    return jsonify({'error': 'VIN requerido'}), 400
+  make = request.args.get('make', '').strip()
+  model = request.args.get('model', '').strip()
+  trim = request.args.get('trim', '').strip()
+  if not make or not model:
+    return jsonify({'error': 'Marca y modelo requeridos '}), 400
   try:
-    data = vehiculos_api().decode_vin(vin)
+    data = vehiculos_api().search_cars(make, model, trim)
   except Exception as exc:
-    return jsonify({'error': 'No se pudo consultar el VIN', 'detail': str(exc)}), 502
+    return jsonify({'error': 'No se pudo consultar Ninja Cars', 'detail': str(exc)}), 502
   return jsonify(data)
 
 

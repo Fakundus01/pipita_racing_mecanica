@@ -1,0 +1,45 @@
+{
+  "_file": "api_vehiculos.patch.validation.v3.json",
+  "catalog_patch": {
+    "version": "car_catalog_api_v1_patch_2026-02-03_validation_v3_ar",
+    "applies_to_schema": "api_vehiculos_base_v0",
+    "notes": {
+      "scope": "Argentina",
+      "description": "Agrega validaciones y reportes de consistencia (no modifica datos; solo genera warnings/errors para tu pipeline)."
+    },
+    "operation": "validate_catalog",
+    "rules": {
+      "fail_on": ["duplicate_model_id_v3", "missing_brand_id_v3", "missing_model_id_v3"],
+      "warn_on": [
+        "missing_model_years",
+        "missing_body_or_segment",
+        "empty_aliases_search",
+        "orphan_generation_years"
+      ],
+      "checks": {
+        "unique": ["brands[*].brand_id_v3", "brands[*].models[*].model_id_v3"],
+        "required_fields": {
+          "brand": ["name", "brand_slug", "brand_id_v3"],
+          "model": ["name", "model_slug", "model_id_v3"]
+        },
+        "taxonomy_sanity": {
+          "body_enum": ["Car", "SUV", "Truck", "Van", "MPV"],
+          "segment_enum": ["Hatchback", "Sedan", "Coupe", "Pickup", null]
+        },
+        "year_range_sanity": {
+          "min_year": 1950,
+          "max_year": 2026,
+          "require_start_lte_end": true
+        }
+      }
+    },
+    "outputs": {
+      "report_field": "_validation_report",
+      "report_shape": {
+        "summary": ["errors_count", "warnings_count"],
+        "errors": ["code", "path", "message"],
+        "warnings": ["code", "path", "message"]
+      }
+    }
+  }
+}

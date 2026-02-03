@@ -1,0 +1,101 @@
+{
+  "catalog_patch": {
+    "version": "car_catalog_api_v1_patch_2026-02-03_ar_status_origin_v2_expand_new_brands",
+    "applies_to_schema": "car_catalog_api_v1",
+    "notes": {
+      "scope": "Argentina",
+      "description": "Extiende status/origin para marcas agregadas (punto 3) y refuerza reglas. La cobertura total del catálogo AR completo se continuará en v3+.",
+      "data_quality": "best_effort_market_classification"
+    },
+    "enums": {
+      "status": ["production", "discontinued", "limited_import", "unknown"],
+      "origin": ["local", "mercosur", "extra_zone", "unknown"]
+    },
+    "rules": {
+      "default_behavior": "Si un modelo no está en overrides, queda como unknown/unknown.",
+      "ignore_unknown_model_refs": true,
+      "ar_origin_heuristic": {
+        "local": "producción en AR",
+        "mercosur": "proveniente usualmente de Brasil/Uruguay (Mercosur)",
+        "extra_zone": "proveniente usualmente fuera de Mercosur",
+        "unknown": "sin dato estable"
+      }
+    },
+    "overrides": {
+      "mg": {
+        "mg3_hybrid": { "status": "production", "origin": "extra_zone" },
+        "mg4": { "status": "production", "origin": "extra_zone" },
+        "zs": { "status": "production", "origin": "extra_zone" },
+        "zs_hybrid": { "status": "production", "origin": "extra_zone" },
+        "gt": { "status": "production", "origin": "extra_zone" },
+        "rx5": { "status": "production", "origin": "extra_zone" },
+        "cyberster": { "status": "limited_import", "origin": "extra_zone" }
+      },
+      "jetour": {
+        "x50": { "status": "production", "origin": "extra_zone" },
+        "x70": { "status": "production", "origin": "extra_zone" },
+        "x70_plus": { "status": "production", "origin": "extra_zone" },
+        "dashing": { "status": "production", "origin": "extra_zone" },
+        "t1": { "status": "limited_import", "origin": "extra_zone" }
+      },
+      "gac": {
+        "emzoom": { "status": "production", "origin": "extra_zone" },
+        "emkoo": { "status": "production", "origin": "extra_zone" },
+        "gs8": { "status": "production", "origin": "extra_zone" },
+        "aion_es": { "status": "production", "origin": "extra_zone" },
+        "empow": { "status": "production", "origin": "extra_zone" }
+      },
+      "jmc": {
+        "grand_avenue": { "status": "production", "origin": "extra_zone" },
+        "grand_avenue_plus": { "status": "production", "origin": "extra_zone" },
+        "grand_avenue_dadao_pro": { "status": "production", "origin": "extra_zone" },
+        "n900": { "status": "production", "origin": "extra_zone" },
+        "n800": { "status": "production", "origin": "extra_zone" }
+      },
+      "forthing": {
+        "t5_evo": { "status": "production", "origin": "extra_zone" },
+        "t5_hev": { "status": "production", "origin": "extra_zone" },
+        "friday": { "status": "production", "origin": "extra_zone" },
+        "u_tour": { "status": "production", "origin": "extra_zone" }
+      },
+      "skywell": {
+        "et5": { "status": "production", "origin": "extra_zone" },
+        "be11": { "status": "production", "origin": "extra_zone" }
+      },
+      "kaiyi": {
+        "x3": { "status": "production", "origin": "extra_zone" }
+      },
+      "kyc": {
+        "mamut_cabina_simple": { "status": "production", "origin": "extra_zone" },
+        "mamut_cabina_doble": { "status": "production", "origin": "extra_zone" },
+        "mamut_box": { "status": "production", "origin": "extra_zone" }
+      },
+      "shineray": {
+        "t30": { "status": "production", "origin": "extra_zone" },
+        "t32": { "status": "production", "origin": "extra_zone" },
+        "x30_furgon": { "status": "production", "origin": "extra_zone" },
+        "x30_pasajeros": { "status": "production", "origin": "extra_zone" },
+        "srm_m7": { "status": "production", "origin": "extra_zone" }
+      },
+      "jmev": {
+        "easy_3": { "status": "production", "origin": "extra_zone" }
+      },
+      "coradir": {
+        "tito": { "status": "production", "origin": "local" },
+        "tito_s5": { "status": "production", "origin": "local" },
+        "tita": { "status": "production", "origin": "local" }
+      },
+      "scania": {
+        "p_series": { "status": "production", "origin": "unknown" },
+        "g_series": { "status": "production", "origin": "unknown" },
+        "r_series": { "status": "production", "origin": "unknown" }
+      }
+    },
+    "status": {
+      "current_point": "1b_status_origin_full",
+      "progress": "expanded_for_new_brands_v2",
+      "remaining_work": "Completar status/origin para el resto de marcas/modelos del base (v3+).",
+      "next_point": "2b_taxonomy_full"
+    }
+  }
+}

@@ -1,0 +1,218 @@
+{
+  "catalog_patch": {
+    "version": "car_catalog_api_v1_patch_2026-02-03_generations_v1",
+    "applies_to_schema": "car_catalog_api_v1",
+    "notes": {
+      "scope": "Argentina",
+      "description": "Generaciones aproximadas por modelo. Incluye rangos de años y (opcional) un flag de facelift. Se expandirá con plataforma/código interno cuando sea necesario."
+    },
+    "rules": {
+      "generation_id_format": "{model_id}_g{n}",
+      "years_are_inclusive": true
+    },
+    "overrides": {
+      "toyota": {
+        "hilux": {
+          "generations": [
+            { "generation_id": "hilux_g7", "name": "Gen 7", "years": [2005, 2015], "facelift": false },
+            { "generation_id": "hilux_g8", "name": "Gen 8", "years": [2016, 2026], "facelift": true }
+          ]
+        },
+        "corolla": {
+          "generations": [
+            { "generation_id": "corolla_g10", "name": "Gen 10", "years": [2008, 2013], "facelift": true },
+            { "generation_id": "corolla_g11", "name": "Gen 11", "years": [2014, 2019], "facelift": true },
+            { "generation_id": "corolla_g12", "name": "Gen 12", "years": [2020, 2026], "facelift": true }
+          ]
+        },
+        "corolla_cross": {
+          "generations": [
+            { "generation_id": "corolla_cross_g1", "name": "Gen 1", "years": [2021, 2026], "facelift": false }
+          ]
+        },
+        "yaris": {
+          "generations": [
+            { "generation_id": "yaris_g3", "name": "Gen 3", "years": [2016, 2020], "facelift": true },
+            { "generation_id": "yaris_g4", "name": "Gen 4", "years": [2021, 2026], "facelift": false }
+          ]
+        },
+        "sw4": {
+          "generations": [
+            { "generation_id": "sw4_g2", "name": "Gen 2", "years": [2005, 2015], "facelift": true },
+            { "generation_id": "sw4_g3", "name": "Gen 3", "years": [2016, 2026], "facelift": true }
+          ]
+        }
+      },
+      "volkswagen": {
+        "amarok": {
+          "generations": [
+            { "generation_id": "amarok_g1", "name": "Gen 1", "years": [2010, 2022], "facelift": true },
+            { "generation_id": "amarok_g2", "name": "Gen 2", "years": [2023, 2026], "facelift": false }
+          ]
+        },
+        "gol_trend": {
+          "generations": [
+            { "generation_id": "gol_trend_g1", "name": "Gen 1", "years": [2008, 2012], "facelift": true },
+            { "generation_id": "gol_trend_g2", "name": "Gen 2", "years": [2013, 2022], "facelift": true }
+          ]
+        },
+        "polo": {
+          "generations": [
+            { "generation_id": "polo_g6", "name": "Gen 6", "years": [2018, 2026], "facelift": true }
+          ]
+        },
+        "virtus": {
+          "generations": [
+            { "generation_id": "virtus_g1", "name": "Gen 1", "years": [2018, 2026], "facelift": true }
+          ]
+        },
+        "t_cross": {
+          "generations": [
+            { "generation_id": "t_cross_g1", "name": "Gen 1", "years": [2019, 2026], "facelift": true }
+          ]
+        },
+        "taos": {
+          "generations": [
+            { "generation_id": "taos_g1", "name": "Gen 1", "years": [2021, 2026], "facelift": true }
+          ]
+        },
+        "nivus": {
+          "generations": [
+            { "generation_id": "nivus_g1", "name": "Gen 1", "years": [2020, 2026], "facelift": true }
+          ]
+        }
+      },
+      "chevrolet": {
+        "onix": {
+          "generations": [
+            { "generation_id": "onix_g1", "name": "Gen 1", "years": [2013, 2019], "facelift": true },
+            { "generation_id": "onix_g2", "name": "Gen 2", "years": [2020, 2026], "facelift": true }
+          ]
+        },
+        "onix_plus": {
+          "generations": [
+            { "generation_id": "onix_plus_g1", "name": "Gen 1", "years": [2019, 2026], "facelift": true }
+          ]
+        },
+        "cruze": {
+          "generations": [
+            { "generation_id": "cruze_g2", "name": "Gen 2", "years": [2016, 2023], "facelift": true }
+          ]
+        },
+        "tracker": {
+          "generations": [
+            { "generation_id": "tracker_g3", "name": "Gen 3", "years": [2020, 2026], "facelift": true }
+          ]
+        },
+        "s10": {
+          "generations": [
+            { "generation_id": "s10_g2", "name": "Gen 2", "years": [2012, 2026], "facelift": true }
+          ]
+        }
+      },
+      "fiat": {
+        "cronos": {
+          "generations": [
+            { "generation_id": "cronos_g1", "name": "Gen 1", "years": [2018, 2026], "facelift": true }
+          ]
+        },
+        "argo": {
+          "generations": [
+            { "generation_id": "argo_g1", "name": "Gen 1", "years": [2017, 2026], "facelift": true }
+          ]
+        },
+        "pulse": {
+          "generations": [
+            { "generation_id": "pulse_g1", "name": "Gen 1", "years": [2021, 2026], "facelift": false }
+          ]
+        },
+        "strada": {
+          "generations": [
+            { "generation_id": "strada_g2", "name": "Gen 2", "years": [2013, 2020], "facelift": true },
+            { "generation_id": "strada_g3", "name": "Gen 3", "years": [2021, 2026], "facelift": true }
+          ]
+        },
+        "toro": {
+          "generations": [
+            { "generation_id": "toro_g1", "name": "Gen 1", "years": [2016, 2026], "facelift": true }
+          ]
+        }
+      },
+      "peugeot": {
+        "208": {
+          "generations": [
+            { "generation_id": "208_g1", "name": "Gen 1", "years": [2013, 2019], "facelift": true },
+            { "generation_id": "208_g2", "name": "Gen 2", "years": [2020, 2026], "facelift": true }
+          ]
+        },
+        "2008": {
+          "generations": [
+            { "generation_id": "2008_g1", "name": "Gen 1", "years": [2016, 2019], "facelift": true },
+            { "generation_id": "2008_g2", "name": "Gen 2", "years": [2020, 2026], "facelift": true }
+          ]
+        },
+        "partner": {
+          "generations": [
+            { "generation_id": "partner_g2", "name": "Gen 2", "years": [1998, 2018], "facelift": true },
+            { "generation_id": "partner_g3", "name": "Gen 3", "years": [2019, 2026], "facelift": true }
+          ]
+        }
+      },
+      "ford": {
+        "ranger": {
+          "generations": [
+            { "generation_id": "ranger_g3", "name": "Gen 3", "years": [2012, 2022], "facelift": true },
+            { "generation_id": "ranger_g4", "name": "Gen 4", "years": [2023, 2026], "facelift": false }
+          ]
+        },
+        "maverick": {
+          "generations": [
+            { "generation_id": "maverick_g1", "name": "Gen 1", "years": [2022, 2026], "facelift": false }
+          ]
+        },
+        "territory": {
+          "generations": [
+            { "generation_id": "territory_g1", "name": "Gen 1", "years": [2020, 2026], "facelift": true }
+          ]
+        },
+        "mustang": {
+          "generations": [
+            { "generation_id": "mustang_s550", "name": "S550", "years": [2015, 2023], "facelift": true },
+            { "generation_id": "mustang_s650", "name": "S650", "years": [2024, 2026], "facelift": false }
+          ]
+        }
+      },
+      "renault": {
+        "sandero": {
+          "generations": [
+            { "generation_id": "sandero_g1", "name": "Gen 1", "years": [2008, 2014], "facelift": true },
+            { "generation_id": "sandero_g2", "name": "Gen 2", "years": [2015, 2024], "facelift": true }
+          ]
+        },
+        "logan": {
+          "generations": [
+            { "generation_id": "logan_g1", "name": "Gen 1", "years": [2008, 2014], "facelift": true },
+            { "generation_id": "logan_g2", "name": "Gen 2", "years": [2015, 2024], "facelift": true }
+          ]
+        },
+        "duster": {
+          "generations": [
+            { "generation_id": "duster_g1", "name": "Gen 1", "years": [2011, 2017], "facelift": true },
+            { "generation_id": "duster_g2", "name": "Gen 2", "years": [2018, 2026], "facelift": true }
+          ]
+        },
+        "kangoo": {
+          "generations": [
+            { "generation_id": "kangoo_g1", "name": "Gen 1", "years": [1998, 2008], "facelift": true },
+            { "generation_id": "kangoo_g2", "name": "Gen 2", "years": [2009, 2026], "facelift": true }
+          ]
+        },
+        "alaskan": {
+          "generations": [
+            { "generation_id": "alaskan_g1", "name": "Gen 1", "years": [2018, 2023], "facelift": true }
+          ]
+        }
+      }
+    }
+  }
+}

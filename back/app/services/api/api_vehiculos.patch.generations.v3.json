@@ -1,0 +1,27 @@
+{
+  "catalog_patch": {
+    "version": "car_catalog_api_v1_patch_2026-02-03_generations_v3_ar_derive_from_model_years",
+    "applies_to_schema": "api_vehiculos_base_v0",
+    "notes": {
+      "scope": "Argentina",
+      "description": "Genera generaciones automáticamente para todos los modelos usando el rango model_years si existe. Evita tener que definir 200+ modelos a mano."
+    },
+    "operation": "derive_generations_from_model_years",
+    "rules": {
+      "apply_to_all_models": true,
+      "only_if_missing_generations": true,
+      "default_generation": {
+        "generation_id_template": "{brand_id}::{model_name_slug}::g1",
+        "name": "Gen 1",
+        "facelift": false,
+        "years_source": "model.model_years",
+        "years_fallback": [null, null]
+      },
+      "slug_rules": {
+        "lowercase": true,
+        "replace_spaces_with": "_",
+        "remove_chars_regex": "[^a-z0-9_]"
+      }
+    }
+  }
+}

@@ -1,4 +1,5 @@
 from flask import Flask
+from sqlalchemy import inspect
 from flask_cors import CORS
 
 from app.config import Config
@@ -20,5 +21,12 @@ def create_app(config_class=Config):
   migrate.init_app(app, db)
 
   app.register_blueprint(api, url_prefix='/api')
+
+  if app.config.get('AUTO_CREATE_DB', False):
+    with app.app_context():
+      if app.config['SQLALCHEMY_DATABASE_URI'].startswith('sqlite:'):
+        inspector = inspect(db.engine)
+        if not inspector.get_table_names():
+          db.create_all()
 
   return app

@@ -1,0 +1,100 @@
+{
+  "catalog_patch": {
+    "version": "car_catalog_api_v1_patch_2026-02-03_aliases_search_v2_ar_expand_new_brands",
+    "applies_to_schema": "car_catalog_api_v1",
+    "notes": {
+      "scope": "Argentina",
+      "description": "Aliases para marcas/modelos agregados (punto 3). Mejora búsqueda y evita duplicados por escritura.",
+      "data_quality": "best_effort"
+    },
+    "rules": {
+      "ignore_unknown_model_refs": true,
+      "query_normalization": {
+        "lowercase": true,
+        "trim": true,
+        "collapse_spaces": true,
+        "remove_diacritics": true,
+        "replace": [
+          { "from": "mg ", "to": "mg " },
+          { "from": "jetour ", "to": "jetour " },
+          { "from": "gac ", "to": "gac " }
+        ]
+      }
+    },
+    "overrides": {
+      "mg": {
+        "mg3_hybrid": { "aliases": ["mg3 hybrid", "mg 3 hybrid", "mg3 hev", "mg 3 hev"] },
+        "mg4": { "aliases": ["mg4", "mg 4", "mg4 ev", "mg 4 ev"] },
+        "zs": { "aliases": ["zs", "mg zs", "mgzs"] },
+        "zs_hybrid": { "aliases": ["zs hybrid", "mg zs hybrid", "zs hev"] },
+        "gt": { "aliases": ["mg gt", "gt", "mg5 gt"] },
+        "rx5": { "aliases": ["rx5", "mg rx5"] },
+        "cyberster": { "aliases": ["cyberster", "mg cyberster"] }
+      },
+      "jetour": {
+        "x50": { "aliases": ["x50", "jetour x50"] },
+        "x70": { "aliases": ["x70", "jetour x70"] },
+        "x70_plus": { "aliases": ["x70 plus", "x70+", "jetour x70 plus"] },
+        "dashing": { "aliases": ["dashing", "jetour dashing"] },
+        "t1": { "aliases": ["t1", "jetour t1"] }
+      },
+      "gac": {
+        "emzoom": { "aliases": ["emzoom", "gac emzoom"] },
+        "emkoo": { "aliases": ["emkoo", "gac emkoo"] },
+        "gs8": { "aliases": ["gs8", "gac gs8"] },
+        "aion_es": { "aliases": ["aion es", "aion-es", "gac aion es"] },
+        "empow": { "aliases": ["empow", "gac empow"] }
+      },
+      "jmc": {
+        "grand_avenue": { "aliases": ["grand avenue", "jmc grand avenue"] },
+        "grand_avenue_plus": { "aliases": ["grand avenue plus", "jmc grand avenue plus"] },
+        "grand_avenue_dadao_pro": { "aliases": ["dadao pro", "grand avenue dadao pro", "jmc dadao pro"] },
+        "n900": { "aliases": ["n900", "jmc n900"] },
+        "n800": { "aliases": ["n800", "jmc n800"] }
+      },
+      "forthing": {
+        "t5_evo": { "aliases": ["t5 evo", "forthing t5 evo", "t5evo"] },
+        "t5_hev": { "aliases": ["t5 hev", "forthing t5 hev", "t5 hybrid"] },
+        "friday": { "aliases": ["friday", "forthing friday", "friday ev"] },
+        "u_tour": { "aliases": ["u-tour", "utour", "forthing u-tour"] }
+      },
+      "skywell": {
+        "et5": { "aliases": ["et5", "skywell et5"] },
+        "be11": { "aliases": ["be11", "skywell be11"] }
+      },
+      "kaiyi": {
+        "x3": { "aliases": ["x3", "kaiyi x3"] }
+      },
+      "kyc": {
+        "mamut_cabina_simple": { "aliases": ["mamut cabina simple", "kyc mamut cabina simple"] },
+        "mamut_cabina_doble": { "aliases": ["mamut cabina doble", "kyc mamut cabina doble"] },
+        "mamut_box": { "aliases": ["mamut box", "kyc mamut box"] }
+      },
+      "shineray": {
+        "t30": { "aliases": ["t30", "shineray t30"] },
+        "t32": { "aliases": ["t32", "shineray t32"] },
+        "x30_furgon": { "aliases": ["x30 furgon", "x30 furgón", "shineray x30 furgon"] },
+        "x30_pasajeros": { "aliases": ["x30 pasajeros", "shineray x30 pasajeros"] },
+        "srm_m7": { "aliases": ["srm m7", "m7", "shineray srm m7"] }
+      },
+      "jmev": {
+        "easy_3": { "aliases": ["easy 3", "easy3", "jmev easy 3"] }
+      },
+      "coradir": {
+        "tito": { "aliases": ["tito", "coradir tito", "tito ev"] },
+        "tito_s5": { "aliases": ["tito s5", "coradir tito s5"] },
+        "tita": { "aliases": ["tita", "coradir tita", "tita ev"] }
+      },
+      "scania": {
+        "p_series": { "aliases": ["p series", "serie p", "scania p"] },
+        "g_series": { "aliases": ["g series", "serie g", "scania g"] },
+        "r_series": { "aliases": ["r series", "serie r", "scania r"] }
+      }
+    },
+    "status": {
+      "current_point": "7b_aliases_full",
+      "progress": "expanded_to_new_brands_v2",
+      "next_point": "1b_status_origin_full"
+    }
+  }
+}

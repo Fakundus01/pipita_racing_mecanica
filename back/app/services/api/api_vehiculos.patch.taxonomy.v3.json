@@ -1,0 +1,585 @@
+{
+  "_file": "api_vehiculos.patch.taxonomy.v3.json",
+  "catalog_patch": {
+    "version": "car_catalog_api_v1_patch_2026-02-03_taxonomy_v3_full_base_coverage",
+    "applies_to_schema": "api_vehiculos_base_v0",
+    "notes": {
+      "scope": "Argentina",
+      "description": "Normaliza taxonomía para TODO el base actual (58 marcas) agregando campos body/segment/attributes por modelo, sin tocar el array segments original. Match por nombre exacto dentro de cada brand_id.",
+      "compat": "Diseñado para tu base actual (brand.brand_id + model.name + model.segments)."
+    },
+    "operation": "normalize_taxonomy_fields",
+    "rules": {
+      "match_strategy": "brand_id + model.name (case-sensitive) -> set fields",
+      "attributes_enum": [
+        "ev",
+        "hybrid",
+        "phev",
+        "commercial",
+        "crossover",
+        "sports",
+        "luxury",
+        "ultra_luxury",
+        "supercar",
+        "hypercar"
+      ],
+      "body_enum": ["Car", "SUV", "Truck", "Van", "MPV"],
+      "segment_enum": ["Hatchback", "Sedan", "Coupe", "Pickup", null],
+      "derivation_reference": {
+        "body": "SUV|Truck|Van|MPV if present in segments else Car",
+        "segment": "Pickup/Hatchback/Sedan/Coupe if present in segments else null",
+        "attributes": "Map EV->ev, Commercial->commercial, Crossover->crossover, Sports->sports, Luxury->luxury, Ultra Luxury->ultra_luxury, Supercar->supercar, Hypercar->hypercar"
+      }
+    },
+    "overrides_by_brand_id": {
+      "renault": [
+        {
+          "match": { "name": "Alaskan" },
+          "set": { "body": "Truck", "segment": "Pickup", "attributes": [] }
+        },
+        {
+          "match": { "name": "Duster" },
+          "set": { "body": "SUV", "segment": null, "attributes": [] }
+        },
+        {
+          "match": { "name": "Kangoo" },
+          "set": { "body": "Van", "segment": null, "attributes": ["commercial"] }
+        },
+        {
+          "match": { "name": "Kardian" },
+          "set": { "body": "SUV", "segment": null, "attributes": [] }
+        },
+        {
+          "match": { "name": "Logan" },
+          "set": { "body": "Car", "segment": "Sedan", "attributes": [] }
+        },
+        {
+          "match": { "name": "Sandero" },
+          "set": { "body": "Car", "segment": "Hatchback", "attributes": [] }
+        },
+        {
+          "match": { "name": "Stepway" },
+          "set": { "body": "Car", "segment": null, "attributes": ["crossover"] }
+        }
+      ],
+      "volkswagen": [
+        {
+          "match": { "name": "Amarok" },
+          "set": { "body": "Truck", "segment": "Pickup", "attributes": [] }
+        },
+        {
+          "match": { "name": "Nivus" },
+          "set": { "body": "SUV", "segment": null, "attributes": [] }
+        },
+        {
+          "match": { "name": "Polo" },
+          "set": { "body": "Car", "segment": "Hatchback", "attributes": [] }
+        },
+        {
+          "match": { "name": "Taos" },
+          "set": { "body": "SUV", "segment": null, "attributes": [] }
+        },
+        {
+          "match": { "name": "T-Cross" },
+          "set": { "body": "SUV", "segment": null, "attributes": [] }
+        },
+        {
+          "match": { "name": "Virtus" },
+          "set": { "body": "Car", "segment": "Sedan", "attributes": [] }
+        }
+      ],
+      "toyota": [
+        {
+          "match": { "name": "Corolla" },
+          "set": { "body": "Car", "segment": "Sedan", "attributes": [] }
+        },
+        {
+          "match": { "name": "Corolla Cross" },
+          "set": { "body": "SUV", "segment": null, "attributes": [] }
+        },
+        {
+          "match": { "name": "Etios" },
+          "set": { "body": "Car", "segment": "Hatchback", "attributes": [] }
+        },
+        {
+          "match": { "name": "Etios Sedan" },
+          "set": { "body": "Car", "segment": "Sedan", "attributes": [] }
+        },
+        {
+          "match": { "name": "Hilux" },
+          "set": { "body": "Truck", "segment": "Pickup", "attributes": [] }
+        },
+        {
+          "match": { "name": "SW4" },
+          "set": { "body": "SUV", "segment": null, "attributes": [] }
+        },
+        {
+          "match": { "name": "Yaris" },
+          "set": { "body": "Car", "segment": "Hatchback", "attributes": [] }
+        },
+        {
+          "match": { "name": "Yaris Sedan" },
+          "set": { "body": "Car", "segment": "Sedan", "attributes": [] }
+        }
+      ],
+      "fiat": [
+        {
+          "match": { "name": "Argo" },
+          "set": { "body": "Car", "segment": "Hatchback", "attributes": [] }
+        },
+        {
+          "match": { "name": "Cronos" },
+          "set": { "body": "Car", "segment": "Sedan", "attributes": [] }
+        },
+        {
+          "match": { "name": "Fastback" },
+          "set": { "body": "SUV", "segment": null, "attributes": ["crossover"] }
+        },
+        {
+          "match": { "name": "Mobi" },
+          "set": { "body": "Car", "segment": "Hatchback", "attributes": [] }
+        },
+        {
+          "match": { "name": "Pulse" },
+          "set": { "body": "SUV", "segment": null, "attributes": [] }
+        },
+        {
+          "match": { "name": "Strada" },
+          "set": { "body": "Truck", "segment": "Pickup", "attributes": [] }
+        },
+        {
+          "match": { "name": "Toro" },
+          "set": { "body": "Truck", "segment": "Pickup", "attributes": [] }
+        }
+      ],
+      "peugeot": [
+        {
+          "match": { "name": "2008" },
+          "set": { "body": "SUV", "segment": null, "attributes": [] }
+        },
+        {
+          "match": { "name": "208" },
+          "set": { "body": "Car", "segment": "Hatchback", "attributes": [] }
+        },
+        {
+          "match": { "name": "3008" },
+          "set": { "body": "SUV", "segment": null, "attributes": [] }
+        },
+        {
+          "match": { "name": "5008" },
+          "set": { "body": "SUV", "segment": null, "attributes": [] }
+        },
+        {
+          "match": { "name": "Partner" },
+          "set": { "body": "Van", "segment": null, "attributes": ["commercial"] }
+        }
+      ],
+      "citroen": [
+        {
+          "match": { "name": "Berlingo" },
+          "set": { "body": "Van", "segment": null, "attributes": ["commercial"] }
+        },
+        {
+          "match": { "name": "C3" },
+          "set": { "body": "Car", "segment": "Hatchback", "attributes": [] }
+        },
+        {
+          "match": { "name": "C3 Aircross" },
+          "set": { "body": "SUV", "segment": null, "attributes": [] }
+        },
+        {
+          "match": { "name": "C4 Cactus" },
+          "set": { "body": "SUV", "segment": null, "attributes": ["crossover"] }
+        }
+      ],
+      "chevrolet": [
+        {
+          "match": { "name": "Cruze" },
+          "set": { "body": "Car", "segment": "Sedan", "attributes": [] }
+        },
+        {
+          "match": { "name": "Montana" },
+          "set": { "body": "Truck", "segment": "Pickup", "attributes": [] }
+        },
+        {
+          "match": { "name": "Onix" },
+          "set": { "body": "Car", "segment": "Hatchback", "attributes": [] }
+        },
+        {
+          "match": { "name": "Onix Plus" },
+          "set": { "body": "Car", "segment": "Sedan", "attributes": [] }
+        },
+        {
+          "match": { "name": "S10" },
+          "set": { "body": "Truck", "segment": "Pickup", "attributes": [] }
+        },
+        {
+          "match": { "name": "Spin" },
+          "set": { "body": "MPV", "segment": null, "attributes": [] }
+        },
+        {
+          "match": { "name": "Tracker" },
+          "set": { "body": "SUV", "segment": null, "attributes": [] }
+        }
+      ],
+      "ford": [
+        {
+          "match": { "name": "Bronco" },
+          "set": { "body": "SUV", "segment": null, "attributes": [] }
+        },
+        {
+          "match": { "name": "Maverick" },
+          "set": { "body": "Truck", "segment": "Pickup", "attributes": [] }
+        },
+        {
+          "match": { "name": "Mustang" },
+          "set": { "body": "Car", "segment": null, "attributes": ["sports"] }
+        },
+        {
+          "match": { "name": "Ranger" },
+          "set": { "body": "Truck", "segment": "Pickup", "attributes": [] }
+        },
+        {
+          "match": { "name": "Territory" },
+          "set": { "body": "SUV", "segment": null, "attributes": [] }
+        }
+      ],
+      "nissan": [
+        {
+          "match": { "name": "Frontier" },
+          "set": { "body": "Truck", "segment": "Pickup", "attributes": [] }
+        },
+        {
+          "match": { "name": "Kicks" },
+          "set": { "body": "SUV", "segment": null, "attributes": [] }
+        },
+        {
+          "match": { "name": "Sentra" },
+          "set": { "body": "Car", "segment": "Sedan", "attributes": [] }
+        }
+      ],
+      "jeep": [
+        {
+          "match": { "name": "Compass" },
+          "set": { "body": "SUV", "segment": null, "attributes": [] }
+        },
+        {
+          "match": { "name": "Renegade" },
+          "set": { "body": "SUV", "segment": null, "attributes": [] }
+        },
+        {
+          "match": { "name": "Wrangler" },
+          "set": { "body": "SUV", "segment": null, "attributes": [] }
+        }
+      ],
+      "ram": [
+        {
+          "match": { "name": "1500" },
+          "set": { "body": "Truck", "segment": "Pickup", "attributes": [] }
+        },
+        {
+          "match": { "name": "2500" },
+          "set": { "body": "Truck", "segment": "Pickup", "attributes": [] }
+        },
+        {
+          "match": { "name": "Rampage" },
+          "set": { "body": "Truck", "segment": "Pickup", "attributes": [] }
+        }
+      ],
+      "hyundai": [
+        {
+          "match": { "name": "Creta" },
+          "set": { "body": "SUV", "segment": null, "attributes": [] }
+        },
+        {
+          "match": { "name": "HB20" },
+          "set": { "body": "Car", "segment": "Hatchback", "attributes": [] }
+        },
+        {
+          "match": { "name": "HB20 Sedan" },
+          "set": { "body": "Car", "segment": "Sedan", "attributes": [] }
+        },
+        {
+          "match": { "name": "Tucson" },
+          "set": { "body": "SUV", "segment": null, "attributes": [] }
+        }
+      ],
+      "kia": [
+        {
+          "match": { "name": "Carnival" },
+          "set": { "body": "MPV", "segment": null, "attributes": [] }
+        },
+        {
+          "match": { "name": "Cerato" },
+          "set": { "body": "Car", "segment": "Sedan", "attributes": [] }
+        },
+        {
+          "match": { "name": "Seltos" },
+          "set": { "body": "SUV", "segment": null, "attributes": [] }
+        },
+        {
+          "match": { "name": "Sportage" },
+          "set": { "body": "SUV", "segment": null, "attributes": [] }
+        }
+      ],
+      "honda": [
+        {
+          "match": { "name": "City" },
+          "set": { "body": "Car", "segment": "Sedan", "attributes": [] }
+        },
+        {
+          "match": { "name": "Civic" },
+          "set": { "body": "Car", "segment": "Sedan", "attributes": [] }
+        },
+        {
+          "match": { "name": "CR-V" },
+          "set": { "body": "SUV", "segment": null, "attributes": [] }
+        }
+      ],
+      "bmw": [
+        {
+          "match": { "name": "Serie 1" },
+          "set": { "body": "Car", "segment": null, "attributes": ["luxury"] }
+        },
+        {
+          "match": { "name": "Serie 3" },
+          "set": { "body": "Car", "segment": "Sedan", "attributes": ["luxury"] }
+        },
+        {
+          "match": { "name": "X1" },
+          "set": { "body": "SUV", "segment": null, "attributes": ["luxury"] }
+        },
+        {
+          "match": { "name": "X3" },
+          "set": { "body": "SUV", "segment": null, "attributes": ["luxury"] }
+        }
+      ],
+      "audi": [
+        {
+          "match": { "name": "A1" },
+          "set": { "body": "Car", "segment": null, "attributes": ["luxury"] }
+        },
+        {
+          "match": { "name": "A3" },
+          "set": { "body": "Car", "segment": "Sedan", "attributes": ["luxury"] }
+        },
+        {
+          "match": { "name": "Q3" },
+          "set": { "body": "SUV", "segment": null, "attributes": ["luxury"] }
+        }
+      ],
+      "mercedes_benz": [
+        {
+          "match": { "name": "Sprinter" },
+          "set": { "body": "Van", "segment": null, "attributes": ["commercial"] }
+        }
+      ],
+      "byd": [
+        {
+          "match": { "name": "Atto 3" },
+          "set": { "body": "SUV", "segment": null, "attributes": ["ev"] }
+        },
+        {
+          "match": { "name": "Dolphin" },
+          "set": { "body": "Car", "segment": "Hatchback", "attributes": ["ev"] }
+        },
+        {
+          "match": { "name": "Seal" },
+          "set": { "body": "Car", "segment": "Sedan", "attributes": ["ev"] }
+        }
+      ],
+      "mg": [
+        {
+          "match": { "name": "MG3 Hybrid" },
+          "set": { "body": "Car", "segment": "Hatchback", "attributes": ["hybrid"] }
+        },
+        {
+          "match": { "name": "MG4" },
+          "set": { "body": "Car", "segment": "Hatchback", "attributes": ["ev"] }
+        },
+        {
+          "match": { "name": "ZS" },
+          "set": { "body": "SUV", "segment": null, "attributes": [] }
+        },
+        {
+          "match": { "name": "ZS Hybrid" },
+          "set": { "body": "SUV", "segment": null, "attributes": ["hybrid"] }
+        },
+        {
+          "match": { "name": "Cyberster" },
+          "set": { "body": "Car", "segment": null, "attributes": ["ev"] }
+        }
+      ],
+      "jetour": [
+        {
+          "match": { "name": "X50" },
+          "set": { "body": "SUV", "segment": null, "attributes": [] }
+        },
+        {
+          "match": { "name": "X70" },
+          "set": { "body": "SUV", "segment": null, "attributes": [] }
+        },
+        {
+          "match": { "name": "X70 Plus" },
+          "set": { "body": "SUV", "segment": null, "attributes": [] }
+        },
+        {
+          "match": { "name": "Dashing" },
+          "set": { "body": "SUV", "segment": null, "attributes": [] }
+        },
+        {
+          "match": { "name": "T1" },
+          "set": { "body": "SUV", "segment": null, "attributes": [] }
+        }
+      ],
+      "gac": [
+        {
+          "match": { "name": "Emzoom" },
+          "set": { "body": "SUV", "segment": null, "attributes": [] }
+        },
+        {
+          "match": { "name": "Emkoo" },
+          "set": { "body": "SUV", "segment": null, "attributes": [] }
+        },
+        {
+          "match": { "name": "GS8" },
+          "set": { "body": "SUV", "segment": null, "attributes": [] }
+        },
+        {
+          "match": { "name": "Aion ES" },
+          "set": { "body": "Car", "segment": "Sedan", "attributes": ["ev"] }
+        },
+        {
+          "match": { "name": "Empow" },
+          "set": { "body": "Car", "segment": "Sedan", "attributes": [] }
+        }
+      ],
+      "jmc": [
+        {
+          "match": { "name": "Grand Avenue" },
+          "set": { "body": "Truck", "segment": "Pickup", "attributes": [] }
+        },
+        {
+          "match": { "name": "Grand Avenue Plus" },
+          "set": { "body": "Truck", "segment": "Pickup", "attributes": [] }
+        },
+        {
+          "match": { "name": "Grand Avenue Dadao Pro" },
+          "set": { "body": "Truck", "segment": "Pickup", "attributes": [] }
+        },
+        {
+          "match": { "name": "N900" },
+          "set": { "body": "Van", "segment": null, "attributes": ["commercial"] }
+        },
+        {
+          "match": { "name": "N800" },
+          "set": { "body": "Van", "segment": null, "attributes": ["commercial"] }
+        }
+      ],
+      "forthing": [
+        {
+          "match": { "name": "T5 EVO" },
+          "set": { "body": "SUV", "segment": null, "attributes": [] }
+        },
+        {
+          "match": { "name": "T5 HEV" },
+          "set": { "body": "SUV", "segment": null, "attributes": [] }
+        },
+        {
+          "match": { "name": "Friday" },
+          "set": { "body": "SUV", "segment": null, "attributes": ["ev"] }
+        },
+        {
+          "match": { "name": "U-Tour" },
+          "set": { "body": "MPV", "segment": null, "attributes": [] }
+        }
+      ],
+      "skywell": [
+        {
+          "match": { "name": "ET5" },
+          "set": { "body": "SUV", "segment": null, "attributes": ["ev"] }
+        },
+        {
+          "match": { "name": "BE11" },
+          "set": { "body": "SUV", "segment": null, "attributes": ["ev"] }
+        }
+      ],
+      "kaiyi": [
+        {
+          "match": { "name": "X3" },
+          "set": { "body": "SUV", "segment": null, "attributes": [] }
+        }
+      ],
+      "kyc": [
+        {
+          "match": { "name": "Mamut Cabina Simple" },
+          "set": { "body": "Van", "segment": null, "attributes": ["commercial"] }
+        },
+        {
+          "match": { "name": "Mamut Cabina Doble" },
+          "set": { "body": "Van", "segment": null, "attributes": ["commercial"] }
+        },
+        {
+          "match": { "name": "Mamut Box" },
+          "set": { "body": "Van", "segment": null, "attributes": ["commercial"] }
+        }
+      ],
+      "shineray": [
+        {
+          "match": { "name": "T30" },
+          "set": { "body": "Van", "segment": null, "attributes": ["commercial"] }
+        },
+        {
+          "match": { "name": "T32" },
+          "set": { "body": "Van", "segment": null, "attributes": ["commercial"] }
+        },
+        {
+          "match": { "name": "X30 Furgón" },
+          "set": { "body": "Van", "segment": null, "attributes": ["commercial"] }
+        },
+        {
+          "match": { "name": "X30 Pasajeros" },
+          "set": { "body": "Van", "segment": null, "attributes": [] }
+        },
+        {
+          "match": { "name": "SRM M7" },
+          "set": { "body": "Van", "segment": null, "attributes": ["commercial"] }
+        }
+      ],
+      "jmev": [
+        {
+          "match": { "name": "Easy 3" },
+          "set": { "body": "Car", "segment": "Hatchback", "attributes": ["ev"] }
+        }
+      ],
+      "coradir": [
+        {
+          "match": { "name": "Tito" },
+          "set": { "body": "Car", "segment": "Hatchback", "attributes": ["ev"] }
+        },
+        {
+          "match": { "name": "Tito S5" },
+          "set": { "body": "Car", "segment": "Hatchback", "attributes": ["ev"] }
+        },
+        {
+          "match": { "name": "Tita" },
+          "set": { "body": "Van", "segment": null, "attributes": ["ev", "commercial"] }
+        }
+      ],
+      "scania": [
+        {
+          "match": { "name": "P Series" },
+          "set": { "body": "Truck", "segment": null, "attributes": ["commercial"] }
+        },
+        {
+          "match": { "name": "G Series" },
+          "set": { "body": "Truck", "segment": null, "attributes": ["commercial"] }
+        },
+        {
+          "match": { "name": "R Series" },
+          "set": { "body": "Truck", "segment": null, "attributes": ["commercial"] }
+        }
+      ]
+    }
+  }
+}

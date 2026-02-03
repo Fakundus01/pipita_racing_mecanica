@@ -1,0 +1,353 @@
+{
+  "catalog_patch": {
+    "version": "car_catalog_api_v1_patch_2026-02-03_ar_status_origin_v3_core_ar_coverage",
+    "applies_to_schema": "car_catalog_api_v1",
+    "notes": {
+      "scope": "Argentina",
+      "description": "Completa status/origin para modelos principales del mercado AR (produccion local / Mercosur / extra-zona) + heurística para importación limitada en marcas premium.",
+      "data_quality": "heuristic_market_classification"
+    },
+    "enums": {
+      "status": ["production", "discontinued", "limited_import", "unknown"],
+      "origin": ["local", "mercosur", "extra_zone", "unknown"]
+    },
+    "rules": {
+      "default_behavior": "Si un modelo no está en overrides, queda como unknown/unknown.",
+      "ignore_unknown_model_refs": true,
+      "ar_origin_heuristic": {
+        "local": "producción en Argentina",
+        "mercosur": "importación desde Mercosur (principalmente Brasil)",
+        "extra_zone": "importación fuera de Mercosur",
+        "unknown": "sin dato estable"
+      }
+    },
+    "overrides": {
+      "toyota": {
+        "hilux": { "status": "production", "origin": "local" },
+        "sw4": { "status": "production", "origin": "local" },
+        "corolla": { "status": "production", "origin": "mercosur" },
+        "corolla_cross": { "status": "production", "origin": "mercosur" },
+        "yaris": { "status": "production", "origin": "mercosur" },
+        "etios": { "status": "discontinued", "origin": "mercosur" }
+      },
+      "volkswagen": {
+        "taos": { "status": "production", "origin": "local" },
+        "amarok": { "status": "production", "origin": "local" },
+        "polo": { "status": "production", "origin": "mercosur" },
+        "virtus": { "status": "production", "origin": "mercosur" },
+        "nivus": { "status": "production", "origin": "mercosur" },
+        "t_cross": { "status": "production", "origin": "mercosur" },
+        "gol_trend": { "status": "discontinued", "origin": "mercosur" }
+      },
+      "renault": {
+        "alaskan": { "status": "production", "origin": "local" },
+        "kangoo": { "status": "production", "origin": "local" },
+        "kardian": { "status": "production", "origin": "mercosur" },
+        "duster": { "status": "production", "origin": "extra_zone" },
+        "logan": { "status": "discontinued", "origin": "mercosur" },
+        "sandero": { "status": "discontinued", "origin": "mercosur" },
+        "stepway": { "status": "discontinued", "origin": "mercosur" }
+      },
+      "fiat": {
+        "cronos": { "status": "production", "origin": "local" },
+        "argo": { "status": "production", "origin": "mercosur" },
+        "mobi": { "status": "production", "origin": "mercosur" },
+        "pulse": { "status": "production", "origin": "mercosur" },
+        "fastback": { "status": "production", "origin": "mercosur" },
+        "strada": { "status": "production", "origin": "mercosur" },
+        "toro": { "status": "production", "origin": "mercosur" }
+      },
+      "peugeot": {
+        "208": { "status": "production", "origin": "local" },
+        "2008": { "status": "production", "origin": "local" },
+        "partner": { "status": "production", "origin": "mercosur" },
+        "3008": { "status": "limited_import", "origin": "extra_zone" },
+        "5008": { "status": "limited_import", "origin": "extra_zone" }
+      },
+      "citroen": {
+        "c3": { "status": "production", "origin": "local" },
+        "c3_aircross": { "status": "production", "origin": "local" },
+        "berlingo": { "status": "production", "origin": "mercosur" },
+        "c4_cactus": { "status": "discontinued", "origin": "mercosur" }
+      },
+      "chevrolet": {
+        "cruze": { "status": "discontinued", "origin": "local" },
+        "tracker": { "status": "production", "origin": "mercosur" },
+        "onix": { "status": "production", "origin": "mercosur" },
+        "onix_plus": { "status": "production", "origin": "mercosur" },
+        "montana": { "status": "production", "origin": "mercosur" },
+        "s10": { "status": "production", "origin": "mercosur" },
+        "spin": { "status": "production", "origin": "mercosur" }
+      },
+      "ford": {
+        "ranger": { "status": "production", "origin": "local" },
+        "maverick": { "status": "production", "origin": "extra_zone" },
+        "territory": { "status": "production", "origin": "extra_zone" },
+        "bronco": { "status": "limited_import", "origin": "extra_zone" },
+        "mustang": { "status": "limited_import", "origin": "extra_zone" },
+        "kuga": { "status": "discontinued", "origin": "extra_zone" }
+      },
+      "nissan": {
+        "frontier": { "status": "production", "origin": "local" },
+        "kicks": { "status": "production", "origin": "mercosur" },
+        "sentra": { "status": "production", "origin": "extra_zone" },
+        "x_trail": { "status": "limited_import", "origin": "extra_zone" }
+      },
+      "jeep": {
+        "renegade": { "status": "production", "origin": "mercosur" },
+        "compass": { "status": "production", "origin": "mercosur" },
+        "wrangler": { "status": "limited_import", "origin": "extra_zone" },
+        "grand_cherokee": { "status": "limited_import", "origin": "extra_zone" }
+      },
+      "ram": {
+        "rampage": { "status": "production", "origin": "mercosur" },
+        "1500": { "status": "limited_import", "origin": "extra_zone" },
+        "2500": { "status": "limited_import", "origin": "extra_zone" }
+      },
+      "hyundai": {
+        "creta": { "status": "production", "origin": "extra_zone" },
+        "hb20": { "status": "production", "origin": "extra_zone" },
+        "santa_fe": { "status": "production", "origin": "extra_zone" },
+        "tucson": { "status": "production", "origin": "extra_zone" }
+      },
+      "kia": {
+        "carnival": { "status": "production", "origin": "extra_zone" },
+        "cerato": { "status": "production", "origin": "extra_zone" },
+        "seltos": { "status": "production", "origin": "extra_zone" },
+        "sportage": { "status": "production", "origin": "extra_zone" }
+      },
+      "honda": {
+        "city": { "status": "production", "origin": "extra_zone" },
+        "civic": { "status": "production", "origin": "extra_zone" },
+        "cr_v": { "status": "production", "origin": "extra_zone" },
+        "fit": { "status": "production", "origin": "extra_zone" }
+      },
+      "mercedes_benz": {
+        "sprinter": { "status": "production", "origin": "local" },
+        "clase_a": { "status": "limited_import", "origin": "extra_zone" },
+        "clase_c": { "status": "limited_import", "origin": "extra_zone" },
+        "gla": { "status": "limited_import", "origin": "extra_zone" },
+        "glc": { "status": "limited_import", "origin": "extra_zone" }
+      },
+      "iveco": {
+        "daily": { "status": "production", "origin": "local" },
+        "tector": { "status": "production", "origin": "local" }
+      },
+      "aston_martin": {
+        "db11": { "status": "limited_import", "origin": "extra_zone" },
+        "db12": { "status": "limited_import", "origin": "extra_zone" },
+        "dbx": { "status": "limited_import", "origin": "extra_zone" },
+        "vantage": { "status": "limited_import", "origin": "extra_zone" }
+      },
+      "bentley": {
+        "bentayga": { "status": "limited_import", "origin": "extra_zone" },
+        "continental_gt": { "status": "limited_import", "origin": "extra_zone" },
+        "flying_spur": { "status": "limited_import", "origin": "extra_zone" }
+      },
+      "bugatti": {
+        "chiron": { "status": "limited_import", "origin": "extra_zone" }
+      },
+      "cadillac": {
+        "escalade": { "status": "limited_import", "origin": "extra_zone" }
+      },
+      "ferrari": {
+        "296": { "status": "limited_import", "origin": "extra_zone" },
+        "812": { "status": "limited_import", "origin": "extra_zone" },
+        "f8": { "status": "limited_import", "origin": "extra_zone" },
+        "purosangue": { "status": "limited_import", "origin": "extra_zone" },
+        "roma": { "status": "limited_import", "origin": "extra_zone" }
+      },
+      "lamborghini": {
+        "aventador": { "status": "limited_import", "origin": "extra_zone" },
+        "huracan": { "status": "limited_import", "origin": "extra_zone" },
+        "revuelto": { "status": "limited_import", "origin": "extra_zone" },
+        "urus": { "status": "limited_import", "origin": "extra_zone" }
+      },
+      "mclaren": {
+        "720s": { "status": "limited_import", "origin": "extra_zone" },
+        "artura": { "status": "limited_import", "origin": "extra_zone" }
+      },
+      "maserati": {
+        "ghibli": { "status": "limited_import", "origin": "extra_zone" },
+        "grecale": { "status": "limited_import", "origin": "extra_zone" },
+        "levante": { "status": "limited_import", "origin": "extra_zone" },
+        "mc20": { "status": "limited_import", "origin": "extra_zone" }
+      },
+      "porsche": {
+        "911": { "status": "limited_import", "origin": "extra_zone" },
+        "boxster": { "status": "limited_import", "origin": "extra_zone" },
+        "cayenne": { "status": "limited_import", "origin": "extra_zone" },
+        "macan": { "status": "limited_import", "origin": "extra_zone" },
+        "panamera": { "status": "limited_import", "origin": "extra_zone" }
+      },
+      "rolls_royce": {
+        "cullinan": { "status": "limited_import", "origin": "extra_zone" },
+        "ghost": { "status": "limited_import", "origin": "extra_zone" },
+        "phantom": { "status": "limited_import", "origin": "extra_zone" }
+      },
+      "jaguar": {
+        "e_pace": { "status": "limited_import", "origin": "extra_zone" },
+        "f_pace": { "status": "limited_import", "origin": "extra_zone" },
+        "i_pace": { "status": "limited_import", "origin": "extra_zone" },
+        "xe": { "status": "limited_import", "origin": "extra_zone" },
+        "xf": { "status": "limited_import", "origin": "extra_zone" }
+      },
+      "land_rover": {
+        "defender": { "status": "limited_import", "origin": "extra_zone" },
+        "discovery": { "status": "limited_import", "origin": "extra_zone" },
+        "discovery_sport": { "status": "limited_import", "origin": "extra_zone" },
+        "range_rover": { "status": "limited_import", "origin": "extra_zone" },
+        "range_rover_evoque": { "status": "limited_import", "origin": "extra_zone" },
+        "range_rover_sport": { "status": "limited_import", "origin": "extra_zone" },
+        "range_rover_velar": { "status": "limited_import", "origin": "extra_zone" }
+      },
+      "lexus": {
+        "es": { "status": "limited_import", "origin": "extra_zone" },
+        "gx": { "status": "limited_import", "origin": "extra_zone" },
+        "is": { "status": "limited_import", "origin": "extra_zone" },
+        "lx": { "status": "limited_import", "origin": "extra_zone" },
+        "nx": { "status": "limited_import", "origin": "extra_zone" },
+        "rx": { "status": "limited_import", "origin": "extra_zone" }
+      },
+      "infiniti": {
+        "q50": { "status": "limited_import", "origin": "extra_zone" },
+        "q60": { "status": "limited_import", "origin": "extra_zone" },
+        "qx50": { "status": "limited_import", "origin": "extra_zone" },
+        "qx60": { "status": "limited_import", "origin": "extra_zone" }
+      },
+      "genesis": {
+        "g70": { "status": "limited_import", "origin": "extra_zone" },
+        "g80": { "status": "limited_import", "origin": "extra_zone" },
+        "gv70": { "status": "limited_import", "origin": "extra_zone" },
+        "gv80": { "status": "limited_import", "origin": "extra_zone" }
+      },
+      "volvo": {
+        "s60": { "status": "limited_import", "origin": "extra_zone" },
+        "xc40": { "status": "limited_import", "origin": "extra_zone" },
+        "xc60": { "status": "limited_import", "origin": "extra_zone" },
+        "xc90": { "status": "limited_import", "origin": "extra_zone" }
+      },
+      "alfa_romeo": {
+        "giulia": { "status": "limited_import", "origin": "extra_zone" },
+        "stelvio": { "status": "limited_import", "origin": "extra_zone" }
+      },
+      "bmw": {
+        "serie_1": { "status": "limited_import", "origin": "extra_zone" },
+        "serie_2": { "status": "limited_import", "origin": "extra_zone" },
+        "serie_3": { "status": "limited_import", "origin": "extra_zone" },
+        "serie_4": { "status": "limited_import", "origin": "extra_zone" },
+        "serie_5": { "status": "limited_import", "origin": "extra_zone" },
+        "x1": { "status": "limited_import", "origin": "extra_zone" },
+        "x3": { "status": "limited_import", "origin": "extra_zone" },
+        "x5": { "status": "limited_import", "origin": "extra_zone" }
+      },
+      "audi": {
+        "a1": { "status": "limited_import", "origin": "extra_zone" },
+        "a3": { "status": "limited_import", "origin": "extra_zone" },
+        "a4": { "status": "limited_import", "origin": "extra_zone" },
+        "a5": { "status": "limited_import", "origin": "extra_zone" },
+        "q3": { "status": "limited_import", "origin": "extra_zone" },
+        "q5": { "status": "limited_import", "origin": "extra_zone" },
+        "q7": { "status": "limited_import", "origin": "extra_zone" }
+      },
+      "mini": {
+        "cooper": { "status": "limited_import", "origin": "extra_zone" },
+        "countryman": { "status": "limited_import", "origin": "extra_zone" }
+      },
+      "subaru": {
+        "forester": { "status": "production", "origin": "extra_zone" },
+        "outback": { "status": "production", "origin": "extra_zone" },
+        "xv": { "status": "production", "origin": "extra_zone" }
+      },
+      "suzuki": {
+        "jimny": { "status": "production", "origin": "extra_zone" },
+        "swift": { "status": "production", "origin": "extra_zone" },
+        "vitara": { "status": "production", "origin": "extra_zone" }
+      },
+      "mazda": {
+        "cx_30": { "status": "production", "origin": "extra_zone" },
+        "cx_5": { "status": "production", "origin": "extra_zone" },
+        "mx_5": { "status": "production", "origin": "extra_zone" }
+      },
+      "mitsubishi": {
+        "eclipse_cross": { "status": "production", "origin": "extra_zone" },
+        "l200": { "status": "production", "origin": "extra_zone" },
+        "outlander": { "status": "production", "origin": "extra_zone" },
+        "pajero_sport": { "status": "production", "origin": "extra_zone" }
+      },
+      "isuzu": {
+        "d_max": { "status": "production", "origin": "extra_zone" },
+        "mu_x": { "status": "production", "origin": "extra_zone" }
+      },
+      "jac": {
+        "js2": { "status": "production", "origin": "extra_zone" },
+        "js4": { "status": "production", "origin": "extra_zone" },
+        "t8": { "status": "production", "origin": "extra_zone" }
+      },
+      "chery": {
+        "tiggo_2": { "status": "production", "origin": "extra_zone" },
+        "tiggo_4": { "status": "production", "origin": "extra_zone" },
+        "tiggo_7": { "status": "production", "origin": "extra_zone" },
+        "tiggo_8": { "status": "production", "origin": "extra_zone" }
+      },
+      "changan": {
+        "cs15": { "status": "production", "origin": "extra_zone" },
+        "cs35": { "status": "production", "origin": "extra_zone" },
+        "cs55": { "status": "production", "origin": "extra_zone" }
+      },
+      "baic": {
+        "x35": { "status": "production", "origin": "extra_zone" },
+        "x55": { "status": "production", "origin": "extra_zone" }
+      },
+      "byd": {
+        "atto_3": { "status": "production", "origin": "extra_zone" },
+        "dolphin": { "status": "production", "origin": "extra_zone" },
+        "seal": { "status": "production", "origin": "extra_zone" }
+      },
+      "geely": {
+        "coolray": { "status": "production", "origin": "extra_zone" },
+        "okavango": { "status": "production", "origin": "extra_zone" }
+      },
+      "great_wall": {
+        "poer": { "status": "production", "origin": "extra_zone" }
+      },
+      "haval": {
+        "h2": { "status": "production", "origin": "extra_zone" },
+        "h6": { "status": "production", "origin": "extra_zone" },
+        "jolion": { "status": "production", "origin": "extra_zone" }
+      },
+      "dfsk": {
+        "c31": { "status": "production", "origin": "extra_zone" },
+        "c32": { "status": "production", "origin": "extra_zone" },
+        "glory_560": { "status": "production", "origin": "extra_zone" }
+      },
+      "dongfeng": {
+        "aeolus_yixuan": { "status": "production", "origin": "extra_zone" }
+      },
+      "foton": {
+        "tunland": { "status": "production", "origin": "extra_zone" }
+      },
+      "hino": {
+        "300_series": { "status": "production", "origin": "extra_zone" },
+        "500_series": { "status": "production", "origin": "extra_zone" }
+      },
+      "dodge": {
+        "durango": { "status": "production", "origin": "extra_zone" }
+      },
+      "ds": {
+        "ds3": { "status": "production", "origin": "extra_zone" },
+        "ds4": { "status": "production", "origin": "extra_zone" },
+        "ds7": { "status": "production", "origin": "extra_zone" }
+      },
+      "seat": {
+        "ibiza": { "status": "production", "origin": "extra_zone" },
+        "leon": { "status": "production", "origin": "extra_zone" }
+      },
+      "skoda": {
+        "karoq": { "status": "production", "origin": "extra_zone" },
+        "kodiaq": { "status": "production", "origin": "extra_zone" },
+        "octavia": { "status": "production", "origin": "extra_zone" }
+      }
+    }
+  }
+}

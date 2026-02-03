@@ -1,0 +1,63 @@
+{
+  "catalog_patch": {
+    "version": "car_catalog_api_v1_patch_2026-02-03_model_years_v1",
+    "applies_to_schema": "car_catalog_api_v1",
+    "notes": {
+      "scope": "Argentina",
+      "description": "Años de comercialización aproximados por modelo. Se expandirá por generaciones en futuras versiones."
+    },
+    "rules": {
+      "years_definition": "Inclusive range of model years available in Argentina market"
+    },
+    "overrides": {
+      "toyota": {
+        "hilux": { "years": [2005, 2026] },
+        "corolla": { "years": [2008, 2026] },
+        "corolla_cross": { "years": [2021, 2026] },
+        "yaris": { "years": [2016, 2026] },
+        "sw4": { "years": [2005, 2026] }
+      },
+      "volkswagen": {
+        "amarok": { "years": [2010, 2026] },
+        "gol_trend": { "years": [2008, 2022] },
+        "polo": { "years": [2018, 2026] },
+        "virtus": { "years": [2018, 2026] },
+        "t_cross": { "years": [2019, 2026] },
+        "taos": { "years": [2021, 2026] },
+        "nivus": { "years": [2020, 2026] }
+      },
+      "chevrolet": {
+        "onix": { "years": [2013, 2026] },
+        "onix_plus": { "years": [2019, 2026] },
+        "cruze": { "years": [2016, 2023] },
+        "tracker": { "years": [2020, 2026] },
+        "s10": { "years": [2012, 2026] }
+      },
+      "fiat": {
+        "cronos": { "years": [2018, 2026] },
+        "argo": { "years": [2017, 2026] },
+        "pulse": { "years": [2021, 2026] },
+        "strada": { "years": [2013, 2026] },
+        "toro": { "years": [2016, 2026] }
+      },
+      "peugeot": {
+        "208": { "years": [2013, 2026] },
+        "2008": { "years": [2016, 2026] },
+        "partner": { "years": [1998, 2026] }
+      },
+      "ford": {
+        "ranger": { "years": [2012, 2026] },
+        "maverick": { "years": [2022, 2026] },
+        "territory": { "years": [2020, 2026] },
+        "mustang": { "years": [2015, 2026] }
+      },
+      "renault": {
+        "sandero": { "years": [2008, 2024] },
+        "logan": { "years": [2008, 2024] },
+        "duster": { "years": [2011, 2026] },
+        "kangoo": { "years": [1998, 2026] },
+        "alaskan": { "years": [2018, 2023] }
+      }
+    }
+  }
+}

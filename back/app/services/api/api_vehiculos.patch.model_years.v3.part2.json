@@ -1,0 +1,287 @@
+{
+  "_file": "api_vehiculos.patch.model_years.v3.part2.json",
+  "catalog_patch": {
+    "version": "car_catalog_api_v1_patch_2026-02-03_model_years_v3_part2_premium_china_utilitarios",
+    "applies_to_schema": "api_vehiculos_base_v0",
+    "notes": {
+      "scope": "Argentina",
+      "description": "Model-years (rangos) por modelo. Parte 2/?. Matching por brand_id + model.name (exacto).",
+      "data_quality": "best_effort_ranges",
+      "range_format": "[start_year, end_year] ambos inclusivos"
+    },
+    "operation": "set_model_year_ranges",
+    "rules": {
+      "ignore_unknown_model_refs": true,
+      "default_behavior": "Si no está en overrides, no se modifica."
+    },
+    "overrides_by_brand_id": {
+      "jeep": [
+        { "match": { "name": "Renegade" }, "set": { "model_years": [2015, 2026] } },
+        { "match": { "name": "Compass" }, "set": { "model_years": [2007, 2026] } },
+        { "match": { "name": "Wrangler" }, "set": { "model_years": [2007, 2026] } },
+        { "match": { "name": "Grand Cherokee" }, "set": { "model_years": [2011, 2026] } }
+      ],
+      "mercedes_benz": [
+        { "match": { "name": "Sprinter" }, "set": { "model_years": [1995, 2026] } },
+        { "match": { "name": "Clase A" }, "set": { "model_years": [2013, 2026] } },
+        { "match": { "name": "Clase C" }, "set": { "model_years": [2014, 2026] } },
+        { "match": { "name": "GLA" }, "set": { "model_years": [2014, 2026] } },
+        { "match": { "name": "GLC" }, "set": { "model_years": [2016, 2026] } }
+      ],
+      "bmw": [
+        { "match": { "name": "Serie 1" }, "set": { "model_years": [2012, 2026] } },
+        { "match": { "name": "Serie 2" }, "set": { "model_years": [2014, 2026] } },
+        { "match": { "name": "Serie 3" }, "set": { "model_years": [2012, 2026] } },
+        { "match": { "name": "Serie 4" }, "set": { "model_years": [2014, 2026] } },
+        { "match": { "name": "Serie 5" }, "set": { "model_years": [2011, 2026] } },
+        { "match": { "name": "X1" }, "set": { "model_years": [2016, 2026] } },
+        { "match": { "name": "X3" }, "set": { "model_years": [2011, 2026] } },
+        { "match": { "name": "X5" }, "set": { "model_years": [2011, 2026] } }
+      ],
+      "audi": [
+        { "match": { "name": "A1" }, "set": { "model_years": [2011, 2026] } },
+        { "match": { "name": "A3" }, "set": { "model_years": [2013, 2026] } },
+        { "match": { "name": "A4" }, "set": { "model_years": [2011, 2026] } },
+        { "match": { "name": "A5" }, "set": { "model_years": [2011, 2026] } },
+        { "match": { "name": "Q3" }, "set": { "model_years": [2012, 2026] } },
+        { "match": { "name": "Q5" }, "set": { "model_years": [2011, 2026] } },
+        { "match": { "name": "Q7" }, "set": { "model_years": [2011, 2026] } }
+      ],
+      "mini": [
+        { "match": { "name": "Cooper" }, "set": { "model_years": [2014, 2026] } },
+        { "match": { "name": "Countryman" }, "set": { "model_years": [2011, 2026] } }
+      ],
+      "volvo": [
+        { "match": { "name": "S60" }, "set": { "model_years": [2011, 2026] } },
+        { "match": { "name": "XC40" }, "set": { "model_years": [2018, 2026] } },
+        { "match": { "name": "XC60" }, "set": { "model_years": [2017, 2026] } },
+        { "match": { "name": "XC90" }, "set": { "model_years": [2015, 2026] } }
+      ],
+      "land_rover": [
+        { "match": { "name": "Defender" }, "set": { "model_years": [2020, 2026] } },
+        { "match": { "name": "Discovery" }, "set": { "model_years": [2017, 2026] } },
+        { "match": { "name": "Discovery Sport" }, "set": { "model_years": [2015, 2026] } },
+        { "match": { "name": "Range Rover" }, "set": { "model_years": [2013, 2026] } },
+        { "match": { "name": "Range Rover Evoque" }, "set": { "model_years": [2012, 2026] } },
+        { "match": { "name": "Range Rover Sport" }, "set": { "model_years": [2014, 2026] } },
+        { "match": { "name": "Range Rover Velar" }, "set": { "model_years": [2018, 2026] } }
+      ],
+      "jaguar": [
+        { "match": { "name": "E-Pace" }, "set": { "model_years": [2018, 2026] } },
+        { "match": { "name": "F-Pace" }, "set": { "model_years": [2016, 2026] } },
+        { "match": { "name": "I-Pace" }, "set": { "model_years": [2019, 2026] } },
+        { "match": { "name": "XE" }, "set": { "model_years": [2015, 2026] } },
+        { "match": { "name": "XF" }, "set": { "model_years": [2016, 2026] } }
+      ],
+      "porsche": [
+        { "match": { "name": "911" }, "set": { "model_years": [2012, 2026] } },
+        { "match": { "name": "Boxster" }, "set": { "model_years": [2012, 2026] } },
+        { "match": { "name": "Cayenne" }, "set": { "model_years": [2011, 2026] } },
+        { "match": { "name": "Macan" }, "set": { "model_years": [2014, 2026] } },
+        { "match": { "name": "Panamera" }, "set": { "model_years": [2011, 2026] } }
+      ],
+      "lexus": [
+        { "match": { "name": "ES" }, "set": { "model_years": [2019, 2026] } },
+        { "match": { "name": "GX" }, "set": { "model_years": [2010, 2026] } },
+        { "match": { "name": "IS" }, "set": { "model_years": [2014, 2026] } },
+        { "match": { "name": "LX" }, "set": { "model_years": [2008, 2026] } },
+        { "match": { "name": "NX" }, "set": { "model_years": [2015, 2026] } },
+        { "match": { "name": "RX" }, "set": { "model_years": [2016, 2026] } }
+      ],
+      "subaru": [
+        { "match": { "name": "Forester" }, "set": { "model_years": [2013, 2026] } },
+        { "match": { "name": "Outback" }, "set": { "model_years": [2011, 2026] } },
+        { "match": { "name": "XV" }, "set": { "model_years": [2012, 2026] } }
+      ],
+      "suzuki": [
+        { "match": { "name": "Jimny" }, "set": { "model_years": [2019, 2026] } },
+        { "match": { "name": "Swift" }, "set": { "model_years": [2011, 2026] } },
+        { "match": { "name": "Vitara" }, "set": { "model_years": [2016, 2026] } }
+      ],
+      "mazda": [
+        { "match": { "name": "CX-30" }, "set": { "model_years": [2020, 2026] } },
+        { "match": { "name": "CX-5" }, "set": { "model_years": [2012, 2026] } },
+        { "match": { "name": "MX-5" }, "set": { "model_years": [2016, 2026] } }
+      ],
+      "mitsubishi": [
+        { "match": { "name": "Eclipse Cross" }, "set": { "model_years": [2018, 2026] } },
+        { "match": { "name": "L200" }, "set": { "model_years": [2010, 2026] } },
+        { "match": { "name": "Outlander" }, "set": { "model_years": [2013, 2026] } },
+        { "match": { "name": "Pajero Sport" }, "set": { "model_years": [2016, 2026] } }
+      ],
+      "isuzu": [
+        { "match": { "name": "D-Max" }, "set": { "model_years": [2012, 2026] } },
+        { "match": { "name": "MU-X" }, "set": { "model_years": [2014, 2026] } }
+      ],
+      "jac": [
+        { "match": { "name": "JS2" }, "set": { "model_years": [2019, 2026] } },
+        { "match": { "name": "JS4" }, "set": { "model_years": [2021, 2026] } },
+        { "match": { "name": "T8" }, "set": { "model_years": [2019, 2026] } }
+      ],
+      "chery": [
+        { "match": { "name": "Tiggo 2" }, "set": { "model_years": [2017, 2026] } },
+        { "match": { "name": "Tiggo 4" }, "set": { "model_years": [2019, 2026] } },
+        { "match": { "name": "Tiggo 7" }, "set": { "model_years": [2020, 2026] } },
+        { "match": { "name": "Tiggo 8" }, "set": { "model_years": [2020, 2026] } }
+      ],
+      "changan": [
+        { "match": { "name": "CS15" }, "set": { "model_years": [2018, 2026] } },
+        { "match": { "name": "CS35" }, "set": { "model_years": [2018, 2026] } },
+        { "match": { "name": "CS55" }, "set": { "model_years": [2021, 2026] } }
+      ],
+      "baic": [
+        { "match": { "name": "X35" }, "set": { "model_years": [2018, 2026] } },
+        { "match": { "name": "X55" }, "set": { "model_years": [2022, 2026] } }
+      ],
+      "byd": [
+        { "match": { "name": "Atto 3" }, "set": { "model_years": [2022, 2026] } },
+        { "match": { "name": "Dolphin" }, "set": { "model_years": [2023, 2026] } },
+        { "match": { "name": "Seal" }, "set": { "model_years": [2023, 2026] } }
+      ],
+      "geely": [
+        { "match": { "name": "Coolray" }, "set": { "model_years": [2021, 2026] } },
+        { "match": { "name": "Okavango" }, "set": { "model_years": [2022, 2026] } }
+      ],
+      "haval": [
+        { "match": { "name": "H2" }, "set": { "model_years": [2018, 2021] } },
+        { "match": { "name": "H6" }, "set": { "model_years": [2018, 2026] } },
+        { "match": { "name": "Jolion" }, "set": { "model_years": [2021, 2026] } }
+      ],
+      "great_wall": [
+        { "match": { "name": "Poer" }, "set": { "model_years": [2021, 2026] } }
+      ],
+      "dfsk": [
+        { "match": { "name": "C31" }, "set": { "model_years": [2019, 2026] } },
+        { "match": { "name": "C32" }, "set": { "model_years": [2019, 2026] } },
+        { "match": { "name": "Glory 560" }, "set": { "model_years": [2019, 2026] } }
+      ],
+      "foton": [
+        { "match": { "name": "Tunland" }, "set": { "model_years": [2019, 2026] } }
+      ],
+      "iveco": [
+        { "match": { "name": "Daily" }, "set": { "model_years": [2000, 2026] } },
+        { "match": { "name": "Tector" }, "set": { "model_years": [2001, 2026] } }
+      ],
+      "hino": [
+        { "match": { "name": "300 Series" }, "set": { "model_years": [2011, 2026] } },
+        { "match": { "name": "500 Series" }, "set": { "model_years": [2011, 2026] } }
+      ],
+      "scania": [
+        { "match": { "name": "P Series" }, "set": { "model_years": [2017, 2026] } },
+        { "match": { "name": "G Series" }, "set": { "model_years": [2017, 2026] } },
+        { "match": { "name": "R Series" }, "set": { "model_years": [2017, 2026] } }
+      ],
+      "coradir": [
+        { "match": { "name": "Tito" }, "set": { "model_years": [2021, 2026] } },
+        { "match": { "name": "Tito S5" }, "set": { "model_years": [2023, 2026] } },
+        { "match": { "name": "Tita" }, "set": { "model_years": [2022, 2026] } }
+      ],
+      "mg": [
+        { "match": { "name": "MG3 Hybrid" }, "set": { "model_years": [2024, 2026] } },
+        { "match": { "name": "MG4" }, "set": { "model_years": [2023, 2026] } },
+        { "match": { "name": "ZS" }, "set": { "model_years": [2018, 2026] } },
+        { "match": { "name": "ZS Hybrid" }, "set": { "model_years": [2024, 2026] } },
+        { "match": { "name": "GT" }, "set": { "model_years": [2023, 2026] } },
+        { "match": { "name": "RX5" }, "set": { "model_years": [2023, 2026] } },
+        { "match": { "name": "Cyberster" }, "set": { "model_years": [2025, 2026] } }
+      ],
+      "jetour": [
+        { "match": { "name": "X50" }, "set": { "model_years": [2024, 2026] } },
+        { "match": { "name": "X70" }, "set": { "model_years": [2023, 2026] } },
+        { "match": { "name": "X70 Plus" }, "set": { "model_years": [2024, 2026] } },
+        { "match": { "name": "Dashing" }, "set": { "model_years": [2024, 2026] } },
+        { "match": { "name": "T1" }, "set": { "model_years": [2025, 2026] } }
+      ],
+      "gac": [
+        { "match": { "name": "Emzoom" }, "set": { "model_years": [2024, 2026] } },
+        { "match": { "name": "Emkoo" }, "set": { "model_years": [2024, 2026] } },
+        { "match": { "name": "GS8" }, "set": { "model_years": [2024, 2026] } },
+        { "match": { "name": "Aion ES" }, "set": { "model_years": [2024, 2026] } },
+        { "match": { "name": "Empow" }, "set": { "model_years": [2024, 2026] } }
+      ],
+      "jmc": [
+        { "match": { "name": "Grand Avenue" }, "set": { "model_years": [2024, 2026] } },
+        { "match": { "name": "Grand Avenue Plus" }, "set": { "model_years": [2024, 2026] } },
+        { "match": { "name": "Grand Avenue Dadao Pro" }, "set": { "model_years": [2025, 2026] } },
+        { "match": { "name": "N900" }, "set": { "model_years": [2024, 2026] } },
+        { "match": { "name": "N800" }, "set": { "model_years": [2024, 2026] } }
+      ],
+      "forthing": [
+        { "match": { "name": "T5 EVO" }, "set": { "model_years": [2024, 2026] } },
+        { "match": { "name": "T5 HEV" }, "set": { "model_years": [2025, 2026] } },
+        { "match": { "name": "Friday" }, "set": { "model_years": [2025, 2026] } },
+        { "match": { "name": "U-Tour" }, "set": { "model_years": [2024, 2026] } }
+      ],
+      "skywell": [
+        { "match": { "name": "ET5" }, "set": { "model_years": [2024, 2026] } },
+        { "match": { "name": "BE11" }, "set": { "model_years": [2024, 2026] } }
+      ],
+      "kaiyi": [
+        { "match": { "name": "X3" }, "set": { "model_years": [2024, 2026] } }
+      ],
+      "kyc": [
+        { "match": { "name": "Mamut Cabina Simple" }, "set": { "model_years": [2024, 2026] } },
+        { "match": { "name": "Mamut Cabina Doble" }, "set": { "model_years": [2024, 2026] } },
+        { "match": { "name": "Mamut Box" }, "set": { "model_years": [2024, 2026] } }
+      ],
+      "shineray": [
+        { "match": { "name": "T30" }, "set": { "model_years": [2020, 2026] } },
+        { "match": { "name": "T32" }, "set": { "model_years": [2020, 2026] } },
+        { "match": { "name": "X30 Furgón" }, "set": { "model_years": [2020, 2026] } },
+        { "match": { "name": "X30 Pasajeros" }, "set": { "model_years": [2020, 2026] } },
+        { "match": { "name": "SRM M7" }, "set": { "model_years": [2023, 2026] } }
+      ],
+      "jmev": [
+        { "match": { "name": "Easy 3" }, "set": { "model_years": [2024, 2026] } }
+      ],
+      "seat": [
+        { "match": { "name": "Ibiza" }, "set": { "model_years": [2012, 2020] } },
+        { "match": { "name": "Leon" }, "set": { "model_years": [2014, 2020] } },
+        { "match": { "name": "Arona" }, "set": { "model_years": [2018, 2020] } },
+        { "match": { "name": "Ateca" }, "set": { "model_years": [2017, 2020] } }
+      ],
+      "ds": [
+        { "match": { "name": "DS 3" }, "set": { "model_years": [2016, 2020] } },
+        { "match": { "name": "DS 4" }, "set": { "model_years": [2016, 2020] } },
+        { "match": { "name": "DS 7 Crossback" }, "set": { "model_years": [2018, 2021] } }
+      ],
+      "alfa_romeo": [
+        { "match": { "name": "Giulia" }, "set": { "model_years": [2017, 2023] } },
+        { "match": { "name": "Stelvio" }, "set": { "model_years": [2018, 2023] } },
+        { "match": { "name": "Mito" }, "set": { "model_years": [2011, 2018] } }
+      ],
+      "dodge": [
+        { "match": { "name": "Journey" }, "set": { "model_years": [2009, 2020] } },
+        { "match": { "name": "Durango" }, "set": { "model_years": [2014, 2023] } }
+      ],
+      "chrysler": [
+        { "match": { "name": "300C" }, "set": { "model_years": [2012, 2018] } },
+        { "match": { "name": "Pacifica" }, "set": { "model_years": [2017, 2021] } }
+      ],
+      "smart": [
+        { "match": { "name": "Fortwo" }, "set": { "model_years": [2015, 2019] } }
+      ],
+      "ssangyong": [
+        { "match": { "name": "Tivoli" }, "set": { "model_years": [2016, 2023] } },
+        { "match": { "name": "Korando" }, "set": { "model_years": [2017, 2023] } },
+        { "match": { "name": "Rexton" }, "set": { "model_years": [2018, 2023] } }
+      ],
+      "lifan": [
+        { "match": { "name": "X60" }, "set": { "model_years": [2015, 2019] } },
+        { "match": { "name": "MyWay" }, "set": { "model_years": [2017, 2019] } }
+      ],
+      "zotye": [
+        { "match": { "name": "T600" }, "set": { "model_years": [2016, 2019] } }
+      ],
+      "haima": [
+        { "match": { "name": "S5" }, "set": { "model_years": [2018, 2019] } }
+      ],
+      "brilliance": [
+        { "match": { "name": "V3" }, "set": { "model_years": [2018, 2019] } }
+      ],
+      "faw": [
+        { "match": { "name": "R7" }, "set": { "model_years": [2018, 2019] } }
+      ]    
+    }
+  }
+}

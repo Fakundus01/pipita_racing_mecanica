@@ -1,0 +1,393 @@
+{
+  "catalog_patch": {
+    "version": "car_catalog_api_v1_patch_2026-02-03_trims_variants_v2_ar_expand_new_brands",
+    "applies_to_schema": "car_catalog_api_v1",
+    "notes": {
+      "scope": "Argentina",
+      "description": "Extensión de variantes/trims para marcas/modelos agregados en AR. Dataset incremental; trims pueden variar por año. Se usa 'unknown' cuando no hay dato estable.",
+      "data_quality": "best_effort"
+    },
+    "enums": {
+      "powertrain": ["ice", "hybrid", "phev", "ev", "unknown"],
+      "transmission": ["mt", "at", "cvt", "dct", "unknown"],
+      "drive": ["fwd", "rwd", "awd", "4x4", "unknown"]
+    },
+    "rules": {
+      "ignore_unknown_model_refs": true,
+      "variant_id_format": "{model_id}_{trim_slug}"
+    },
+    "overrides": {
+      "mg": {
+        "zs": {
+          "variants": [
+            {
+              "variant_id": "zs_comfort",
+              "name": "Comfort",
+              "powertrain": "ice",
+              "drive": "fwd",
+              "transmission": "unknown"
+            },
+            {
+              "variant_id": "zs_luxury",
+              "name": "Luxury",
+              "powertrain": "ice",
+              "drive": "fwd",
+              "transmission": "unknown"
+            }
+          ]
+        },
+        "zs_hybrid": {
+          "variants": [
+            {
+              "variant_id": "zs_hybrid",
+              "name": "Hybrid",
+              "powertrain": "hybrid",
+              "drive": "fwd",
+              "transmission": "cvt"
+            }
+          ]
+        },
+        "mg4": {
+          "variants": [
+            {
+              "variant_id": "mg4_ev",
+              "name": "EV",
+              "powertrain": "ev",
+              "drive": "rwd",
+              "transmission": "unknown"
+            }
+          ]
+        },
+        "gt": {
+          "variants": [
+            {
+              "variant_id": "gt",
+              "name": "GT",
+              "powertrain": "ice",
+              "drive": "fwd",
+              "transmission": "unknown"
+            }
+          ]
+        }
+      },
+      "jetour": {
+        "x70": {
+          "variants": [
+            {
+              "variant_id": "x70",
+              "name": "X70",
+              "powertrain": "ice",
+              "drive": "fwd",
+              "transmission": "unknown"
+            }
+          ]
+        },
+        "x70_plus": {
+          "variants": [
+            {
+              "variant_id": "x70_plus",
+              "name": "X70 Plus",
+              "powertrain": "ice",
+              "drive": "fwd",
+              "transmission": "unknown"
+            }
+          ]
+        },
+        "dashing": {
+          "variants": [
+            {
+              "variant_id": "dashing",
+              "name": "Dashing",
+              "powertrain": "ice",
+              "drive": "fwd",
+              "transmission": "unknown"
+            }
+          ]
+        },
+        "x50": {
+          "variants": [
+            {
+              "variant_id": "x50",
+              "name": "X50",
+              "powertrain": "ice",
+              "drive": "fwd",
+              "transmission": "unknown"
+            }
+          ]
+        }
+      },
+      "gac": {
+        "emzoom": {
+          "variants": [
+            {
+              "variant_id": "emzoom",
+              "name": "Emzoom",
+              "powertrain": "ice",
+              "drive": "fwd",
+              "transmission": "unknown"
+            }
+          ]
+        },
+        "emkoo": {
+          "variants": [
+            {
+              "variant_id": "emkoo_hybrid",
+              "name": "Hybrid",
+              "powertrain": "hybrid",
+              "drive": "fwd",
+              "transmission": "unknown"
+            }
+          ]
+        },
+        "gs8": {
+          "variants": [
+            {
+              "variant_id": "gs8",
+              "name": "GS8",
+              "powertrain": "ice",
+              "drive": "awd",
+              "transmission": "unknown"
+            }
+          ]
+        },
+        "aion_es": {
+          "variants": [
+            {
+              "variant_id": "aion_es_ev",
+              "name": "EV",
+              "powertrain": "ev",
+              "drive": "fwd",
+              "transmission": "unknown"
+            }
+          ]
+        }
+      },
+      "jmc": {
+        "grand_avenue": {
+          "variants": [
+            {
+              "variant_id": "grand_avenue_4x2",
+              "name": "4x2",
+              "powertrain": "ice",
+              "drive": "rwd",
+              "transmission": "unknown"
+            },
+            {
+              "variant_id": "grand_avenue_4x4",
+              "name": "4x4",
+              "powertrain": "ice",
+              "drive": "4x4",
+              "transmission": "unknown"
+            }
+          ]
+        },
+        "n900": {
+          "variants": [
+            {
+              "variant_id": "n900",
+              "name": "N900",
+              "powertrain": "ice",
+              "drive": "rwd",
+              "transmission": "unknown"
+            }
+          ]
+        },
+        "n800": {
+          "variants": [
+            {
+              "variant_id": "n800",
+              "name": "N800",
+              "powertrain": "ice",
+              "drive": "rwd",
+              "transmission": "unknown"
+            }
+          ]
+        }
+      },
+      "forthing": {
+        "t5_evo": {
+          "variants": [
+            {
+              "variant_id": "t5_evo",
+              "name": "T5 EVO",
+              "powertrain": "ice",
+              "drive": "fwd",
+              "transmission": "unknown"
+            }
+          ]
+        },
+        "t5_hev": {
+          "variants": [
+            {
+              "variant_id": "t5_hev",
+              "name": "T5 HEV",
+              "powertrain": "hybrid",
+              "drive": "fwd",
+              "transmission": "unknown"
+            }
+          ]
+        },
+        "friday": {
+          "variants": [
+            {
+              "variant_id": "friday_ev",
+              "name": "EV",
+              "powertrain": "ev",
+              "drive": "fwd",
+              "transmission": "unknown"
+            }
+          ]
+        },
+        "u_tour": {
+          "variants": [
+            {
+              "variant_id": "u_tour",
+              "name": "U-Tour",
+              "powertrain": "ice",
+              "drive": "fwd",
+              "transmission": "unknown"
+            }
+          ]
+        }
+      },
+      "skywell": {
+        "et5": {
+          "variants": [
+            {
+              "variant_id": "et5_ev",
+              "name": "EV",
+              "powertrain": "ev",
+              "drive": "fwd",
+              "transmission": "unknown"
+            }
+          ]
+        },
+        "be11": {
+          "variants": [
+            {
+              "variant_id": "be11_ev",
+              "name": "EV",
+              "powertrain": "ev",
+              "drive": "fwd",
+              "transmission": "unknown"
+            }
+          ]
+        }
+      },
+      "kaiyi": {
+        "x3": {
+          "variants": [
+            {
+              "variant_id": "x3",
+              "name": "X3",
+              "powertrain": "ice",
+              "drive": "fwd",
+              "transmission": "unknown"
+            }
+          ]
+        }
+      },
+      "kyc": {
+        "mamut_box": {
+          "variants": [
+            {
+              "variant_id": "mamut_box",
+              "name": "Box",
+              "powertrain": "ice",
+              "drive": "rwd",
+              "transmission": "unknown"
+            }
+          ]
+        }
+      },
+      "shineray": {
+        "x30_furgon": {
+          "variants": [
+            {
+              "variant_id": "x30_furgon",
+              "name": "Furgón",
+              "powertrain": "ice",
+              "drive": "rwd",
+              "transmission": "unknown"
+            }
+          ]
+        },
+        "x30_pasajeros": {
+          "variants": [
+            {
+              "variant_id": "x30_pasajeros",
+              "name": "Pasajeros",
+              "powertrain": "ice",
+              "drive": "rwd",
+              "transmission": "unknown"
+            }
+          ]
+        },
+        "t30": {
+          "variants": [
+            {
+              "variant_id": "t30",
+              "name": "T30",
+              "powertrain": "ice",
+              "drive": "rwd",
+              "transmission": "unknown"
+            }
+          ]
+        },
+        "t32": {
+          "variants": [
+            {
+              "variant_id": "t32",
+              "name": "T32",
+              "powertrain": "ice",
+              "drive": "rwd",
+              "transmission": "unknown"
+            }
+          ]
+        }
+      },
+      "jmev": {
+        "easy_3": {
+          "variants": [
+            {
+              "variant_id": "easy_3_ev",
+              "name": "EV",
+              "powertrain": "ev",
+              "drive": "fwd",
+              "transmission": "unknown"
+            }
+          ]
+        }
+      },
+      "coradir": {
+        "tito": {
+          "variants": [
+            {
+              "variant_id": "tito_ev",
+              "name": "EV",
+              "powertrain": "ev",
+              "drive": "fwd",
+              "transmission": "unknown"
+            }
+          ]
+        },
+        "tita": {
+          "variants": [
+            {
+              "variant_id": "tita_ev",
+              "name": "EV",
+              "powertrain": "ev",
+              "drive": "fwd",
+              "transmission": "unknown"
+            }
+          ]
+        }
+      }
+    },
+    "status": {
+      "current_point": "6b_variants_full",
+      "progress": "expanded_to_new_brands_v2",
+      "next_point": "7b_aliases_full"
+    }
+  }
+}

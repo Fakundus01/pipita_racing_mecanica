@@ -1,0 +1,114 @@
+{
+  "catalog_patch": {
+    "version": "car_catalog_api_v1_patch_2026-02-03_taxonomy_v1",
+    "applies_to_schema": "car_catalog_api_v1",
+    "enums": {
+      "body": ["Car", "SUV", "Truck", "Van", "MPV"],
+      "segment": ["Hatchback", "Sedan", "Coupe", "Wagon", "Convertible", "Pickup", "Commercial", "OffRoad", null],
+      "attributes": [
+        "ev",
+        "hybrid",
+        "phev",
+        "commercial",
+        "crossover",
+        "sports",
+        "luxury",
+        "ultra_luxury",
+        "supercar",
+        "hypercar"
+      ]
+    },
+    "rules": {
+      "segment_is_body_style_not_use_case": "Commercial -> attribute 'commercial' (not segment).",
+      "truck_should_use_segment_pickup_when_applicable": "If body=Truck and model is pickup, set segment=Pickup.",
+      "van_should_use_attribute_commercial_when_applicable": "If body=Van and is utilitario, add attribute 'commercial'.",
+      "sports_luxury_super_hyper_as_attributes": "Sports/Luxury/UltraLuxury/Supercar/Hypercar go to attributes only."
+    },
+    "overrides": {
+      "chevrolet": {
+        "montana": { "segment": "Pickup" },
+        "s10": { "segment": "Pickup" },
+        "spin": { "body": "MPV", "segment": null }
+      },
+      "fiat": {
+        "strada": { "segment": "Pickup" },
+        "toro": { "segment": "Pickup" }
+      },
+      "ford": {
+        "maverick": { "segment": "Pickup" },
+        "ranger": { "segment": "Pickup" }
+      },
+      "toyota": {
+        "hilux": { "segment": "Pickup" }
+      },
+      "ram": {
+        "1500": { "segment": "Pickup" },
+        "2500": { "segment": "Pickup" },
+        "rampage": { "segment": "Pickup" }
+      },
+      "renault": {
+        "alaskan": { "segment": "Pickup" },
+        "kangoo": { "body": "Van", "segment": null, "attributes": ["commercial"] }
+      },
+      "citroen": {
+        "berlingo": { "body": "Van", "segment": null, "attributes": ["commercial"] }
+      },
+      "peugeot": {
+        "partner": { "body": "Van", "segment": null, "attributes": ["commercial"] }
+      },
+      "mercedes_benz": {
+        "sprinter": { "body": "Van", "segment": null, "attributes": ["commercial"] }
+      },
+      "iveco": {
+        "daily": { "body": "Van", "segment": null, "attributes": ["commercial"] }
+      },
+      "foton": {
+        "aumark": { "body": "Truck", "segment": "Commercial", "attributes": ["commercial"] }
+      },
+      "dongfeng": {
+        "captain_t": { "body": "Truck", "segment": "Commercial", "attributes": ["commercial"] }
+      },
+      "ds": {
+        "ds_4": { "body": "Car", "segment": "Hatchback" }
+      },
+      "dodge": {
+        "challenger": { "attributes": ["sports"] }
+      },
+      "porsche": {
+        "911": { "attributes": ["sports"] }
+      },
+      "mclaren": {
+        "artura": { "attributes": ["supercar"] },
+        "720s": { "attributes": ["supercar"] },
+        "750s": { "attributes": ["supercar"] },
+        "gt": { "attributes": ["sports"] }
+      },
+      "maserati": {
+        "mc20": { "attributes": ["supercar"] }
+      },
+      "bugatti": {
+        "chiron": { "attributes": ["hypercar"] },
+        "mistral": { "attributes": ["hypercar"] }
+      },
+      "bentley": {
+        "bentayga": { "attributes": ["luxury"] },
+        "continental_gt": { "attributes": ["luxury"] },
+        "flying_spur": { "attributes": ["luxury"] }
+      },
+      "rolls_royce": {
+        "ghost": { "attributes": ["ultra_luxury"] },
+        "phantom": { "attributes": ["ultra_luxury"] },
+        "cullinan": { "attributes": ["ultra_luxury"] }
+      },
+      "byd": {
+        "dolphin": { "attributes": ["ev"] },
+        "atto_3": { "attributes": ["ev"] },
+        "seal": { "attributes": ["ev"] },
+        "tang": { "attributes": ["ev"] }
+      },
+      "baic": {
+        "eu5": { "attributes": ["ev"] }
+      }
+    }
+  }
+}

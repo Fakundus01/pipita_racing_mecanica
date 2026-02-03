@@ -1,0 +1,69 @@
+{
+  "catalog_patch": {
+    "version": "car_catalog_api_v1_patch_2026-02-03_api_indexes_v3_ar",
+    "applies_to_schema": "api_vehiculos_base_v0",
+    "notes": {
+      "scope": "Argentina",
+      "description": "Agrega índices derivados para servir la API rápido: lookup por brand_slug/model_slug/model_id_v3 y un search_index plano."
+    },
+    "operation": "build_api_indexes",
+    "rules": {
+      "requires": ["brand_slug", "model_slug", "brand_id_v3", "model_id_v3", "aliases_search"],
+      "output_root_fields": ["index_brands_by_slug", "index_models_by_id", "index_models_by_slug", "search_index_models"],
+      "dedupe_search_index": true
+    },
+    "build": {
+      "index_brands_by_slug": {
+        "key": "brand_slug",
+        "value": {
+          "brand_id_v3": "{brand_id_v3}",
+          "brand_uid": "{brand_uid}",
+          "name": "{name}",
+          "name_norm": "{name_norm}",
+          "origin": "{origin}",
+          "status": "{status}"
+        }
+      },
+      "index_models_by_id": {
+        "key": "model_id_v3",
+        "value": {
+          "brand_id_v3": "{brand_id_v3}",
+          "brand_slug": "{brand_slug}",
+          "model_slug": "{model_slug}",
+          "name": "{name}",
+          "name_norm": "{name_norm}",
+          "body": "{body}",
+          "segment": "{segment}",
+          "attributes": "{attributes}",
+          "model_years": "{model_years}",
+          "generation_ids": "{generations[*].generation_id}",
+          "trim_set_refs": "{trim_set_refs}"
+        }
+      },
+      "index_models_by_slug": {
+        "key": "{brand_slug}::{model_slug}",
+        "value": {
+          "model_id_v3": "{model_id_v3}",
+          "name": "{name}",
+          "name_norm": "{name_norm}",
+          "body": "{body}",
+          "segment": "{segment}",
+          "attributes": "{attributes}",
+          "model_years": "{model_years}"
+        }
+      },
+      "search_index_models": {
+        "key": "model_id_v3",
+        "value": {
+          "tokens": "{aliases_search}",
+          "display": "{name}",
+          "brand_display": "{brand.name}",
+          "brand_slug": "{brand_slug}",
+          "model_slug": "{model_slug}",
+          "model_id_v3": "{model_id_v3}"
+        }
+      }
+    }
+  }
+}
+

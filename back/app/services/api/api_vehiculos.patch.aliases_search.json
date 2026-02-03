@@ -1,0 +1,283 @@
+{
+  "catalog_patch": {
+    "version": "car_catalog_api_v1_patch_2026-02-03_aliases_search_v1",
+    "applies_to_schema": "car_catalog_api_v1",
+    "notes": {
+      "scope": "Argentina",
+      "description": "Aliases y normalizaciones para mejorar búsqueda/SEO y evitar duplicados por escritura. No cambia IDs; solo agrega 'aliases' por modelo y reglas de normalización de query."
+    },
+    "rules": {
+      "query_normalization": {
+        "lowercase": true,
+        "trim": true,
+        "collapse_spaces": true,
+        "remove_diacritics": true,
+        "replace": [
+          { "from": "cr v", "to": "cr-v" },
+          { "from": "crv", "to": "cr-v" },
+          { "from": "hr v", "to": "hr-v" },
+          { "from": "hrv", "to": "hr-v" },
+          { "from": "mercedes", "to": "mercedes-benz" },
+          { "from": "vw", "to": "volkswagen" }
+        ]
+      },
+      "alias_rules": {
+        "allow_common_trim_in_alias": true,
+        "allow_punctuation_variants": true,
+        "avoid_years_in_alias": true
+      }
+    },
+    "overrides": {
+      "volkswagen": {
+        "gol_trend": {
+          "aliases": [
+            "gol trend",
+            "gol trendline",
+            "gol",
+            "gol g6",
+            "gol g5"
+          ]
+        },
+        "t_cross": {
+          "aliases": [
+            "t-cross",
+            "t cross",
+            "tcross"
+          ]
+        },
+        "nivus": {
+          "aliases": [
+            "vw nivus",
+            "nivus",
+            "nivus comfortline",
+            "nivus highline"
+          ]
+        },
+        "taos": {
+          "aliases": [
+            "vw taos",
+            "taos comfortline",
+            "taos highline"
+          ]
+        }
+      },
+      "toyota": {
+        "hilux": {
+          "aliases": [
+            "hilux",
+            "hilux sr",
+            "hilux srx",
+            "hilux gr sport",
+            "hilux gr-sport",
+            "hilux dx"
+          ]
+        },
+        "corolla": {
+          "aliases": [
+            "corolla",
+            "corolla xli",
+            "corolla xei",
+            "corolla seg"
+          ]
+        },
+        "corolla_cross": {
+          "aliases": [
+            "corolla cross",
+            "corolla-cross",
+            "corolla cross hybrid",
+            "ccross"
+          ]
+        },
+        "sw4": {
+          "aliases": [
+            "sw4",
+            "hilux sw4",
+            "fortuner"
+          ]
+        },
+        "yaris": {
+          "aliases": [
+            "yaris",
+            "yaris hatch",
+            "yaris sedan"
+          ]
+        }
+      },
+      "chevrolet": {
+        "onix": {
+          "aliases": [
+            "onix",
+            "onix lt",
+            "onix premier"
+          ]
+        },
+        "onix_plus": {
+          "aliases": [
+            "onix plus",
+            "onix sedan"
+          ]
+        },
+        "tracker": {
+          "aliases": [
+            "tracker",
+            "tracker lt",
+            "tracker premier"
+          ]
+        },
+        "s10": {
+          "aliases": [
+            "s10",
+            "silverado s10"
+          ]
+        }
+      },
+      "fiat": {
+        "cronos": {
+          "aliases": [
+            "cronos",
+            "cronos like",
+            "cronos drive",
+            "cronos precision"
+          ]
+        },
+        "argo": {
+          "aliases": [
+            "argo",
+            "argo drive",
+            "argo precision"
+          ]
+        },
+        "pulse": {
+          "aliases": [
+            "pulse",
+            "pulse drive",
+            "pulse audace",
+            "pulse impetus"
+          ]
+        },
+        "strada": {
+          "aliases": [
+            "strada",
+            "strada volcano",
+            "strada freedom"
+          ]
+        },
+        "toro": {
+          "aliases": [
+            "toro",
+            "toro freedom",
+            "toro volcano",
+            "toro ranch"
+          ]
+        }
+      },
+      "peugeot": {
+        "208": {
+          "aliases": [
+            "208",
+            "peugeot 208",
+            "208 allure",
+            "208 feline",
+            "208 gt"
+          ]
+        },
+        "2008": {
+          "aliases": [
+            "2008",
+            "peugeot 2008"
+          ]
+        },
+        "partner": {
+          "aliases": [
+            "partner",
+            "partner patagonica",
+            "partner confort"
+          ]
+        }
+      },
+      "renault": {
+        "duster": {
+          "aliases": [
+            "duster",
+            "duster oroch"
+          ]
+        },
+        "sandero": {
+          "aliases": [
+            "sandero",
+            "sandero stepway",
+            "stepway"
+          ]
+        },
+        "logan": {
+          "aliases": [
+            "logan"
+          ]
+        },
+        "kangoo": {
+          "aliases": [
+            "kangoo",
+            "kangoo express"
+          ]
+        },
+        "alaskan": {
+          "aliases": [
+            "alaskan"
+          ]
+        }
+      },
+      "ford": {
+        "ranger": {
+          "aliases": [
+            "ranger",
+            "ranger limited",
+            "ranger xlt",
+            "ranger xl"
+          ]
+        },
+        "maverick": {
+          "aliases": [
+            "maverick",
+            "maverick hybrid"
+          ]
+        },
+        "territory": {
+          "aliases": [
+            "territory"
+          ]
+        },
+        "mustang": {
+          "aliases": [
+            "mustang",
+            "mustang gt"
+          ]
+        }
+      },
+      "honda": {
+        "cr_v": {
+          "aliases": [
+            "cr-v",
+            "crv",
+            "cr v"
+          ]
+        },
+        "hr_v": {
+          "aliases": [
+            "hr-v",
+            "hrv",
+            "hr v"
+          ]
+        }
+      },
+      "mercedes_benz": {
+        "sprinter": {
+          "aliases": [
+            "sprinter",
+            "mercedes sprinter",
+            "mb sprinter"
+          ]
+        }
+      }
+    }
+  }
+}

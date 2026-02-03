@@ -1,0 +1,59 @@
+{
+  "catalog_patch": {
+    "version": "car_catalog_api_v1_patch_2026-02-03_trims_mapping_v3_ar",
+    "applies_to_schema": "api_vehiculos_base_v0",
+    "notes": {
+      "scope": "Argentina",
+      "description": "Asigna trim_sets a cada modelo según taxonomía (body/segment/attributes). Requiere que ya exista trim_sets (api_vehiculos.patch.trims.v3.json) y que taxonomy haya corrido."
+    },
+    "operation": "assign_trim_sets_to_models",
+    "rules": {
+      "match_strategy": "por modelo usando campos normalizados: model.body, model.segment, model.attributes",
+      "write_field": "trim_set_refs",
+      "dedupe": true,
+      "ignore_unknown_models": true
+    },
+    "mapping": [
+      {
+        "if": { "body": "Car", "segment": "Hatchback" },
+        "set": ["base_entry", "latam_common", "powertrain"]
+      },
+      {
+        "if": { "body": "Car", "segment": "Sedan" },
+        "set": ["base_entry", "latam_common", "powertrain"]
+      },
+      {
+        "if": { "body": "SUV" },
+        "set": ["base_entry", "latam_common", "powertrain"]
+      },
+      {
+        "if": { "body": "Truck", "segment": "Pickup" },
+        "set": ["base_entry", "latam_common", "powertrain"]
+      },
+      {
+        "if": { "body": "Van" },
+        "set": ["base_entry", "latam_common", "powertrain"]
+      },
+      {
+        "if": { "attributes_any": ["luxury"] },
+        "append": ["sport_luxury"]
+      },
+      {
+        "if": { "attributes_any": ["sports", "supercar", "hypercar", "ultra_luxury"] },
+        "append": ["sport_luxury"]
+      },
+      {
+        "if": { "attributes_any": ["ev", "hybrid", "phev"] },
+        "ensure_contains": ["powertrain"]
+      }
+    ],
+    "status": {
+      "point_completed": "Trims/variants (base mapping)",
+      "remaining_points_estimate": [
+        "Refinar generaciones (facelift / gen2) por modelo clave si querés precisión real",
+        "Expandir trims reales por modelo (ej: Corolla XLi/XEi/SEG, Ranger XL/XLS/XLT/Limited, etc.)",
+        "Agregar markets/regiones como capa (AR vs BR/CL/US/EU) si vas a escalar"
+      ]
+    }
+  }
+}

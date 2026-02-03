@@ -1,0 +1,110 @@
+{
+  "catalog_patch": {
+    "version": "car_catalog_api_v1_patch_2026-02-03_ids_normalization_v3_ar",
+    "applies_to_schema": "api_vehiculos_base_v0",
+    "notes": {
+      "scope": "Argentina",
+      "description": "Agrega IDs estables y slugs normalizados para brand y model, con aliases para búsqueda/compatibilidad. No elimina campos existentes."
+    },
+    "operation": "add_ids_and_normalize_names",
+    "rules": {
+      "id_format": {
+        "brand_id": "b::{brand_slug}",
+        "model_id": "m::{brand_slug}::{model_slug}"
+      },
+      "slugify": {
+        "lowercase": true,
+        "trim": true,
+        "collapse_spaces": true,
+        "replace_spaces_with": "_",
+        "normalize_unicode": "NFKD",
+        "remove_diacritics": true,
+        "replace_specials": {
+          "&": "and",
+          "+": "plus",
+          "-": "_",
+          "/": "_"
+        },
+        "remove_chars_regex": "[^a-z0-9_]",
+        "collapse_underscores": true
+      },
+      "normalization": {
+        "brand_name": {
+          "keep_original": true,
+          "set_normalized_name_field": "name_norm"
+        },
+        "model_name": {
+          "keep_original": true,
+          "set_normalized_name_field": "name_norm"
+        }
+      },
+      "aliases": {
+        "create_field": "aliases_search",
+        "sources": ["name", "name_norm"],
+        "add_slug_variants": true,
+        "add_common_variants": true
+      },
+      "conflict_policy": {
+        "if_same_slug_in_same_brand": "append_numeric_suffix",
+        "suffix_format": "_{n}"
+      }
+    },
+    "actions": [
+      {
+        "target": "brands[*]",
+        "set": {
+          "brand_uid": "{brand_id}",
+          "brand_slug": "{slugify(name)}",
+          "brand_id_v3": "b::{brand_slug}",
+          "name_norm": "{normalize_name(name)}"
+        }
+      },
+      {
+        "target": "brands[*].models[*]",
+        "set": {
+          "model_slug": "{slugify(name)}",
+          "model_id_v3": "m::{brand_slug}::{model_slug}",
+          "name_norm": "{normalize_name(name)}",
+          "aliases_search": "{build_aliases(name, name_norm, model_slug)}"
+        }
+      }
+    ],
+    "common_variants_rules": {
+      "per_model": [
+        {
+          "if_contains": "t-cross",
+          "add": ["tcross", "t cross", "t-cross"]
+        },
+        {
+          "if_contains": "cr-v",
+          "add": ["crv", "cr v", "cr-v"]
+        },
+        {
+          "if_contains": "x-trail",
+          "add": ["xtrail", "x trail", "x-trail"]
+        },
+        {
+          "if_contains": "cx-",
+          "add": ["cx", "cx "]
+        },
+        {
+          "if_contains": "serie",
+          "add": ["series"]
+        },
+        {
+          "if_contains": "classe",
+          "add": ["clase"]
+        }
+      ],
+      "tokens": {
+        "remove_noise": ["the", "nuevo", "new", "ii", "iii", "iv"],
+        "keep_numbers": true,
+        "keep_letters": true
+      }
+    },
+    "output_fields_summary": {
+      "brand_fields_added": ["brand_uid", "brand_slug", "brand_id_v3", "name_norm"],
+      "model_fields_added": ["model_slug", "model_id_v3", "name_norm", "aliases_search"]
+    }
+  }
+}

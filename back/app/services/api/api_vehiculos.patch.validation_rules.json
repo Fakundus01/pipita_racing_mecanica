@@ -1,0 +1,74 @@
+{
+  "catalog_patch": {
+    "version": "car_catalog_api_v1_patch_2026-02-03_validation_rules_v1",
+    "applies_to_schema": "car_catalog_api_v1",
+    "notes": {
+      "description": "Reglas de validación para mantener consistencia del catálogo (IDs, slugs, taxonomía, arrays). No modifica datos; define constraints para tu validador (frontend/back).",
+      "scope": "global + AR"
+    },
+    "validation": {
+      "required_top_level": ["_meta", "brands"],
+      "brand_rules": {
+        "required_fields": ["brand_id", "name", "country", "models"],
+        "brand_id_regex": "^[a-z0-9]+(?:_[a-z0-9]+)*$",
+        "unique_brand_id": true,
+        "country_iso_alpha2_or_custom": true
+      },
+      "model_rules": {
+        "required_fields": ["model_id", "name", "body"],
+        "model_id_regex": "^[a-z0-9]+(?:_[a-z0-9]+)*$",
+        "unique_model_id_within_brand": true,
+        "body_enum": ["Car", "SUV", "Truck", "Van", "MPV"],
+        "segment_enum": ["Hatchback", "Sedan", "Coupe", "Wagon", "Convertible", "Pickup", "Commercial", "OffRoad", null],
+        "attributes_enum": [
+          "ev",
+          "hybrid",
+          "phev",
+          "commercial",
+          "crossover",
+          "sports",
+          "luxury",
+          "ultra_luxury",
+          "supercar",
+          "hypercar"
+        ],
+        "arrays_no_duplicates": ["attributes", "aliases"],
+        "years_format": {
+          "type": "range",
+          "min": 1950,
+          "max": 2030
+        },
+        "generations_format": {
+          "generation_id_regex": "^[a-z0-9]+(?:_[a-z0-9]+)*$",
+          "required_fields": ["generation_id", "name", "years"],
+          "years_range_rule": "generation.years must be within model.years when both exist",
+          "no_overlapping_year_ranges": true
+        },
+        "variants_format": {
+          "variant_id_regex": "^[a-z0-9]+(?:_[a-z0-9]+)*$",
+          "required_fields": ["variant_id", "name"],
+          "powertrain_enum": ["ice", "hybrid", "phev", "ev", "unknown"],
+          "transmission_enum": ["mt", "at", "cvt", "dct", "unknown"],
+          "drive_enum": ["fwd", "rwd", "awd", "4x4", "unknown"]
+        }
+      },
+      "patch_rules": {
+        "allowed_patch_keys": [
+          "overrides",
+          "overrides_by_brand_id",
+          "rules",
+          "enums",
+          "validation",
+          "notes",
+          "operation"
+        ],
+        "disallow_unknown_brand_refs": true,
+        "disallow_unknown_model_refs": true
+      },
+      "market_rules": {
+        "status_enum": ["production", "discontinued", "limited_import", "unknown"],
+        "origin_enum": ["local", "mercosur", "extra_zone", "unknown"]
+      }
+    }
+  }
+}
