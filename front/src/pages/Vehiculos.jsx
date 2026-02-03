@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import {
   createVehiculo,
-  decodeVin,
+  decodeVehiculo,
   deleteVehiculo,
   listVehiculos,
   updateVehiculo,
@@ -11,11 +11,11 @@ function Vehiculos({ onAction, onAuthError }) {
   const [vehiculos, setVehiculos] = useState([])
   const [form, setForm] = useState({ marca: '', modelo: '', anio: '' })
   const [editingId, setEditingId] = useState(null)
-  const [vin, setVin] = useState('')
-  const [vinInfo, setVinInfo] = useState(null)
+  const [catalogoForm, setCatalogoForm] = useState({ marca: '', modelo: '', version: '' })
+  const [catalogoInfo, setCatalogoInfo] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const [vinError, setVinError] = useState('')
+  const [catalogoError, setCatalogoError] = useState('')
 
   useEffect(() => {
     let cancelled = false
@@ -104,16 +104,16 @@ function Vehiculos({ onAction, onAuthError }) {
     }
   }
 
-  const handleVinLookup = async (event) => {
+  const handleCatalogoLookup = async (event) => {
     event.preventDefault()
-    setVinError('')
-    setVinInfo(null)
+    setCatalogoError('')
+    setCatalogoInfo(null)
     try {
-      const data = await decodeVin(vin)
-      setVinInfo(data)
-      onAction('VIN decodificado desde la API externa.')
+      const data = await decodeVehiculo(catalogoForm)
+      setCatalogoInfo(data)
+      onAction('Ficha localizada en el catálogo local.')
     } catch (err) {
-      setVinError(err.message)
+      setCatalogoError(err.message)
       if (err.status === 401) {
         onAuthError()
       }
@@ -125,7 +125,7 @@ function Vehiculos({ onAction, onAuthError }) {
       <header className="page-header">
         <div>
           <h1>Vehículos en catálogo</h1>
-          <p>Organiza inventario y carga fichas con datos de API.</p>
+          <p>Organiza inventario y consulta fichas desde el catálogo local.</p>
         </div>
         <button className="primary" onClick={() => onAction('Completa el formulario para crear una ficha.')}>
           Nueva ficha
@@ -179,22 +179,39 @@ function Vehiculos({ onAction, onAuthError }) {
           {error ? <p className="inline-error">{error}</p> : null}
         </article>
         <article className="page-card">
-          <h3>Decodificar VIN (API NHTSA)</h3>
-          <form className="mini-form" onSubmit={handleVinLookup}>
+          <h3>Buscar en catálogo local</h3>
+          <form className="mini-form" onSubmit={handleCatalogoLookup}>
             <input
-              value={vin}
-              onChange={(event) => setVin(event.target.value)}
-              placeholder="VIN / Chasis"
+              value={catalogoForm.marca}
+              onChange={(event) =>
+                setCatalogoForm((prev) => ({ ...prev, marca: event.target.value }))
+              }
+              placeholder="Marca (ej. Toyota)"
               required
+            />
+            <input
+              value={catalogoForm.modelo}
+              onChange={(event) =>
+                setCatalogoForm((prev) => ({ ...prev, modelo: event.target.value }))
+              }
+              placeholder="Modelo (ej. Hilux)"
+              required
+            />
+            <input
+              value={catalogoForm.version}
+              onChange={(event) =>
+                setCatalogoForm((prev) => ({ ...prev, version: event.target.value }))
+              }
+              placeholder="Versión (opcional)"
             />
             <button className="secondary" type="submit">Consultar</button>
           </form>
-          {vinError ? <p className="inline-error">{vinError}</p> : null}
-          {vinInfo ? (
+          {catalogoError ? <p className="inline-error">{catalogoError}</p> : null}
+          {catalogoInfo ? (
             <div className="vin-result">
-              <p><strong>{vinInfo.marca || 'Marca N/D'}</strong> {vinInfo.modelo || ''}</p>
-              <p>Año: {vinInfo.anio || 'N/D'} · Combustible: {vinInfo.combustible || 'N/D'}</p>
-              <p>Carrocería: {vinInfo.tipo_carroceria || 'N/D'} · País: {vinInfo.pais_origen || 'N/D'}</p>
+              <p><strong>{catalogoInfo.marca || 'Marca N/D'}</strong> {catalogoInfo.modelo || ''}</p>
+              <p>Año: {catalogoInfo.anio || 'N/D'} · Combustible: {catalogoInfo.combustible || 'N/D'}</p>
+              <p>Carrocería: {catalogoInfo.tipo_carroceria || 'N/D'} · País: {catalogoInfo.pais_origen || 'N/D'}</p>
             </div>
           ) : null}
         </article>

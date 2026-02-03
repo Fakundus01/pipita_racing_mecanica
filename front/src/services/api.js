@@ -81,8 +81,13 @@ export const deleteVehiculo = (id) =>
     method: 'DELETE',
   })
 
-export const decodeVin = (vin) =>
-  apiFetch(`/vehiculos/decodificar?vin=${encodeURIComponent(vin)}`)
+export const decodeVehiculo = ({ marca, modelo, version }) => {
+  const params = new URLSearchParams()
+  if (marca) params.set('make', marca)
+  if (modelo) params.set('model', modelo)
+  if (version) params.set('trim', version)
+  return apiFetch(`/vehiculos/decodificar?${params.toString()}`)
+}
 
 export const listPartes = () => apiFetch('/partes')
 export const getParte = (id) => apiFetch(`/partes/${id}`)
