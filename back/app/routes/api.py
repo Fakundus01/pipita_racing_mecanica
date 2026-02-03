@@ -31,10 +31,8 @@ def is_authenticated():
 
 def vehiculos_api():
   return VehiculosApiService(
-    current_app.config['NINJA_CARS_API_BASE'],
-    current_app.config['NINJA_CARS_API_KEY'],
+    current_app.config['VEHICULOS_API_JSON_PATH'],
   )
-
 
 def serialize_excel_value(value):
   if isinstance(value, (datetime, date)):
@@ -198,7 +196,7 @@ def decode_vehiculo_vin():
   model = request.args.get('model', '').strip()
   trim = request.args.get('trim', '').strip()
   if not make or not model:
-    return jsonify({'error': 'Marca y modelo requeridos '}), 400
+    return jsonify({'error': 'Marca y modelo requeridos.'}), 400
   try:
     data = vehiculos_api().search_cars(make, model, trim)
   except Exception as exc:

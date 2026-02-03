@@ -19,8 +19,10 @@ class Config:
       'http://localhost:5173,http://127.0.0.1:5173,http://localhost:5174,http://127.0.0.1:5174',
     )
   )
-  NINJA_CARS_API_BASE = os.getenv('NINJA_CARS_API_BASE', 'https://api.api-ninjas.com/v1')
-  NINJA_CARS_API_KEY = os.getenv('NINJA_CARS_API_KEY', 'M3JIRj8jwJYQC4iwpSTUtfjnkuiNAX9fq5o3OZcS')
+  VEHICULOS_API_JSON_PATH = os.getenv(
+    'VEHICULOS_API_JSON_PATH',
+    os.path.join(os.path.dirname(__file__), 'services', 'api', 'api_vehiculos.json'),
+  )
   SESSION_COOKIE_HTTPONLY = True
   SESSION_COOKIE_SAMESITE = os.getenv('SESSION_COOKIE_SAMESITE', 'Lax')
   SESSION_COOKIE_DOMAIN = os.getenv('SESSION_COOKIE_DOMAIN')
