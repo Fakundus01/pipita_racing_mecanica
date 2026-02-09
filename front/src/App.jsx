@@ -102,7 +102,7 @@ function App() {
           <span className="brand-icon">🏁</span>
           <div>
             <p className="brand-title">Pipita Garage</p>
-            <p className="brand-subtitle">Anotaciones de ventas</p>
+            <p className="brand-subtitle">Gestión de taller</p>
           </div>
         </div>
         <nav className="nav">
@@ -118,19 +118,18 @@ function App() {
           ))}
         </nav>
         <div className="sidebar-card">
-          <h3>API rápida</h3>
+          <h3>Gestión rápida</h3>
           <p>
-            Conecta una API de autos para autocompletar marca, modelo, versión y
-            precio sugerido al escribir.
+            Acceso directo para cargar tareas del taller y cambios por vehículo.
           </p>
           <ul>
-            <li>Autocompletar VIN/Patente</li>
-            <li>Lista de modelos por marca</li>
-            <li>Historial de mantenimiento</li>
+            <li>Clientes y vehículos</li>
+            <li>Tareas del taller</li>
+            <li>Cambios por vehículo</li>
           </ul>
-          <button className="secondary" onClick={() => setMessage('Abrimos la configuración de API.')}
+          <button className="secondary" onClick={() => { setActiveView('vehiculos'); setMessage('Abrimos tareas y cambios de taller.') }}
           >
-            Configurar API
+            Ir a tareas
           </button>
         </div>
         <button className="secondary" onClick={handleLogout}>

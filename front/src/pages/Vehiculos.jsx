@@ -2,9 +2,11 @@ import { useEffect, useMemo, useState } from 'react'
 import {
   addCatalogoVehiculo,
   createServicio,
+  createServicioCatalogo,
   createVehiculo,
   deleteServicio,
   deleteVehiculo,
+  downloadServiciosTemplate,
   getVehiculoPorPatente,
   listCatalogoAnios,
   listCatalogoMarcas,
@@ -31,6 +33,7 @@ function Vehiculos({ onAction, onAuthError }) {
   const [catalogoAnios, setCatalogoAnios] = useState([])
   const [catalogoServicios, setCatalogoServicios] = useState([])
   const [catalogoNuevo, setCatalogoNuevo] = useState({ marca: '', modelo: '', version: '', anio: '' })
+  const [nuevaTarea, setNuevaTarea] = useState({ nombre: '', categoria: '', intervalo_km: '' })
   const [catalogoNuevoStatus, setCatalogoNuevoStatus] = useState('')
   const [patenteBusqueda, setPatenteBusqueda] = useState('')
   const [clienteBusquedaId, setClienteBusquedaId] = useState('')
@@ -52,6 +55,21 @@ function Vehiculos({ onAction, onAuthError }) {
     return cliente?.vehiculos || []
   }, [clientes, clienteBusquedaId])
 
+  const loadServiciosData = async (cancelledRef = { cancelled: false }) => {
+    setServiciosLoading(true)
+    try {
+      const [serviciosData, catalogoServiciosData] = await Promise.all([listServicios(), listCatalogoServicios()])
+      if (!cancelledRef.cancelled) {
+        setServicios(serviciosData)
+        setCatalogoServicios(catalogoServiciosData.servicios || [])
+      }
+    } catch (err) {
+      if (!cancelledRef.cancelled && err.status === 401) onAuthError()
+    } finally {
+      if (!cancelledRef.cancelled) setServiciosLoading(false)
+    }
+  }
+
   useEffect(() => {
     let cancelled = false
     const loadVehiculos = async () => {
@@ -67,33 +85,23 @@ function Vehiculos({ onAction, onAuthError }) {
         if (!cancelled) {
           setError(err.message)
           if (err.status === 401) onAuthError()
-          }        
+        }        
       } finally {
         if (!cancelled) setLoading(false)
       }
     }
     loadVehiculos()
-    return () => { cancelled = true }
+    return () => {
+      cancelled = true
+    }
   }, [onAuthError])
 
   useEffect(() => {
-    let cancelled = false
-    const loadServicios = async () => {
-      setServiciosLoading(true)
-      try {
-        const [serviciosData, catalogoServiciosData] = await Promise.all([listServicios(), listCatalogoServicios()])
-        if (!cancelled) {
-          setServicios(serviciosData)
-          setCatalogoServicios(catalogoServiciosData.servicios || [])
-        }
-      } catch (err) {
-        if (!cancelled && err.status === 401) onAuthError()
-      } finally {
-       if (!cancelled) setServiciosLoading(false)
-      }
+    const ref = { cancelled: false }
+    loadServiciosData(ref)
+    return () => {
+      ref.cancelled = true
     }
-    loadServicios()
-    return () => { cancelled = true }
   }, [onAuthError])
 
   useEffect(() => {
@@ -113,7 +121,9 @@ function Vehiculos({ onAction, onAuthError }) {
       }
     }
     loadCatalogo()
-    return () => { cancelled = true }
+    return () => {
+      cancelled = true
+    }
   }, [onAuthError])
 
   useEffect(() => {
@@ -135,7 +145,9 @@ function Vehiculos({ onAction, onAuthError }) {
       }
     }
     loadModelos()
-    return () => { cancelled = true }
+    return () => {
+      cancelled = true
+    }
   }, [form.marca])
 
   useEffect(() => {
@@ -156,7 +168,9 @@ function Vehiculos({ onAction, onAuthError }) {
       }
     }
     loadVersiones()
-    return () => { cancelled = true }
+    return () => {
+      cancelled = true
+    }
   }, [form.marca, form.modelo])
 
   const applyVehiculoToForms = (vehiculo) => {
@@ -197,7 +211,7 @@ function Vehiculos({ onAction, onAuthError }) {
     } catch (err) {
       setError(err.message)
       if (err.status === 401) onAuthError()
-   }
+    }
   }
 
   const handleEdit = (vehiculo) => {
@@ -238,8 +252,43 @@ function Vehiculos({ onAction, onAuthError }) {
         anio: catalogoNuevo.anio ? Number(catalogoNuevo.anio) : null,
       }
       await addCatalogoVehiculo(payload)
-      setCatalogoNuevoStatus('Entrada agregada al catálogo con versión.')
+      setCatalogoNuevoStatus('Entrada agregada al catálogo de vehículos.')
       setCatalogoNuevo({ marca: '', modelo: '', version: '', anio: '' })
+    } catch (err) {
+      setCatalogoNuevoStatus(err.message)
+    }
+  }
+
+  const handleNuevaTareaSubmit = async (event) => {
+    event.preventDefault()
+    setCatalogoNuevoStatus('')
+    try {
+      await createServicioCatalogo({
+        nombre: nuevaTarea.nombre,
+        categoria: nuevaTarea.categoria,
+        intervalo_km: nuevaTarea.intervalo_km || null,
+      })
+      setNuevaTarea({ nombre: '', categoria: '', intervalo_km: '' })
+      await loadServiciosData()
+      onAction('Tarea agregada al catálogo y disponible para cambios del auto.')
+    } catch (err) {
+      setCatalogoNuevoStatus(err.message)
+    }
+  }
+
+  const handleDescargarPlantilla = async () => {
+    setCatalogoNuevoStatus('')
+    try {
+      const blob = await downloadServiciosTemplate()
+      const url = window.URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = 'plantilla-tareas-taller.json'
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+      window.URL.revokeObjectURL(url)
+      onAction('Plantilla JSON descargada para cargar cambios y tareas.')
     } catch (err) {
       setCatalogoNuevoStatus(err.message)
     }
@@ -259,7 +308,7 @@ function Vehiculos({ onAction, onAuthError }) {
       const nuevo = await createServicio(payload)
       setServicios((prev) => [nuevo, ...prev])
       setServicioForm({ vehiculo_id: '', descripcion: '', fecha: '', kilometraje: '', costo: '', notas: '' })
-      onAction('Servicio registrado en el historial del vehículo.')
+      onAction('Cambio guardado en el historial del vehículo.')
     } catch (err) {
       setError(err.message)
     }
@@ -274,8 +323,8 @@ const filteredServicios = useMemo(() => {
     <section className="page">
       <header className="page-header">
         <div>
-          <h1>Vehículos y servicios</h1>
-          <p>Autocompletado por cliente o patente + historial técnico del vehículo.</p>
+          <h1>Vehículos y tareas de taller</h1>
+          <p>Cargá vehículos, gestioná tareas y registrá cambios realizados por unidad.</p>
         </div>
         <button className="primary" onClick={() => setShowVehiculoModal(true)}>Cargar vehículo</button>
       </header>
@@ -323,7 +372,15 @@ const filteredServicios = useMemo(() => {
         </article>
 
         <article className="page-card">
-          <h3>Agregar versión al JSON catálogo</h3>
+          <h3>Gestionar tareas del taller</h3>
+          <form className="mini-form" onSubmit={handleNuevaTareaSubmit}>
+            <input name="nombre" value={nuevaTarea.nombre} onChange={(e) => setNuevaTarea((p) => ({ ...p, nombre: e.target.value }))} placeholder="Nombre de tarea" required />
+            <input name="categoria" value={nuevaTarea.categoria} onChange={(e) => setNuevaTarea((p) => ({ ...p, categoria: e.target.value }))} placeholder="Categoría" />
+            <input name="intervalo_km" value={nuevaTarea.intervalo_km} onChange={(e) => setNuevaTarea((p) => ({ ...p, intervalo_km: e.target.value }))} placeholder="Intervalo KM" type="number" />
+            <button className="secondary" type="submit">Guardar tarea</button>
+            <button className="secondary" type="button" onClick={handleDescargarPlantilla}>Descargar plantilla JSON</button>
+          </form>
+          <h4>Agregar versión al catálogo de vehículos</h4>
           <form className="mini-form" onSubmit={handleCatalogoNuevoSubmit}>
             <input name="marca" value={catalogoNuevo.marca} onChange={(e) => setCatalogoNuevo((p) => ({ ...p, marca: e.target.value }))} placeholder="Marca" required />
             <input name="modelo" value={catalogoNuevo.modelo} onChange={(e) => setCatalogoNuevo((p) => ({ ...p, modelo: e.target.value }))} placeholder="Modelo" required />
@@ -335,7 +392,7 @@ const filteredServicios = useMemo(() => {
         </article>
         
         <article className="page-card">
-          <h3>Servicios realizados</h3>
+          <h3>Cambios realizados al auto</h3>
           <form className="mini-form" onSubmit={handleServicioSubmit}>
             <select name="vehiculo_id" value={servicioForm.vehiculo_id} onChange={(e) => setServicioForm((p) => ({ ...p, vehiculo_id: e.target.value }))} required>
               <option value="">Selecciona vehículo</option>
@@ -343,7 +400,7 @@ const filteredServicios = useMemo(() => {
                 <option key={vehiculo.id} value={vehiculo.id}>{vehiculo.marca} {vehiculo.modelo} {vehiculo.patente ? `· ${vehiculo.patente}` : ''}</option>
               ))}
             </select>
-            <input name="descripcion" value={servicioForm.descripcion} onChange={(e) => setServicioForm((p) => ({ ...p, descripcion: e.target.value }))} placeholder="Descripción" list="servicios-catalogo" required />
+            <input name="descripcion" value={servicioForm.descripcion} onChange={(e) => setServicioForm((p) => ({ ...p, descripcion: e.target.value }))} placeholder="Descripción del cambio" list="servicios-catalogo" required />
             <datalist id="servicios-catalogo">
               {catalogoServicios.map((servicio) => <option key={servicio.nombre} value={servicio.nombre} />)}
             </datalist>
@@ -351,10 +408,10 @@ const filteredServicios = useMemo(() => {
             <input name="kilometraje" type="number" value={servicioForm.kilometraje} onChange={(e) => setServicioForm((p) => ({ ...p, kilometraje: e.target.value }))} placeholder="Kilometraje" />
             <input name="costo" type="number" value={servicioForm.costo} onChange={(e) => setServicioForm((p) => ({ ...p, costo: e.target.value }))} placeholder="Costo" />
             <textarea name="notas" value={servicioForm.notas} onChange={(e) => setServicioForm((p) => ({ ...p, notas: e.target.value }))} placeholder="Notas" />
-            <button className="secondary" type="submit">Guardar servicio</button>
+            <button className="secondary" type="submit">Guardar cambio</button>
           </form>
-          {serviciosLoading ? <p>Cargando servicios...</p> : null}
-          {!serviciosLoading && filteredServicios.length === 0 ? <p>No hay servicios registrados.</p> : (
+          {serviciosLoading ? <p>Cargando cambios...</p> : null}
+          {!serviciosLoading && filteredServicios.length === 0 ? <p>No hay cambios registrados.</p> : (
             <ul className="data-list data-list-stacked">
               {filteredServicios.map((servicio) => (
                 <li key={servicio.id}>

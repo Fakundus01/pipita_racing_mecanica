@@ -128,6 +128,24 @@ export const deleteParte = (id) =>
 
 export const listCatalogoServicios = () => apiFetch('/servicios/catalogo')
 
+export const createServicioCatalogo = (payload) =>
+  apiFetch('/servicios/catalogo', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  })
+
+export const downloadServiciosTemplate = async () => {
+  const response = await fetch(`${API_BASE_URL}/servicios/catalogo/plantilla`, {
+    credentials: 'include',
+  })
+
+  if (!response.ok) {
+    throw await buildError(response)
+  }
+
+  return response.blob()
+}
+
 export const listServicios = () => apiFetch('/servicios')
 export const listServiciosPorVehiculo = (vehiculoId) =>
   apiFetch(`/vehiculos/${vehiculoId}/servicios`)

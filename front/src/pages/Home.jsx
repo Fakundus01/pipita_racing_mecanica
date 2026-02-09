@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { downloadExcel, getDashboard } from '../services/api'
+import { downloadExcel, downloadServiciosTemplate, getDashboard } from '../services/api'
 
 function Home({ onAction, onAuthError }) {
   const [dashboard, setDashboard] = useState(null)
@@ -86,14 +86,29 @@ function Home({ onAction, onAuthError }) {
       <section className="home">
         <header className="header">
           <div>
-            <h1>Panel de anotaciones</h1>
+            <h1>Panel del taller</h1>
             <p>
-              Centraliza ventas de autos, camionetas, motos y sus partes en un
-              formato listo para imprimir.
+              Centralizá clientes, vehículos, cambios realizados y reportes listos para imprimir.
             </p>
           </div>
           <div className="header-actions">
-            <button className="secondary" onClick={() => onAction('Plantilla abierta.')}>Ver plantilla</button>
+            <button className="secondary" onClick={async () => {
+              try {
+                const blob = await downloadServiciosTemplate()
+                const url = window.URL.createObjectURL(blob)
+                const link = document.createElement('a')
+                link.href = url
+                link.download = 'plantilla-tareas-taller.json'
+                document.body.appendChild(link)
+                link.click()
+                link.remove()
+                window.URL.revokeObjectURL(url)
+                onAction('Plantilla descargada.')
+              } catch (err) {
+                setExportError(err.message)
+                if (err.status === 401) onAuthError()
+              }
+            }}>Descargar plantilla</button>
             <button
               className="secondary"
               onClick={handleExport}
@@ -120,10 +135,9 @@ function Home({ onAction, onAuthError }) {
           <article className="form-card">
             <div className="card-header">
               <div>
-                <h2>Nueva anotación</h2>
+                <h2>Nueva orden</h2>
                 <p>
-                  Carga ventas y partes con autocompletado para evitar planillas
-                  manuales.
+                  Cargá datos rápidos para la planilla del cliente y su vehículo.
                 </p>
               </div>
               <span className="badge">Borrador</span>
@@ -181,7 +195,7 @@ function Home({ onAction, onAuthError }) {
             </form>
             <div className="form-actions">
               <button className="secondary" type="button" onClick={() => onAction('Borrador guardado.')}>Guardar borrador</button>
-              <button className="primary" type="button" onClick={() => onAction('Planilla enviada a imprimir.')}>Imprimir planilla</button>
+              <button className="primary" type="button" onClick={() => { window.print(); onAction('Se abrió la impresión del navegador.') }}>Imprimir planilla</button>
             </div>
           </article>
 

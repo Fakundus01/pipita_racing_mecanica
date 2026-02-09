@@ -107,9 +107,16 @@ function Reportes({ onAction, onAuthError }) {
         </div>
         <button
           className="primary"
-          onClick={() => onAction('Selecciona un reporte para imprimir.')}
+          type="button"
+          onClick={() => {
+            if (reportes.length === 0) {
+              onAction('No hay reportes para imprimir todavía.')
+              return
+            }
+            handlePrint(reportes[0].id)
+          }}
         >
-          Imprimir
+          Imprimir último
         </button>
       </header>
       <div className="page-grid">

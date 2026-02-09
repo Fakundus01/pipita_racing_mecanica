@@ -1,4 +1,5 @@
 from decimal import Decimal
+import json
 from io import BytesIO
 from datetime import date, datetime
 
@@ -48,6 +49,13 @@ def servicios_catalogo():
   return ServiciosCatalogoService(
     current_app.config['SERVICIOS_CATALOGO_JSON_PATH'],
   )
+
+
+def serialize_json_download(payload, filename):
+  response = make_response(json.dumps(payload, ensure_ascii=False, indent=2))
+  response.headers['Content-Type'] = 'application/json; charset=utf-8'
+  response.headers['Content-Disposition'] = f'attachment; filename="{filename}"'
+  return response
 
 def serialize_excel_value(value):
   if isinstance(value, (datetime, date)):
@@ -399,6 +407,29 @@ def list_servicios():
 @api.get('/servicios/catalogo')
 def list_servicios_catalogo():
   return jsonify({'servicios': servicios_catalogo().list()})
+
+
+@api.post('/servicios/catalogo')
+def create_servicio_catalogo():
+  payload = request.get_json(force=True)
+  nombre = payload.get('nombre', '').strip()
+  categoria = payload.get('categoria', '').strip() or 'General'
+  intervalo_km = payload.get('intervalo_km')
+  try:
+    if intervalo_km not in (None, ''):
+      intervalo_km = int(intervalo_km)
+    entry = servicios_catalogo().add(nombre=nombre, categoria=categoria, intervalo_km=intervalo_km)
+  except ValueError as exc:
+    return jsonify({'error': str(exc)}), 400
+  return jsonify(entry), 201
+
+
+@api.get('/servicios/catalogo/plantilla')
+def download_servicios_template():
+  return serialize_json_download(
+    servicios_catalogo().template(),
+    'plantilla-tareas-taller.json',
+  )
 
 
 @api.get('/vehiculos/<int:vehiculo_id>/servicios')
