@@ -1,27 +1,20 @@
 import { useEffect, useMemo, useState } from 'react'
 import {
-  addCatalogoVehiculo,
-  createServicio,
-  createServicioCatalogo,
   createVehiculo,
-  deleteServicio,
   deleteVehiculo,
-  downloadServiciosTemplate,
   getVehiculoPorPatente,
   listCatalogoAnios,
   listCatalogoMarcas,
   listCatalogoModelos,
-  listCatalogoServicios,
   listCatalogoVersiones,
   listClientes,
-  listServicios,
   listVehiculos,
   updateVehiculo,
 } from '../services/api'
 
 const initialForm = { patente: '', marca: '', modelo: '', version: '', anio: '' }
 
-function Vehiculos({ onAction, onAuthError }) {
+function Vehiculos({ onAction, onAuthError, onNavigate }) {
   const [vehiculos, setVehiculos] = useState([])
   const [clientes, setClientes] = useState([])
   const [form, setForm] = useState(initialForm)
@@ -31,20 +24,11 @@ function Vehiculos({ onAction, onAuthError }) {
   const [catalogoModelos, setCatalogoModelos] = useState([])
   const [catalogoVersiones, setCatalogoVersiones] = useState([])
   const [catalogoAnios, setCatalogoAnios] = useState([])
-  const [catalogoServicios, setCatalogoServicios] = useState([])
-  const [catalogoNuevo, setCatalogoNuevo] = useState({ marca: '', modelo: '', version: '', anio: '' })
-  const [nuevaTarea, setNuevaTarea] = useState({ nombre: '', categoria: '', intervalo_km: '' })
-  const [catalogoNuevoStatus, setCatalogoNuevoStatus] = useState('')
   const [patenteBusqueda, setPatenteBusqueda] = useState('')
   const [clienteBusquedaId, setClienteBusquedaId] = useState('')
   const [patenteClienteSeleccionada, setPatenteClienteSeleccionada] = useState('')
   const [patenteInfo, setPatenteInfo] = useState(null)
   const [loading, setLoading] = useState(true)
-  const [serviciosLoading, setServiciosLoading] = useState(true)
-  const [servicios, setServicios] = useState([])
-  const [servicioForm, setServicioForm] = useState({
-    vehiculo_id: '', descripcion: '', fecha: '', kilometraje: '', costo: '', notas: '',
-  })
   const [error, setError] = useState('')
 
   const vehiculosPorCliente = useMemo(() => {
@@ -54,21 +38,6 @@ function Vehiculos({ onAction, onAuthError }) {
     const cliente = clientes.find((item) => String(item.id) === String(clienteBusquedaId))
     return cliente?.vehiculos || []
   }, [clientes, clienteBusquedaId])
-
-  const loadServiciosData = async (cancelledRef = { cancelled: false }) => {
-    setServiciosLoading(true)
-    try {
-      const [serviciosData, catalogoServiciosData] = await Promise.all([listServicios(), listCatalogoServicios()])
-      if (!cancelledRef.cancelled) {
-        setServicios(serviciosData)
-        setCatalogoServicios(catalogoServiciosData.servicios || [])
-      }
-    } catch (err) {
-      if (!cancelledRef.cancelled && err.status === 401) onAuthError()
-    } finally {
-      if (!cancelledRef.cancelled) setServiciosLoading(false)
-    }
-  }
 
   useEffect(() => {
     let cancelled = false
@@ -93,14 +62,6 @@ function Vehiculos({ onAction, onAuthError }) {
     loadVehiculos()
     return () => {
       cancelled = true
-    }
-  }, [onAuthError])
-
-  useEffect(() => {
-    const ref = { cancelled: false }
-    loadServiciosData(ref)
-    return () => {
-      ref.cancelled = true
     }
   }, [onAuthError])
 
@@ -182,7 +143,6 @@ function Vehiculos({ onAction, onAuthError }) {
       version: vehiculo.version || '',
       anio: vehiculo.anio || '',
     })
-    setServicioForm((prev) => ({ ...prev, vehiculo_id: String(vehiculo.id) }))
     setPatenteInfo(vehiculo)
     onAction(`Autocompletado aplicado para ${vehiculo.patente || `${vehiculo.marca} ${vehiculo.modelo}`}.`)
   }
@@ -241,90 +201,12 @@ function Vehiculos({ onAction, onAuthError }) {
     }
   }
 
-  const handleCatalogoNuevoSubmit = async (event) => {
-    event.preventDefault()
-    setCatalogoNuevoStatus('')
-    try {
-      const payload = {
-        marca: catalogoNuevo.marca.trim(),
-        modelo: catalogoNuevo.modelo.trim(),
-        version: catalogoNuevo.version.trim(),
-        anio: catalogoNuevo.anio ? Number(catalogoNuevo.anio) : null,
-      }
-      await addCatalogoVehiculo(payload)
-      setCatalogoNuevoStatus('Entrada agregada al catálogo de vehículos.')
-      setCatalogoNuevo({ marca: '', modelo: '', version: '', anio: '' })
-    } catch (err) {
-      setCatalogoNuevoStatus(err.message)
-    }
-  }
-
-  const handleNuevaTareaSubmit = async (event) => {
-    event.preventDefault()
-    setCatalogoNuevoStatus('')
-    try {
-      await createServicioCatalogo({
-        nombre: nuevaTarea.nombre,
-        categoria: nuevaTarea.categoria,
-        intervalo_km: nuevaTarea.intervalo_km || null,
-      })
-      setNuevaTarea({ nombre: '', categoria: '', intervalo_km: '' })
-      await loadServiciosData()
-      onAction('Tarea agregada al catálogo y disponible para cambios del auto.')
-    } catch (err) {
-      setCatalogoNuevoStatus(err.message)
-    }
-  }
-
-  const handleDescargarPlantilla = async () => {
-    setCatalogoNuevoStatus('')
-    try {
-      const blob = await downloadServiciosTemplate()
-      const url = window.URL.createObjectURL(blob)
-      const link = document.createElement('a')
-      link.href = url
-      link.download = 'plantilla-tareas-taller.json'
-      document.body.appendChild(link)
-      link.click()
-      link.remove()
-      window.URL.revokeObjectURL(url)
-      onAction('Plantilla JSON descargada para cargar cambios y tareas.')
-    } catch (err) {
-      setCatalogoNuevoStatus(err.message)
-    }
-  }
-
-  const handleServicioSubmit = async (event) => {
-    event.preventDefault()
-    try {
-      const payload = {
-        vehiculo_id: Number(servicioForm.vehiculo_id),
-        descripcion: servicioForm.descripcion.trim(),
-        fecha: servicioForm.fecha || null,
-        kilometraje: servicioForm.kilometraje ? Number(servicioForm.kilometraje) : null,
-        costo: servicioForm.costo ? Number(servicioForm.costo) : 0,
-        notas: servicioForm.notas.trim() || null,
-      }
-      const nuevo = await createServicio(payload)
-      setServicios((prev) => [nuevo, ...prev])
-      setServicioForm({ vehiculo_id: '', descripcion: '', fecha: '', kilometraje: '', costo: '', notas: '' })
-      onAction('Cambio guardado en el historial del vehículo.')
-    } catch (err) {
-      setError(err.message)
-    }
-  }
-
-const filteredServicios = useMemo(() => {
-    if (!servicioForm.vehiculo_id) return servicios
-    return servicios.filter((servicio) => String(servicio.vehiculo_id) === String(servicioForm.vehiculo_id))
-  }, [servicios, servicioForm.vehiculo_id])
-
   return (
     <section className="page">
       <header className="page-header">
         <div>
-          <h1>Vehículos y tareas de taller</h1>
-          <p>Cargá vehículos, gestioná tareas y registrá cambios realizados por unidad.</p>
+          <h1>Vehículos</h1>
+          <p>Cargá y actualizá el inventario de unidades.</p>
         </div>
         <button className="primary" onClick={() => setShowVehiculoModal(true)}>Cargar vehículo</button>
       </header>
@@ -370,63 +252,13 @@ const filteredServicios = useMemo(() => {
             </div>
           ) : null}
         </article>
-
-        <article className="page-card">
-          <h3>Gestionar tareas del taller</h3>
-          <form className="mini-form" onSubmit={handleNuevaTareaSubmit}>
-            <input name="nombre" value={nuevaTarea.nombre} onChange={(e) => setNuevaTarea((p) => ({ ...p, nombre: e.target.value }))} placeholder="Nombre de tarea" required />
-            <input name="categoria" value={nuevaTarea.categoria} onChange={(e) => setNuevaTarea((p) => ({ ...p, categoria: e.target.value }))} placeholder="Categoría" />
-            <input name="intervalo_km" value={nuevaTarea.intervalo_km} onChange={(e) => setNuevaTarea((p) => ({ ...p, intervalo_km: e.target.value }))} placeholder="Intervalo KM" type="number" />
-            <button className="secondary" type="submit">Guardar tarea</button>
-            <button className="secondary" type="button" onClick={handleDescargarPlantilla}>Descargar plantilla JSON</button>
-          </form>
-          <h4>Agregar versión al catálogo de vehículos</h4>
-          <form className="mini-form" onSubmit={handleCatalogoNuevoSubmit}>
-            <input name="marca" value={catalogoNuevo.marca} onChange={(e) => setCatalogoNuevo((p) => ({ ...p, marca: e.target.value }))} placeholder="Marca" required />
-            <input name="modelo" value={catalogoNuevo.modelo} onChange={(e) => setCatalogoNuevo((p) => ({ ...p, modelo: e.target.value }))} placeholder="Modelo" required />
-            <input name="version" value={catalogoNuevo.version} onChange={(e) => setCatalogoNuevo((p) => ({ ...p, version: e.target.value }))} placeholder="Versión" />
-            <input name="anio" value={catalogoNuevo.anio} onChange={(e) => setCatalogoNuevo((p) => ({ ...p, anio: e.target.value }))} placeholder="Año" type="number" />
-            <button className="secondary" type="submit">Agregar</button>
-          </form>
-          {catalogoNuevoStatus ? <p className="inline-error">{catalogoNuevoStatus}</p> : null}
-        </article>
         
-        <article className="page-card">
+        <article className="page-card card-disabled">
           <h3>Cambios realizados al auto</h3>
-          <form className="mini-form" onSubmit={handleServicioSubmit}>
-            <select name="vehiculo_id" value={servicioForm.vehiculo_id} onChange={(e) => setServicioForm((p) => ({ ...p, vehiculo_id: e.target.value }))} required>
-              <option value="">Selecciona vehículo</option>
-              {vehiculos.map((vehiculo) => (
-                <option key={vehiculo.id} value={vehiculo.id}>{vehiculo.marca} {vehiculo.modelo} {vehiculo.patente ? `· ${vehiculo.patente}` : ''}</option>
-              ))}
-            </select>
-            <input name="descripcion" value={servicioForm.descripcion} onChange={(e) => setServicioForm((p) => ({ ...p, descripcion: e.target.value }))} placeholder="Descripción del cambio" list="servicios-catalogo" required />
-            <datalist id="servicios-catalogo">
-              {catalogoServicios.map((servicio) => <option key={servicio.nombre} value={servicio.nombre} />)}
-            </datalist>
-            <input name="fecha" type="date" value={servicioForm.fecha} onChange={(e) => setServicioForm((p) => ({ ...p, fecha: e.target.value }))} />
-            <input name="kilometraje" type="number" value={servicioForm.kilometraje} onChange={(e) => setServicioForm((p) => ({ ...p, kilometraje: e.target.value }))} placeholder="Kilometraje" />
-            <input name="costo" type="number" value={servicioForm.costo} onChange={(e) => setServicioForm((p) => ({ ...p, costo: e.target.value }))} placeholder="Costo" />
-            <textarea name="notas" value={servicioForm.notas} onChange={(e) => setServicioForm((p) => ({ ...p, notas: e.target.value }))} placeholder="Notas" />
-            <button className="secondary" type="submit">Guardar cambio</button>
-          </form>
-          {serviciosLoading ? <p>Cargando cambios...</p> : null}
-          {!serviciosLoading && filteredServicios.length === 0 ? <p>No hay cambios registrados.</p> : (
-            <ul className="data-list data-list-stacked">
-              {filteredServicios.map((servicio) => (
-                <li key={servicio.id}>
-                  <div>
-                    <strong>{servicio.descripcion}</strong>
-                    <span>{servicio.vehiculo?.patente || 'Sin patente'} · {servicio.fecha || 'Fecha N/D'} · {servicio.kilometraje ?? 'KM N/D'} km</span>
-                  </div>
-                  <button className="secondary" type="button" onClick={async () => {
-                    await deleteServicio(servicio.id)
-                    setServicios((prev) => prev.filter((item) => item.id !== servicio.id))
-                  }}>Eliminar</button>
-                </li>
-              ))}
-            </ul>
-          )}
+          <p>Este módulo quedó inactivo en esta pantalla para mantenerla más limpia.</p>
+          <button className="secondary" type="button" onClick={() => onNavigate('taller')}>
+            Abrir página de tareas del taller
+          </button>
         </article>
 
         <article className="page-card">

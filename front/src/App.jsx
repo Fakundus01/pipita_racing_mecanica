@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from 'react'
 import Home from './pages/Home'
 import Clientes from './pages/Clientes'
 import Vehiculos from './pages/Vehiculos'
+import Taller from './pages/Taller'
+import CatalogoVehiculos from './pages/CatalogoVehiculos'
 import Partes from './pages/Partes'
 import Reportes from './pages/Reportes'
 import Login from './components/Login'
@@ -12,6 +14,8 @@ const navigation = [
   { key: 'home', label: 'Panel', description: 'Resumen general' },
   { key: 'clientes', label: 'Clientes', description: 'Contactos y seguimiento' },
   { key: 'vehiculos', label: 'Vehículos', description: 'Autos, camionetas, motos' },
+  { key: 'taller', label: 'Tareas de taller', description: 'Cambios y servicios del auto' },
+  { key: 'catalogo', label: 'Catálogo de vehículos', description: 'Marcas, modelos y versiones' },
   { key: 'partes', label: 'Partes & accesorios', description: 'Inventario de repuestos' },
   { key: 'reportes', label: 'Reportes', description: 'Resumen mensual' },
 ]
@@ -20,6 +24,8 @@ const views = {
   home: Home,
   clientes: Clientes,
   vehiculos: Vehiculos,
+  taller: Taller,
+  catalogo: CatalogoVehiculos,
   partes: Partes,
   reportes: Reportes,
 }
@@ -41,7 +47,7 @@ function App() {
         if (!cancelled) {
           setAuth({ loading: false, authenticated: data.authenticated })
         }
-      } catch (error) {
+      } catch {
         if (!cancelled) {
           setAuth({ loading: false, authenticated: false })
         }
@@ -69,7 +75,7 @@ function App() {
   const handleLogout = async () => {
     try {
       await logout()
-    } catch (error) {
+    } catch {
       // Ignorar errores de cierre de sesión
     }
     setAuth({ loading: false, authenticated: false })
@@ -127,7 +133,7 @@ function App() {
             <li>Tareas del taller</li>
             <li>Cambios por vehículo</li>
           </ul>
-          <button className="secondary" onClick={() => { setActiveView('vehiculos'); setMessage('Abrimos tareas y cambios de taller.') }}
+          <button className="secondary" onClick={() => { setActiveView('taller'); setMessage('Abrimos tareas y cambios de taller.') }}
           >
             Ir a tareas
           </button>
@@ -148,7 +154,7 @@ function App() {
             Actualizar estado
           </button>
         </div>
-        <ActiveComponent onAction={setMessage} onAuthError={handleAuthError} />
+        <ActiveComponent onAction={setMessage} onAuthError={handleAuthError} onNavigate={setActiveView} />
       </main>
     </div>
   )

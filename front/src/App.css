@@ -661,3 +661,11 @@
   align-items: center;
   gap: 0.8rem;
 }
+.card-disabled {
+  opacity: 0.6;
+  border-style: dashed;
+}
+
+.mini-form h4 {
+  margin: 0.25rem 0;
+}

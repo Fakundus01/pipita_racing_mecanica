@@ -1,12 +1,16 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
   createCliente,
+  createVehiculo,
+  deleteCliente,
   listCatalogoAnios,
   listCatalogoMarcas,
   listCatalogoModelos,
   listCatalogoVersiones,
   listClientes,
+  listVehiculos,
   updateCliente,
+  updateVehiculo,
 } from '../services/api'
 
 const initialForm = {
@@ -18,6 +22,7 @@ const initialForm = {
   modelo: '',
   version: '',
   anio: '',
+  vehiculo_id: '',
 }
 
 const toContactKey = (cliente) =>
@@ -27,6 +32,7 @@ const toContactKey = (cliente) =>
 
 function Clientes({ onAction, onAuthError }) {
   const [clientes, setClientes] = useState([])
+  const [vehiculos, setVehiculos] = useState([])
   const [form, setForm] = useState(initialForm)
   const [showModal, setShowModal] = useState(false)
   const [editingCliente, setEditingCliente] = useState(null)
@@ -56,34 +62,31 @@ function Clientes({ onAction, onAuthError }) {
     return [...map.values()].sort((a, b) => a.nombre.localeCompare(b.nombre))
   }, [clientes])
 
-  useEffect(() => {
-    let cancelled = false
-    const loadClientes = async () => {
-      setLoading(true)
-      setError('')
-      try {
-        const data = await listClientes()
-        if (!cancelled) {
-          setClientes(data)
-        }
-      } catch (err) {
-        if (!cancelled) {
-          setError(err.message)
-          if (err.status === 401) {
-            onAuthError()
-          }
-        }
-      } finally {
-        if (!cancelled) {
-          setLoading(false)
-        }
+  const vehiculosSinCliente = useMemo(
+    () => vehiculos.filter((vehiculo) => !vehiculo.cliente_id || (editingCliente && vehiculo.cliente_id === editingCliente.id)),
+    [vehiculos, editingCliente],
+  )
+
+  const loadClientes = useCallback(async () => {
+    setLoading(true)
+    setError('')
+    try {
+      const [clientesData, vehiculosData] = await Promise.all([listClientes(), listVehiculos()])
+      setClientes(clientesData)
+      setVehiculos(vehiculosData)
+    } catch (err) {
+      setError(err.message)
+      if (err.status === 401) {
+        onAuthError()
       }
-    }
-    loadClientes()
-    return () => {
-      cancelled = true
+     } finally {
+      setLoading(false)
     }
   }, [onAuthError])
+
+  useEffect(() => {
+    loadClientes()
+  }, [loadClientes])
 
   useEffect(() => {
     let cancelled = false
@@ -124,8 +127,6 @@ function Clientes({ onAction, onAuthError }) {
         const data = await listCatalogoModelos(form.marca)
         if (!cancelled) {
           setCatalogoModelos(data.modelos || [])
-          setForm((prev) => ({ ...prev, modelo: '', version: '' }))
-          setCatalogoVersiones([])
         }
       } catch (err) {
         if (!cancelled) {
@@ -150,7 +151,6 @@ function Clientes({ onAction, onAuthError }) {
         const data = await listCatalogoVersiones(form.marca, form.modelo)
         if (!cancelled) {
           setCatalogoVersiones(data.versiones || [])
-          setForm((prev) => ({ ...prev, version: '' }))
         }
       } catch (err) {
         if (!cancelled) {
@@ -176,12 +176,19 @@ function Clientes({ onAction, onAuthError }) {
   }
 
   const openEditModal = (cliente) => {
+    const vehiculo = cliente.vehiculos?.[0]
     setEditingCliente(cliente)
     setForm({
       ...initialForm,
       nombre: cliente.nombre || '',
       telefono: cliente.telefono || '',
       email: cliente.email || '',
+      vehiculo_id: vehiculo?.id ? String(vehiculo.id) : '',
+      patente: vehiculo?.patente || '',
+      marca: vehiculo?.marca || '',
+      modelo: vehiculo?.modelo || '',
+      version: vehiculo?.version || '',
+      anio: vehiculo?.anio || '',
     })
     setShowModal(true)
   }
@@ -190,6 +197,23 @@ function Clientes({ onAction, onAuthError }) {
     setShowModal(false)
     setEditingCliente(null)
     setForm(initialForm)
+  }
+
+  const handleVehiculoSelect = (value) => {
+    const vehiculo = vehiculos.find((item) => String(item.id) === String(value))
+    if (!vehiculo) {
+      setForm((prev) => ({ ...prev, vehiculo_id: '', patente: '', marca: '', modelo: '', version: '', anio: '' }))
+      return
+    }
+    setForm((prev) => ({
+      ...prev,
+      vehiculo_id: String(vehiculo.id),
+      patente: vehiculo.patente || '',
+      marca: vehiculo.marca || '',
+      modelo: vehiculo.modelo || '',
+      version: vehiculo.version || '',
+      anio: vehiculo.anio || '',
+    }))
   }
 
   const handleSubmit = async (event) => {
@@ -202,7 +226,28 @@ function Clientes({ onAction, onAuthError }) {
           telefono: form.telefono,
           email: form.email,
         })
-        setClientes((prev) => prev.map((item) => (item.id === editingCliente.id ? actualizado : item)))
+
+        if (form.vehiculo_id) {
+          await updateVehiculo(Number(form.vehiculo_id), {
+            patente: form.patente || null,
+            marca: form.marca,
+            modelo: form.modelo,
+            version: form.version || null,
+            anio: form.anio ? Number(form.anio) : null,
+            cliente_id: editingCliente.id,
+          })
+        } else if (form.marca && form.modelo) {
+          await createVehiculo({
+            patente: form.patente || null,
+            marca: form.marca,
+            modelo: form.modelo,
+            version: form.version || null,
+            anio: form.anio ? Number(form.anio) : null,
+            cliente_id: editingCliente.id,
+          })
+        }
+
+        await loadClientes()
         closeModal()
         onAction(`Cliente ${actualizado.nombre} actualizado.`)
         return
@@ -232,6 +277,18 @@ function Clientes({ onAction, onAuthError }) {
       if (err.status === 401) {
         onAuthError()
       }
+    }
+  }
+
+  const handleDeleteCliente = async (clienteId) => {
+    if (!window.confirm('¿Eliminar cliente y sus vehículos asociados?')) return
+    setError('')
+    try {
+      await deleteCliente(clienteId)
+      await loadClientes()
+      onAction('Cliente eliminado.')
+    } catch (err) {
+      setError(err.message)
     }
   }
 
@@ -273,9 +330,14 @@ function Clientes({ onAction, onAuthError }) {
                     </div>
                   )}
                 </div>
-                <button className="secondary" type="button" onClick={() => openEditModal(cliente)}>
-                  Editar cliente
-                </button>
+                <div className="list-buttons">
+                  <button className="secondary" type="button" onClick={() => openEditModal(cliente)}>
+                    Editar cliente
+                  </button>
+                  <button className="secondary" type="button" onClick={() => handleDeleteCliente(cliente.id)}>
+                    Eliminar cliente
+                  </button>
+                </div>
               </li>
             ))}
           </ul>
@@ -293,36 +355,46 @@ function Clientes({ onAction, onAuthError }) {
               <input name="nombre" value={form.nombre} onChange={handleChange} placeholder="Nombre" required />
               <input name="telefono" value={form.telefono} onChange={handleChange} placeholder="Teléfono" />
               <input name="email" value={form.email} onChange={handleChange} placeholder="Email" />
-              
-              {!editingCliente ? (
+
+              {editingCliente ? (
                 <>
-                  <input name="patente" value={form.patente} onChange={handleChange} placeholder="Patente" />
-                  <select name="marca" value={form.marca} onChange={handleChange}>
-                    <option value="">Selecciona marca</option>
-                    {catalogoMarcas.map((marca) => (
-                      <option key={marca} value={marca}>{marca}</option>
-                    ))}
-                  </select>
-                  <select name="modelo" value={form.modelo} onChange={handleChange} disabled={!form.marca}>
-                    <option value="">Selecciona modelo</option>
-                    {catalogoModelos.map((modelo) => (
-                      <option key={modelo} value={modelo}>{modelo}</option>
-                    ))}
-                  </select>
-                  <select name="version" value={form.version} onChange={handleChange} disabled={!form.modelo}>
-                    <option value="">Selecciona versión</option>
-                    {catalogoVersiones.map((version) => (
-                      <option key={version} value={version}>{version}</option>
-                    ))}
-                  </select>
-                  <select name="anio" value={form.anio} onChange={handleChange}>
-                    <option value="">Selecciona año</option>
-                    {catalogoAnios.map((anio) => (
-                      <option key={anio} value={anio}>{anio}</option>
+                  <h4>Vehículo asociado</h4>
+                  <select name="vehiculo_id" value={form.vehiculo_id} onChange={(e) => handleVehiculoSelect(e.target.value)}>
+                    <option value="">Crear nuevo o dejar sin vehículo</option>
+                    {vehiculosSinCliente.map((vehiculo) => (
+                      <option key={vehiculo.id} value={vehiculo.id}>
+                        {vehiculo.patente || 'Sin patente'} · {vehiculo.marca} {vehiculo.modelo}
+                      </option>
                     ))}
                   </select>
                 </>
               ) : null}
+
+               <input name="patente" value={form.patente} onChange={handleChange} placeholder="Patente" />
+              <select name="marca" value={form.marca} onChange={handleChange}>
+                <option value="">Selecciona marca</option>
+                {catalogoMarcas.map((marca) => (
+                  <option key={marca} value={marca}>{marca}</option>
+                ))}
+              </select>
+              <select name="modelo" value={form.modelo} onChange={handleChange} disabled={!form.marca}>
+                <option value="">Selecciona modelo</option>
+                {catalogoModelos.map((modelo) => (
+                  <option key={modelo} value={modelo}>{modelo}</option>
+                ))}
+              </select>
+              <select name="version" value={form.version} onChange={handleChange} disabled={!form.modelo}>
+                <option value="">Selecciona versión</option>
+                {catalogoVersiones.map((version) => (
+                  <option key={version} value={version}>{version}</option>
+                ))}
+              </select>
+              <select name="anio" value={form.anio} onChange={handleChange}>
+                <option value="">Selecciona año</option>
+                {catalogoAnios.map((anio) => (
+                  <option key={anio} value={anio}>{anio}</option>
+                ))}
+              </select>
 
               <button className="primary" type="submit">{editingCliente ? 'Guardar cambios' : 'Guardar cliente'}</button>
             </form>

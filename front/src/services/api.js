@@ -5,7 +5,7 @@ const buildError = async (response) => {
   try {
     const data = await response.json()
     detail = data?.error || data?.detail || ''
-  } catch (error) {
+  } catch {
     detail = ''
   }
   const message = detail || `Error ${response.status}`
