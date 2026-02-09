@@ -31,3 +31,7 @@ class Config:
   SESSION_COOKIE_SAMESITE = os.getenv('SESSION_COOKIE_SAMESITE', 'Lax')
   SESSION_COOKIE_DOMAIN = os.getenv('SESSION_COOKIE_DOMAIN')
   SESSION_COOKIE_SECURE = os.getenv('SESSION_COOKIE_SECURE', 'False').lower() == 'true'
+  SERVICIOS_CATALOGO_JSON_PATH = os.getenv(
+    'SERVICIOS_CATALOGO_JSON_PATH',
+    os.path.join(os.path.dirname(__file__), 'services', 'api', 'servicios_taller.json'),
+  )

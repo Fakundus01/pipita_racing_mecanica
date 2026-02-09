@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   createCliente,
   listCatalogoAnios,
@@ -8,24 +8,32 @@ import {
   listClientes,
 } from '../services/api'
 
+const initialForm = {
+  nombre: '',
+  telefono: '',
+  email: '',
+  patente: '',
+  marca: '',
+  modelo: '',
+  version: '',
+  anio: '',
+}
+
 function Clientes({ onAction, onAuthError }) {
   const [clientes, setClientes] = useState([])
-  const [form, setForm] = useState({
-    nombre: '',
-    telefono: '',
-    email: '',
-    patente: '',
-    marca: '',
-    modelo: '',
-    version: '',
-    anio: '',
-  })
+  const [form, setForm] = useState(initialForm)
+  const [showModal, setShowModal] = useState(false)
   const [catalogoMarcas, setCatalogoMarcas] = useState([])
   const [catalogoModelos, setCatalogoModelos] = useState([])
   const [catalogoVersiones, setCatalogoVersiones] = useState([])
   const [catalogoAnios, setCatalogoAnios] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+
+  const clientesOrdenados = useMemo(
+    () => [...clientes].sort((a, b) => a.nombre.localeCompare(b.nombre)),
+    [clientes],
+  )
 
   useEffect(() => {
     let cancelled = false
@@ -146,6 +154,11 @@ function Clientes({ onAction, onAuthError }) {
     setForm((prev) => ({ ...prev, [name]: value }))
   }
 
+  const closeModal = () => {
+    setShowModal(false)
+    setForm(initialForm)
+  }
+
   const handleSubmit = async (event) => {
     event.preventDefault()
     setError('')
@@ -166,17 +179,8 @@ function Clientes({ onAction, onAuthError }) {
       }
       const nuevo = await createCliente(payload)
       setClientes((prev) => [nuevo, ...prev])
-       setForm({
-        nombre: '',
-        telefono: '',
-        email: '',
-        patente: '',
-        marca: '',
-        modelo: '',
-        version: '',
-        anio: '',
-      })
-      onAction(`Cliente ${nuevo.nombre} creado.`)
+      closeModal()
+      onAction(`Cliente ${nuevo.nombre} creado con su vehículo.`)
     } catch (err) {
       setError(err.message)
       if (err.status === 401) {
@@ -190,114 +194,86 @@ function Clientes({ onAction, onAuthError }) {
       <header className="page-header">
         <div>
           <h1>Clientes activos</h1>
-          <p>Gestiona datos, estado y preferencias de tus compradores.</p>
+          <p>Alta rápida con popup y detalle de historial de vehículos.</p>
         </div>
-        <button className="primary" onClick={() => onAction('Completa el formulario para crear un cliente.')}>
-          Nuevo cliente
+        <button className="primary" onClick={() => setShowModal(true)}>
+          Cargar cliente
         </button>
       </header>
-      <div className="page-grid">
-        <article className="page-card">
-          <h3>Registrar cliente</h3>
-          <form className="mini-form" onSubmit={handleSubmit}>
-            <input
-              name="nombre"
-              value={form.nombre}
-              onChange={handleChange}
-              placeholder="Nombre"
-              required
-            />
-            <input
-              name="telefono"
-              value={form.telefono}
-              onChange={handleChange}
-              placeholder="Teléfono"
-            />
-            <input
-              name="email"
-              value={form.email}
-              onChange={handleChange}
-              placeholder="Email"
-            />
-            <input
-              name="patente"
-              value={form.patente}
-              onChange={handleChange}
-              placeholder="Patente"
-            />
-            <select
-              name="marca"
-              value={form.marca}
-              onChange={handleChange}
-            >
-              <option value="">Selecciona marca</option>
-              {catalogoMarcas.map((marca) => (
-                <option key={marca} value={marca}>{marca}</option>
-              ))}
-            </select>
-            <select
-              name="modelo"
-              value={form.modelo}
-              onChange={handleChange}
-              disabled={!form.marca}
-            >
-              <option value="">Selecciona modelo</option>
-              {catalogoModelos.map((modelo) => (
-                <option key={modelo} value={modelo}>{modelo}</option>
-              ))}
-            </select>
-            <select
-              name="version"
-              value={form.version}
-              onChange={handleChange}
-              disabled={!form.modelo}
-            >
-              <option value="">Selecciona versión</option>
-              {catalogoVersiones.map((version) => (
-                <option key={version} value={version}>{version}</option>
-              ))}
-            </select>
-            <select
-              name="anio"
-              value={form.anio}
-              onChange={handleChange}
-            >
-              <option value="">Selecciona año</option>
-              {catalogoAnios.map((anio) => (
-                <option key={anio} value={anio}>{anio}</option>
-              ))}
-            </select>
-            <button className="secondary" type="submit">Guardar</button>
-          </form>
-          {error ? <p className="inline-error">{error}</p> : null}
-        </article>
-        <article className="page-card">
-          <h3>Listado actualizado</h3>
-          {loading ? <p>Cargando clientes...</p> : null}
-          {!loading && clientes.length === 0 ? (
-            <p>No hay clientes registrados.</p>
-          ) : (
-            <ul className="data-list">
-              {clientes.map((cliente) => (
-                <li key={cliente.id}>
-                  <div>
-                    <strong>{cliente.nombre}</strong>
-                    <span>{cliente.email || 'Sin email'}</span>
-                  </div>
-                  <div>
-                    <span>{cliente.telefono || 'Sin teléfono'}</span>
-                    <span>
-                      {cliente.vehiculos?.length
-                        ? `${cliente.vehiculos[0].patente || 'Sin patente'} · ${cliente.vehiculos[0].marca} ${cliente.vehiculos[0].modelo}`
-                        : 'Sin vehículo asociado'}
-                    </span>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
-        </article>
-      </div>
+      
+      {error ? <p className="inline-error">{error}</p> : null}
+
+      <article className="page-card">
+        <h3>Historial de vehículos por cliente</h3>
+        {loading ? <p>Cargando clientes...</p> : null}
+        {!loading && clientesOrdenados.length === 0 ? (
+          <p>No hay clientes registrados.</p>
+        ) : (
+          <ul className="data-list data-list-stacked">
+            {clientesOrdenados.map((cliente) => (
+              <li key={cliente.id}>
+                <div>
+                  <strong>{cliente.nombre}</strong>
+                  <span>{cliente.email || 'Sin email'} · {cliente.telefono || 'Sin teléfono'}</span>
+                  {(cliente.vehiculos || []).length === 0 ? (
+                    <span>Sin vehículos asociados.</span>
+                  ) : (
+                    <div className="vehicle-history-inline">
+                      {cliente.vehiculos.map((vehiculo) => (
+                        <span key={vehiculo.id}>
+                          {vehiculo.patente || 'Sin patente'} · {vehiculo.marca} {vehiculo.modelo} · {vehiculo.version || 'Sin versión'} · {vehiculo.anio || 'Año N/D'}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </article>
+
+      {showModal ? (
+        <div className="modal-backdrop" onClick={closeModal}>
+          <article className="modal-card" onClick={(event) => event.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Nuevo cliente</h3>
+              <button className="secondary" type="button" onClick={closeModal}>Cerrar</button>
+            </div>
+            <form className="mini-form" onSubmit={handleSubmit}>
+              <input name="nombre" value={form.nombre} onChange={handleChange} placeholder="Nombre" required />
+              <input name="telefono" value={form.telefono} onChange={handleChange} placeholder="Teléfono" />
+              <input name="email" value={form.email} onChange={handleChange} placeholder="Email" />
+              <input name="patente" value={form.patente} onChange={handleChange} placeholder="Patente" />
+              <select name="marca" value={form.marca} onChange={handleChange}>
+                <option value="">Selecciona marca</option>
+                {catalogoMarcas.map((marca) => (
+                  <option key={marca} value={marca}>{marca}</option>
+                ))}
+              </select>
+              <select name="modelo" value={form.modelo} onChange={handleChange} disabled={!form.marca}>
+                <option value="">Selecciona modelo</option>
+                {catalogoModelos.map((modelo) => (
+                  <option key={modelo} value={modelo}>{modelo}</option>
+                ))}
+              </select>
+              <select name="version" value={form.version} onChange={handleChange} disabled={!form.modelo}>
+                <option value="">Selecciona versión</option>
+                {catalogoVersiones.map((version) => (
+                  <option key={version} value={version}>{version}</option>
+                ))}
+              </select>
+              <select name="anio" value={form.anio} onChange={handleChange}>
+                <option value="">Selecciona año</option>
+                {catalogoAnios.map((anio) => (
+                  <option key={anio} value={anio}>{anio}</option>
+                ))}
+              </select>
+              <button className="primary" type="submit">Guardar cliente</button>
+            </form>
+          </article>
+        </div>
+      ) : null}
     </section>
   )
 }

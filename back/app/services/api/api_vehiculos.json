@@ -578,7 +578,12 @@
               "name": "Tracker",
               "body": "SUV",
               "segment": null,
-              "attributes": [],
+              "attributes": [
+                "LT 1.2T AT",
+                "LTZ 1.2T AT",
+                "Premier 1.2T AT",
+                "RS 1.2T AT"
+              ],
               "status": "unknown",
               "origin": "unknown"
             }
@@ -876,7 +881,11 @@
               "name": "Cronos",
               "body": "Car",
               "segment": "Sedan",
-              "attributes": [],
+              "attributes": [
+                "Like 1.3 MT",
+                "Drive 1.3 CVT",
+                "Precision 1.3 CVT"
+              ],
               "status": "unknown",
               "origin": "unknown"
             },
@@ -978,7 +987,12 @@
               "name": "Ranger",
               "body": "Truck",
               "segment": null,
-              "attributes": [],
+              "attributes": [
+                "XL 2.0 4x2 MT",
+                "XLS 2.0 4x2 AT",
+                "XLT 2.0 4x4 AT",
+                "Limited+ 3.0 V6 4x4 AT"
+              ],
               "status": "unknown",
               "origin": "unknown"
             },
@@ -2027,7 +2041,12 @@
               "name": "208",
               "body": "Car",
               "segment": "Hatchback",
-              "attributes": [],
+              "attributes": [
+                "Like 1.6 MT",
+                "Active 1.6 AT",
+                "Allure 1.6 AT",
+                "Feline 1.0T CVT"
+              ],
               "status": "unknown",
               "origin": "unknown"
             },
@@ -2455,7 +2474,12 @@
               "name": "Corolla",
               "body": "Car",
               "segment": "Sedan",
-              "attributes": [],
+               "attributes": [
+                "XLI 2.0 CVT",
+                "XEI 2.0 CVT",
+                "SEG 2.0 CVT",
+                "GR-Sport 2.0 CVT"
+              ],
               "status": "unknown",
               "origin": "unknown"
             },
@@ -2482,7 +2506,12 @@
               "name": "Hilux",
               "body": "Truck",
               "segment": null,
-              "attributes": [],
+              "attributes": [
+                "DX 2.4 4x2 MT",
+                "SR 2.8 4x2 AT",
+                "SRV 2.8 4x4 AT",
+                "SRX 2.8 4x4 AT"
+              ],
               "status": "unknown",
               "origin": "unknown"
             },
@@ -2519,7 +2548,11 @@
               "name": "Amarok",
               "body": "Truck",
               "segment": null,
-              "attributes": [],
+              "attributes": [
+                "Comfortline 2.0 TDI 4x2",
+                "Highline V6 3.0 TDI 4x4",
+                "Extreme V6 3.0 TDI 4x4"
+              ],
               "status": "unknown",
               "origin": "unknown"
             },

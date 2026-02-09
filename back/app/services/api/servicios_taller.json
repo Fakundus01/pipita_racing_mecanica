@@ -1,0 +1,28 @@
+{
+  "_meta": {
+    "version": 2,
+    "descripcion": "Catálogo base de servicios frecuentes de taller"
+  },
+  "servicios": [
+    {"nombre": "Cambio de aceite y filtro", "categoria": "Mantenimiento", "intervalo_km": 10000},
+    {"nombre": "Cambio de filtro de aire", "categoria": "Mantenimiento", "intervalo_km": 15000},
+    {"nombre": "Cambio de filtro de combustible", "categoria": "Mantenimiento", "intervalo_km": 30000},
+    {"nombre": "Cambio de correa de distribución", "categoria": "Motor", "intervalo_km": 60000},
+    {"nombre": "Cambio de correa poly-v", "categoria": "Motor", "intervalo_km": 50000},
+    {"nombre": "Cambio de bujías", "categoria": "Encendido", "intervalo_km": 40000},
+    {"nombre": "Limpieza de inyectores", "categoria": "Inyección", "intervalo_km": 30000},
+    {"nombre": "Diagnóstico electrónico", "categoria": "Diagnóstico"},
+    {"nombre": "Reparación de tren delantero", "categoria": "Suspensión"},
+    {"nombre": "Alineación y balanceo", "categoria": "Neumáticos", "intervalo_km": 10000},
+    {"nombre": "Cambio de pastillas de freno", "categoria": "Frenos", "intervalo_km": 25000},
+    {"nombre": "Rectificación de discos", "categoria": "Frenos"},
+    {"nombre": "Cambio de líquido de frenos", "categoria": "Frenos", "intervalo_km": 40000},
+    {"nombre": "Cambio de amortiguadores", "categoria": "Suspensión"},
+    {"nombre": "Cambio de batería", "categoria": "Eléctrico"},
+    {"nombre": "Servicio de aire acondicionado", "categoria": "Climatización", "intervalo_km": 20000},
+    {"nombre": "Limpieza de cuerpo mariposa", "categoria": "Admisión"},
+    {"nombre": "Escaneo pre-compra", "categoria": "Diagnóstico"},
+    {"nombre": "Cambio de embrague", "categoria": "Transmisión"},
+    {"nombre": "Cambio de aceite de caja", "categoria": "Transmisión", "intervalo_km": 60000}
+  ]
+}

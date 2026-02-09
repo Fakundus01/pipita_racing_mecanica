@@ -19,6 +19,7 @@ from app.services.reportes_service import ReportesService
 from app.services.vehiculos_service import VehiculosService
 from app.services.vehiculos_api_service import VehiculosApiService
 from app.services.servicios_service import ServiciosService
+from app.services.servicios_catalogo_service import ServiciosCatalogoService
 
 api = Blueprint('api', __name__)
 
@@ -41,6 +42,11 @@ def vehiculos_api():
 def partes_catalogo():
   return PartesCatalogoService(
     current_app.config['PARTES_CATALOGO_JSON_PATH'],
+  )
+
+def servicios_catalogo():
+  return ServiciosCatalogoService(
+    current_app.config['SERVICIOS_CATALOGO_JSON_PATH'],
   )
 
 def serialize_excel_value(value):
@@ -388,6 +394,11 @@ def delete_parte(parte_id):
 def list_servicios():
   servicios = servicios_service.list()
   return jsonify([serialize_servicio(servicio) for servicio in servicios])
+
+
+@api.get('/servicios/catalogo')
+def list_servicios_catalogo():
+  return jsonify({'servicios': servicios_catalogo().list()})
 
 
 @api.get('/vehiculos/<int:vehiculo_id>/servicios')

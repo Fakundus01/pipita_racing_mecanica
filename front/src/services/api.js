@@ -126,6 +126,8 @@ export const deleteParte = (id) =>
   })
 
 
+export const listCatalogoServicios = () => apiFetch('/servicios/catalogo')
+
 export const listServicios = () => apiFetch('/servicios')
 export const listServiciosPorVehiculo = (vehiculoId) =>
   apiFetch(`/vehiculos/${vehiculoId}/servicios`)

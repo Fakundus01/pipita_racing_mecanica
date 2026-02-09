@@ -1,62 +1,56 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
+  addCatalogoVehiculo,
+  createServicio,
   createVehiculo,
-  decodeVehiculo,
+  deleteServicio,
   deleteVehiculo,
   getVehiculoPorPatente,
-  listVehiculos,
   listCatalogoAnios,
   listCatalogoMarcas,
   listCatalogoModelos,
+  listCatalogoServicios,
   listCatalogoVersiones,
-  addCatalogoVehiculo,
-  createServicio,
-  deleteServicio,
+  listClientes,
   listServicios,
+  listVehiculos,
   updateVehiculo,
 } from '../services/api'
 
+const initialForm = { patente: '', marca: '', modelo: '', version: '', anio: '' }
+
 function Vehiculos({ onAction, onAuthError }) {
   const [vehiculos, setVehiculos] = useState([])
-  const [form, setForm] = useState({
-    patente: '',
-    marca: '',
-    modelo: '',
-    version: '',
-    anio: '',
-  })
+  const [clientes, setClientes] = useState([])
+  const [form, setForm] = useState(initialForm)
   const [editingId, setEditingId] = useState(null)
-  const [catalogoForm, setCatalogoForm] = useState({ marca: '', modelo: '', version: '' })
-  const [catalogoInfo, setCatalogoInfo] = useState(null)
+  const [showVehiculoModal, setShowVehiculoModal] = useState(false)
   const [catalogoMarcas, setCatalogoMarcas] = useState([])
   const [catalogoModelos, setCatalogoModelos] = useState([])
   const [catalogoVersiones, setCatalogoVersiones] = useState([])
   const [catalogoAnios, setCatalogoAnios] = useState([])
-  const [catalogoModelosForm, setCatalogoModelosForm] = useState([])
-  const [catalogoVersionesForm, setCatalogoVersionesForm] = useState([])
-  const [catalogoNuevo, setCatalogoNuevo] = useState({
-    marca: '',
-    modelo: '',
-    version: '',
-    anio: '',
-  })
+  const [catalogoServicios, setCatalogoServicios] = useState([])
+  const [catalogoNuevo, setCatalogoNuevo] = useState({ marca: '', modelo: '', version: '', anio: '' })
   const [catalogoNuevoStatus, setCatalogoNuevoStatus] = useState('')
   const [patenteBusqueda, setPatenteBusqueda] = useState('')
-  const [patenteInfo, setPatenteInfo] = useState(null)  
+  const [clienteBusquedaId, setClienteBusquedaId] = useState('')
+  const [patenteClienteSeleccionada, setPatenteClienteSeleccionada] = useState('')
+  const [patenteInfo, setPatenteInfo] = useState(null)
   const [loading, setLoading] = useState(true)
   const [serviciosLoading, setServiciosLoading] = useState(true)
   const [servicios, setServicios] = useState([])
   const [servicioForm, setServicioForm] = useState({
-    vehiculo_id: '',
-    descripcion: '',
-    fecha: '',
-    kilometraje: '',
-    costo: '',
-    notas: '',
+    vehiculo_id: '', descripcion: '', fecha: '', kilometraje: '', costo: '', notas: '',
   })
   const [error, setError] = useState('')
-  const [catalogoError, setCatalogoError] = useState('')
-  const [patenteError, setPatenteError] = useState('')
+
+  const vehiculosPorCliente = useMemo(() => {
+    if (!clienteBusquedaId) {
+      return []
+    }
+    const cliente = clientes.find((item) => String(item.id) === String(clienteBusquedaId))
+    return cliente?.vehiculos || []
+  }, [clientes, clienteBusquedaId])
 
   useEffect(() => {
     let cancelled = false
@@ -64,27 +58,22 @@ function Vehiculos({ onAction, onAuthError }) {
       setLoading(true)
       setError('')
       try {
-        const data = await listVehiculos()
+        const [vehiculosData, clientesData] = await Promise.all([listVehiculos(), listClientes()])
         if (!cancelled) {
-          setVehiculos(data)
+          setVehiculos(vehiculosData)
+          setClientes(clientesData)
         }
       } catch (err) {
         if (!cancelled) {
           setError(err.message)
-          if (err.status === 401) {
-            onAuthError()
-          }
-        }
+          if (err.status === 401) onAuthError()
+          }        
       } finally {
-        if (!cancelled) {
-          setLoading(false)
-        }
+        if (!cancelled) setLoading(false)
       }
     }
     loadVehiculos()
-    return () => {
-      cancelled = true
-    }
+    return () => { cancelled = true }
   }, [onAuthError])
 
   useEffect(() => {
@@ -92,36 +81,26 @@ function Vehiculos({ onAction, onAuthError }) {
     const loadServicios = async () => {
       setServiciosLoading(true)
       try {
-        const data = await listServicios()
+        const [serviciosData, catalogoServiciosData] = await Promise.all([listServicios(), listCatalogoServicios()])
         if (!cancelled) {
-          setServicios(data)
+          setServicios(serviciosData)
+          setCatalogoServicios(catalogoServiciosData.servicios || [])
         }
       } catch (err) {
-        if (!cancelled) {
-          if (err.status === 401) {
-            onAuthError()
-          }
-        }
+        if (!cancelled && err.status === 401) onAuthError()
       } finally {
-        if (!cancelled) {
-          setServiciosLoading(false)
-        }
+       if (!cancelled) setServiciosLoading(false)
       }
     }
     loadServicios()
-    return () => {
-      cancelled = true
-    }
+    return () => { cancelled = true }
   }, [onAuthError])
 
   useEffect(() => {
     let cancelled = false
     const loadCatalogo = async () => {
       try {
-        const [marcasData, aniosData] = await Promise.all([
-          listCatalogoMarcas(),
-          listCatalogoAnios(),
-        ])
+        const [marcasData, aniosData] = await Promise.all([listCatalogoMarcas(), listCatalogoAnios()])
         if (!cancelled) {
           setCatalogoMarcas(marcasData.marcas || [])
           setCatalogoAnios(aniosData.anios || [])
@@ -129,16 +108,12 @@ function Vehiculos({ onAction, onAuthError }) {
       } catch (err) {
         if (!cancelled) {
           setError(err.message)
-          if (err.status === 401) {
-            onAuthError()
-          }
+          if (err.status === 401) onAuthError()
         }
       }
     }
     loadCatalogo()
-    return () => {
-      cancelled = true
-    }
+    return () => { cancelled = true }
   }, [onAuthError])
 
   useEffect(() => {
@@ -154,22 +129,14 @@ function Vehiculos({ onAction, onAuthError }) {
         if (!cancelled) {
           setCatalogoModelos(data.modelos || [])
           setForm((prev) => ({ ...prev, modelo: '', version: '' }))
-          setCatalogoVersiones([])
         }
       } catch (err) {
-        if (!cancelled) {
-          setError(err.message)
-          if (err.status === 401) {
-            onAuthError()
-          }
-        }
+        if (!cancelled) setError(err.message)
       }
     }
     loadModelos()
-    return () => {
-      cancelled = true
-    }
-  }, [form.marca, onAuthError])
+    return () => { cancelled = true }
+  }, [form.marca])
 
   useEffect(() => {
     let cancelled = false
@@ -185,79 +152,25 @@ function Vehiculos({ onAction, onAuthError }) {
           setForm((prev) => ({ ...prev, version: '' }))
         }
       } catch (err) {
-        if (!cancelled) {
-          setError(err.message)
-          if (err.status === 401) {
-            onAuthError()
-          }
-        }
+        if (!cancelled) setError(err.message)
       }
     }
     loadVersiones()
-    return () => {
-      cancelled = true
-    }
-  }, [form.marca, form.modelo, onAuthError])
+    return () => { cancelled = true }
+  }, [form.marca, form.modelo])
 
-  useEffect(() => {
-    let cancelled = false
-    const loadModelosCatalogo = async () => {
-      if (!catalogoForm.marca) {
-        setCatalogoModelosForm([])
-        setCatalogoVersionesForm([])
-        return
-      }
-      try {
-        const data = await listCatalogoModelos(catalogoForm.marca)
-        if (!cancelled) {
-          setCatalogoModelosForm(data.modelos || [])
-          setCatalogoVersionesForm([])
-        }
-      } catch (err) {
-        if (!cancelled) {
-          setCatalogoError(err.message)
-          if (err.status === 401) {
-            onAuthError()
-          }
-        }
-      }
-    }
-    loadModelosCatalogo()
-    return () => {
-      cancelled = true
-    }
-  }, [catalogoForm.marca, onAuthError])
-
-  useEffect(() => {
-    let cancelled = false
-    const loadVersionesCatalogo = async () => {
-      if (!catalogoForm.marca || !catalogoForm.modelo) {
-        setCatalogoVersionesForm([])
-        return
-      }
-      try {
-        const data = await listCatalogoVersiones(catalogoForm.marca, catalogoForm.modelo)
-        if (!cancelled) {
-          setCatalogoVersionesForm(data.versiones || [])
-        }
-      } catch (err) {
-        if (!cancelled) {
-          setCatalogoError(err.message)
-          if (err.status === 401) {
-            onAuthError()
-          }
-        }
-      }
-    }
-    loadVersionesCatalogo()
-    return () => {
-      cancelled = true
-    }
-  }, [catalogoForm.marca, catalogoForm.modelo, onAuthError])
-
-  const handleChange = (event) => {
-    const { name, value } = event.target
-    setForm((prev) => ({ ...prev, [name]: value }))
+  const applyVehiculoToForms = (vehiculo) => {
+    if (!vehiculo) return
+    setForm({
+      patente: vehiculo.patente || '',
+      marca: vehiculo.marca || '',
+      modelo: vehiculo.modelo || '',
+      version: vehiculo.version || '',
+      anio: vehiculo.anio || '',
+    })
+    setServicioForm((prev) => ({ ...prev, vehiculo_id: String(vehiculo.id) }))
+    setPatenteInfo(vehiculo)
+    onAction(`Autocompletado aplicado para ${vehiculo.patente || `${vehiculo.marca} ${vehiculo.modelo}`}.`)
   }
 
   const handleSubmit = async (event) => {
@@ -272,35 +185,25 @@ function Vehiculos({ onAction, onAuthError }) {
       }
       if (editingId) {
         const actualizado = await updateVehiculo(editingId, payload)
-        setVehiculos((prev) =>
-          prev.map((vehiculo) => (vehiculo.id === editingId ? actualizado : vehiculo))
-        )
-        setEditingId(null)
-        setForm({ patente: '', marca: '', modelo: '', version: '', anio: '' })
-        onAction(`Vehículo ${actualizado.marca} actualizado.`)
+        setVehiculos((prev) => prev.map((vehiculo) => (vehiculo.id === editingId ? actualizado : vehiculo)))
       } else {
         const nuevo = await createVehiculo(payload)
         setVehiculos((prev) => [nuevo, ...prev])
-        setForm({ patente: '', marca: '', modelo: '', version: '', anio: '' })
-        onAction(`Vehículo ${nuevo.marca} ${nuevo.modelo} guardado.`)
       }
+      setEditingId(null)
+      setForm(initialForm)
+      setShowVehiculoModal(false)
+      onAction('Ficha de vehículo guardada.')
     } catch (err) {
       setError(err.message)
-      if (err.status === 401) {
-        onAuthError()
-      }
-    }
+      if (err.status === 401) onAuthError()
+   }
   }
 
   const handleEdit = (vehiculo) => {
     setEditingId(vehiculo.id)
-    setForm({
-      patente: vehiculo.patente || '',
-      marca: vehiculo.marca || '',
-      modelo: vehiculo.modelo || '',
-      version: vehiculo.version || '',
-      anio: vehiculo.anio || '',
-    })
+    applyVehiculoToForms(vehiculo)
+    setShowVehiculoModal(true)
   }
 
   const handleDelete = async (vehiculoId) => {
@@ -311,51 +214,17 @@ function Vehiculos({ onAction, onAuthError }) {
       onAction('Vehículo eliminado.')
     } catch (err) {
       setError(err.message)
-      if (err.status === 401) {
-        onAuthError()
-      }
     }
   }
 
-  const handleCatalogoLookup = async (event) => {
-    event.preventDefault()
-    setCatalogoError('')
-    setCatalogoInfo(null)
-    try {
-      const data = await decodeVehiculo(catalogoForm)
-      setCatalogoInfo(data)
-      onAction('Ficha localizada en el catálogo local.')
-    } catch (err) {
-      setCatalogoError(err.message)
-      if (err.status === 401) {
-        onAuthError()
-      }
-    }
-  }
-
-  const handlePatenteLookup = async (event) => {
-    event.preventDefault()
-    setPatenteError('')
-    setPatenteInfo(null)
-    if (!patenteBusqueda) {
-      setPatenteError('Ingresa una patente para consultar.')
-      return
-    }
+  const handlePatenteLookup = async () => {
+    if (!patenteBusqueda) return
     try {
       const data = await getVehiculoPorPatente(patenteBusqueda)
-      setPatenteInfo(data)
-      onAction('Patente localizada en la base de datos.')
+      applyVehiculoToForms(data)
     } catch (err) {
-      setPatenteError(err.message)
-      if (err.status === 401) {
-        onAuthError()
-      }
+      setError(err.message)
     }
-  }
-
-  const handleCatalogoNuevoChange = (event) => {
-    const { name, value } = event.target
-    setCatalogoNuevo((prev) => ({ ...prev, [name]: value }))
   }
 
   const handleCatalogoNuevoSubmit = async (event) => {
@@ -369,30 +238,15 @@ function Vehiculos({ onAction, onAuthError }) {
         anio: catalogoNuevo.anio ? Number(catalogoNuevo.anio) : null,
       }
       await addCatalogoVehiculo(payload)
-      setCatalogoNuevoStatus('Entrada agregada al catálogo.')
+      setCatalogoNuevoStatus('Entrada agregada al catálogo con versión.')
       setCatalogoNuevo({ marca: '', modelo: '', version: '', anio: '' })
-      const marcasData = await listCatalogoMarcas()
-      setCatalogoMarcas(marcasData.marcas || [])
-      if (payload.marca) {
-        const modelosData = await listCatalogoModelos(payload.marca)
-        setCatalogoModelos(modelosData.modelos || [])
-      }
     } catch (err) {
       setCatalogoNuevoStatus(err.message)
-      if (err.status === 401) {
-        onAuthError()
-      }
     }
-  }
-
-  const handleServicioChange = (event) => {
-    const { name, value } = event.target
-    setServicioForm((prev) => ({ ...prev, [name]: value }))
   }
 
   const handleServicioSubmit = async (event) => {
     event.preventDefault()
-    setError('')
     try {
       const payload = {
         vehiculo_id: Number(servicioForm.vehiculo_id),
@@ -404,340 +258,134 @@ function Vehiculos({ onAction, onAuthError }) {
       }
       const nuevo = await createServicio(payload)
       setServicios((prev) => [nuevo, ...prev])
-      setServicioForm({
-        vehiculo_id: '',
-        descripcion: '',
-        fecha: '',
-        kilometraje: '',
-        costo: '',
-        notas: '',
-      })
-      onAction('Servicio registrado en el historial.')
+      setServicioForm({ vehiculo_id: '', descripcion: '', fecha: '', kilometraje: '', costo: '', notas: '' })
+      onAction('Servicio registrado en el historial del vehículo.')
     } catch (err) {
       setError(err.message)
-      if (err.status === 401) {
-        onAuthError()
-      }
     }
   }
 
-  const handleServicioDelete = async (servicioId) => {
-    setError('')
-    try {
-      await deleteServicio(servicioId)
-      setServicios((prev) => prev.filter((servicio) => servicio.id !== servicioId))
-      onAction('Servicio eliminado del historial.')
-    } catch (err) {
-      setError(err.message)
-      if (err.status === 401) {
-        onAuthError()
-      }
-    }
-  }
+const filteredServicios = useMemo(() => {
+    if (!servicioForm.vehiculo_id) return servicios
+    return servicios.filter((servicio) => String(servicio.vehiculo_id) === String(servicioForm.vehiculo_id))
+  }, [servicios, servicioForm.vehiculo_id])
 
   return (
     <section className="page">
       <header className="page-header">
         <div>
-          <h1>Vehículos en catálogo</h1>
-          <p>Organiza inventario y consulta fichas desde el catálogo local.</p>
+          <h1>Vehículos y servicios</h1>
+          <p>Autocompletado por cliente o patente + historial técnico del vehículo.</p>
         </div>
-        <button className="primary" onClick={() => onAction('Completa el formulario para crear una ficha.')}>
-          Nueva ficha
-        </button>
+        <button className="primary" onClick={() => setShowVehiculoModal(true)}>Cargar vehículo</button>
       </header>
+      {error ? <p className="inline-error">{error}</p> : null}
+
       <div className="page-grid">
         <article className="page-card">
-          <h3>{editingId ? 'Editar vehículo' : 'Registrar vehículo'}</h3>
-          <form className="mini-form" onSubmit={handleSubmit}>
-            <input
-              name="patente"
-              value={form.patente}
-              onChange={handleChange}
-              placeholder="Patente"
-            />
-            <select
-              name="marca"
-              value={form.marca}
-              onChange={handleChange}
-              required
-            >
-              <option value="">Selecciona marca</option>
-              {catalogoMarcas.map((marca) => (
-                <option key={marca} value={marca}>{marca}</option>
-              ))}
-            </select>
-            <select
-              name="modelo"
-              value={form.modelo}
-              onChange={handleChange}
-              required
-              disabled={!form.marca}
-            >
-              <option value="">Selecciona modelo</option>
-              {catalogoModelos.map((modelo) => (
-                <option key={modelo} value={modelo}>{modelo}</option>
-              ))}
-            </select>
-            <select
-              name="version"
-              value={form.version}
-              onChange={handleChange}
-              disabled={!form.modelo}
-            >
-              <option value="">Selecciona versión</option>
-              {catalogoVersiones.map((version) => (
-                <option key={version} value={version}>{version}</option>
-              ))}
-            </select>
-            <select
-              name="anio"
-              value={form.anio}
-              onChange={handleChange}
-            >
-              <option value="">Selecciona año</option>
-              {catalogoAnios.map((anio) => (
-                <option key={anio} value={anio}>{anio}</option>
-              ))}
-            </select>
-            <div className="form-actions-inline">
-              <button className="secondary" type="submit">
-                {editingId ? 'Actualizar' : 'Guardar'}
-              </button>
-              {editingId ? (
-                <button
-                  className="secondary"
-                  type="button"
-                  onClick={() => {
-                    setEditingId(null)
-                    setForm({ patente: '', marca: '', modelo: '', version: '', anio: '' })
-                  }}
-                >
-                  Cancelar
-                </button>
-              ) : null}
-            </div>
-          </form>
-          {error ? <p className="inline-error">{error}</p> : null}
-        </article>
-        <article className="page-card">
-          <h3>Buscar en catálogo local</h3>
-          <form className="mini-form" onSubmit={handleCatalogoLookup}>
-           <select
-              value={catalogoForm.marca}
-              onChange={(event) =>
-                setCatalogoForm((prev) => ({ ...prev, marca: event.target.value, modelo: '', version: '' }))
-              }
-              required
-            >
-              <option value="">Selecciona marca</option>
-              {catalogoMarcas.map((marca) => (
-                <option key={marca} value={marca}>{marca}</option>
-              ))}
-            </select>
-            <select
-              value={catalogoForm.modelo}
-              onChange={(event) =>
-                setCatalogoForm((prev) => ({ ...prev, modelo: event.target.value, version: '' }))
-              }
-              required
-            disabled={!catalogoForm.marca}
-            >
-              <option value="">Selecciona modelo</option>
-              {catalogoModelosForm.map((modelo) => (
-                <option key={modelo} value={modelo}>{modelo}</option>
-              ))}
-            </select>
-            <select
-              value={catalogoForm.version}
-              onChange={(event) =>
-                setCatalogoForm((prev) => ({ ...prev, version: event.target.value }))
-              }
-            disabled={!catalogoForm.modelo}
-            >
-              <option value="">Selecciona versión</option>
-              {catalogoVersionesForm.map((version) => (
-                <option key={version} value={version}>{version}</option>
-              ))}
-            </select>
-            <button className="secondary" type="submit">Consultar</button>
-          </form>
-          {catalogoError ? <p className="inline-error">{catalogoError}</p> : null}
-          {catalogoInfo ? (
+          <h3>Autocompletar ficha</h3>
+          <select value={clienteBusquedaId} onChange={(event) => setClienteBusquedaId(event.target.value)}>
+            <option value="">Selecciona cliente</option>
+            {clientes.map((cliente) => <option key={cliente.id} value={cliente.id}>{cliente.nombre}</option>)}
+          </select>
+          <select value={patenteClienteSeleccionada} onChange={(event) => {
+            const patente = event.target.value
+            setPatenteClienteSeleccionada(patente)
+            const vehiculo = vehiculosPorCliente.find((item) => item.patente === patente)
+            applyVehiculoToForms(vehiculo)
+          }} disabled={vehiculosPorCliente.length === 0}>
+            <option value="">Selecciona patente</option>
+            {vehiculosPorCliente.map((vehiculo) => (
+              <option key={vehiculo.id} value={vehiculo.patente || `vehiculo-${vehiculo.id}`}>
+                {vehiculo.patente || 'Sin patente'} · {vehiculo.marca} {vehiculo.modelo}
+              </option>
+            ))}
+          </select>
+          <input
+            value={patenteBusqueda}
+            onChange={(event) => setPatenteBusqueda(event.target.value)}
+            placeholder="Buscar por patente"
+            list="patentes-list"
+          />
+          <datalist id="patentes-list">
+            {vehiculos.filter((vehiculo) => vehiculo.patente).map((vehiculo) => (
+              <option key={vehiculo.id} value={vehiculo.patente} />
+            ))}
+          </datalist>
+          <button className="secondary" onClick={handlePatenteLookup}>Autocompletar por patente</button>
+          {patenteInfo ? (
             <div className="vin-result">
-              <p><strong>{catalogoInfo.marca || 'Marca N/D'}</strong> {catalogoInfo.modelo || ''}</p>
-              <p>Año: {catalogoInfo.anio || 'N/D'} · Combustible: {catalogoInfo.combustible || 'N/D'}</p>
-              <p>Carrocería: {catalogoInfo.tipo_carroceria || 'N/D'} · País: {catalogoInfo.pais_origen || 'N/D'}</p>
+              <p><strong>{patenteInfo.patente || 'Patente N/D'}</strong></p>
+              <p>{patenteInfo.marca} {patenteInfo.modelo} · {patenteInfo.version || 'Sin versión'}</p>
+              <p>Año: {patenteInfo.anio || 'N/D'}</p>
             </div>
           ) : null}
         </article>
+
         <article className="page-card">
-          <h3>Agregar al catálogo</h3>
+          <h3>Agregar versión al JSON catálogo</h3>
           <form className="mini-form" onSubmit={handleCatalogoNuevoSubmit}>
-            <input
-              name="marca"
-              value={catalogoNuevo.marca}
-              onChange={handleCatalogoNuevoChange}
-              placeholder="Marca"
-              required
-            />
-            <input
-              name="modelo"
-              value={catalogoNuevo.modelo}
-              onChange={handleCatalogoNuevoChange}
-              placeholder="Modelo"
-              required
-            />
-            <input
-              name="version"
-              value={catalogoNuevo.version}
-              onChange={handleCatalogoNuevoChange}
-              placeholder="Versión (opcional)"
-            />
-            <input
-              name="anio"
-              value={catalogoNuevo.anio}
-              onChange={handleCatalogoNuevoChange}
-              placeholder="Año (opcional)"
-              type="number"
-              min="1950"
-            />
+            <input name="marca" value={catalogoNuevo.marca} onChange={(e) => setCatalogoNuevo((p) => ({ ...p, marca: e.target.value }))} placeholder="Marca" required />
+            <input name="modelo" value={catalogoNuevo.modelo} onChange={(e) => setCatalogoNuevo((p) => ({ ...p, modelo: e.target.value }))} placeholder="Modelo" required />
+            <input name="version" value={catalogoNuevo.version} onChange={(e) => setCatalogoNuevo((p) => ({ ...p, version: e.target.value }))} placeholder="Versión" />
+            <input name="anio" value={catalogoNuevo.anio} onChange={(e) => setCatalogoNuevo((p) => ({ ...p, anio: e.target.value }))} placeholder="Año" type="number" />
             <button className="secondary" type="submit">Agregar</button>
           </form>
           {catalogoNuevoStatus ? <p className="inline-error">{catalogoNuevoStatus}</p> : null}
         </article>
-        <article className="page-card">
-          <h3>Consultar por patente</h3>
-          <form className="mini-form" onSubmit={handlePatenteLookup}>
-            <input
-              value={patenteBusqueda}
-              onChange={(event) => setPatenteBusqueda(event.target.value)}
-              placeholder="Patente (ej. AA123BB)"
-            />
-            <button className="secondary" type="submit">Buscar</button>
-          </form>
-          {patenteError ? <p className="inline-error">{patenteError}</p> : null}
-          {patenteInfo ? (
-            <div className="vin-result">
-              <p><strong>{patenteInfo.patente || 'Patente N/D'}</strong></p>
-              <p>{patenteInfo.marca} {patenteInfo.modelo} {patenteInfo.version || ''}</p>
-              <p>Año: {patenteInfo.anio || 'N/D'} · Estado: {patenteInfo.estado}</p>
-            </div>
-          ) : null}
-        </article>
+        
         <article className="page-card">
           <h3>Servicios realizados</h3>
           <form className="mini-form" onSubmit={handleServicioSubmit}>
-            <select
-              name="vehiculo_id"
-              value={servicioForm.vehiculo_id}
-              onChange={handleServicioChange}
-              required
-            >
+            <select name="vehiculo_id" value={servicioForm.vehiculo_id} onChange={(e) => setServicioForm((p) => ({ ...p, vehiculo_id: e.target.value }))} required>
               <option value="">Selecciona vehículo</option>
               {vehiculos.map((vehiculo) => (
-                <option key={vehiculo.id} value={vehiculo.id}>
-                  {vehiculo.marca} {vehiculo.modelo} {vehiculo.patente ? `· ${vehiculo.patente}` : ''}
-                </option>
+                <option key={vehiculo.id} value={vehiculo.id}>{vehiculo.marca} {vehiculo.modelo} {vehiculo.patente ? `· ${vehiculo.patente}` : ''}</option>
               ))}
             </select>
-            <input
-              name="descripcion"
-              value={servicioForm.descripcion}
-              onChange={handleServicioChange}
-              placeholder="Descripción del trabajo"
-              required
-            />
-            <input
-              name="fecha"
-              value={servicioForm.fecha}
-              onChange={handleServicioChange}
-              type="date"
-            />
-            <input
-              name="kilometraje"
-              value={servicioForm.kilometraje}
-              onChange={handleServicioChange}
-              placeholder="Kilometraje"
-              type="number"
-              min="0"
-            />
-            <input
-              name="costo"
-              value={servicioForm.costo}
-              onChange={handleServicioChange}
-              placeholder="Costo"
-              type="number"
-              min="0"
-              step="0.01"
-            />
-            <textarea
-              name="notas"
-              value={servicioForm.notas}
-              onChange={handleServicioChange}
-              placeholder="Notas adicionales"
-            />
+            <input name="descripcion" value={servicioForm.descripcion} onChange={(e) => setServicioForm((p) => ({ ...p, descripcion: e.target.value }))} placeholder="Descripción" list="servicios-catalogo" required />
+            <datalist id="servicios-catalogo">
+              {catalogoServicios.map((servicio) => <option key={servicio.nombre} value={servicio.nombre} />)}
+            </datalist>
+            <input name="fecha" type="date" value={servicioForm.fecha} onChange={(e) => setServicioForm((p) => ({ ...p, fecha: e.target.value }))} />
+            <input name="kilometraje" type="number" value={servicioForm.kilometraje} onChange={(e) => setServicioForm((p) => ({ ...p, kilometraje: e.target.value }))} placeholder="Kilometraje" />
+            <input name="costo" type="number" value={servicioForm.costo} onChange={(e) => setServicioForm((p) => ({ ...p, costo: e.target.value }))} placeholder="Costo" />
+            <textarea name="notas" value={servicioForm.notas} onChange={(e) => setServicioForm((p) => ({ ...p, notas: e.target.value }))} placeholder="Notas" />
             <button className="secondary" type="submit">Guardar servicio</button>
           </form>
           {serviciosLoading ? <p>Cargando servicios...</p> : null}
-          {!serviciosLoading && servicios.length === 0 ? (
-            <p>No hay servicios registrados.</p>
-          ) : (
-            <ul className="data-list">
-              {servicios.map((servicio) => (
+          {!serviciosLoading && filteredServicios.length === 0 ? <p>No hay servicios registrados.</p> : (
+            <ul className="data-list data-list-stacked">
+              {filteredServicios.map((servicio) => (
                 <li key={servicio.id}>
                   <div>
                     <strong>{servicio.descripcion}</strong>
-                    <span>
-                      {servicio.vehiculo
-                        ? `${servicio.vehiculo.marca} ${servicio.vehiculo.modelo}`
-                        : 'Vehículo N/D'}
-                    </span>
-                    <span>
-                      {servicio.fecha || 'Fecha N/D'} · {servicio.kilometraje ?? 'KM N/D'} km
-                    </span>
+                    <span>{servicio.vehiculo?.patente || 'Sin patente'} · {servicio.fecha || 'Fecha N/D'} · {servicio.kilometraje ?? 'KM N/D'} km</span>
                   </div>
-                  <div className="list-actions">
-                    <span>${Number(servicio.costo || 0).toFixed(2)}</span>
-                    <div className="list-buttons">
-                      <button
-                        className="secondary"
-                        type="button"
-                        onClick={() => handleServicioDelete(servicio.id)}
-                      >
-                        Eliminar
-                      </button>
-                    </div>
-                  </div>
+                  <button className="secondary" type="button" onClick={async () => {
+                    await deleteServicio(servicio.id)
+                    setServicios((prev) => prev.filter((item) => item.id !== servicio.id))
+                  }}>Eliminar</button>
                 </li>
               ))}
             </ul>
           )}
         </article>
+
         <article className="page-card">
           <h3>Inventario activo</h3>
           {loading ? <p>Cargando vehículos...</p> : null}
-          {!loading && vehiculos.length === 0 ? (
-            <p>No hay vehículos registrados.</p>
-          ) : (
-            <ul className="data-list">
+          {!loading && vehiculos.length === 0 ? <p>No hay vehículos registrados.</p> : (
+            <ul className="data-list data-list-stacked">
               {vehiculos.map((vehiculo) => (
                 <li key={vehiculo.id}>
                   <div>
                     <strong>{vehiculo.marca} {vehiculo.modelo}</strong>
-                    <span>{vehiculo.patente || 'Sin patente'}</span>
-                    <span>Estado: {vehiculo.estado}</span>
+                    <span>{vehiculo.patente || 'Sin patente'} · {vehiculo.version || 'Sin versión'} · {vehiculo.anio || 'Año N/D'}</span>
                   </div>
-                  <div className="list-actions">
-                    <span>{vehiculo.anio || 'Año N/D'} · {vehiculo.version || 'Versión N/D'}</span>
-                    <div className="list-buttons">
-                      <button className="secondary" type="button" onClick={() => handleEdit(vehiculo)}>
-                        Editar
-                      </button>
-                      <button className="secondary" type="button" onClick={() => handleDelete(vehiculo.id)}>
-                        Eliminar
-                      </button>
-                    </div>
+                  <div className="list-buttons">
+                    <button className="secondary" onClick={() => handleEdit(vehiculo)}>Editar</button>
+                    <button className="secondary" onClick={() => handleDelete(vehiculo.id)}>Eliminar</button>
                   </div>
                 </li>
               ))}
@@ -745,6 +393,37 @@ function Vehiculos({ onAction, onAuthError }) {
           )}
         </article>
       </div>
+
+      {showVehiculoModal ? (
+        <div className="modal-backdrop" onClick={() => setShowVehiculoModal(false)}>
+          <article className="modal-card" onClick={(event) => event.stopPropagation()}>
+            <div className="modal-header">
+              <h3>{editingId ? 'Editar vehículo' : 'Registrar vehículo'}</h3>
+              <button className="secondary" onClick={() => setShowVehiculoModal(false)}>Cerrar</button>
+            </div>
+            <form className="mini-form" onSubmit={handleSubmit}>
+              <input name="patente" value={form.patente} onChange={(e) => setForm((p) => ({ ...p, patente: e.target.value }))} placeholder="Patente" />
+              <select name="marca" value={form.marca} onChange={(e) => setForm((p) => ({ ...p, marca: e.target.value }))} required>
+                <option value="">Selecciona marca</option>
+                {catalogoMarcas.map((marca) => <option key={marca} value={marca}>{marca}</option>)}
+              </select>
+              <select name="modelo" value={form.modelo} onChange={(e) => setForm((p) => ({ ...p, modelo: e.target.value }))} required disabled={!form.marca}>
+                <option value="">Selecciona modelo</option>
+                {catalogoModelos.map((modelo) => <option key={modelo} value={modelo}>{modelo}</option>)}
+              </select>
+              <select name="version" value={form.version} onChange={(e) => setForm((p) => ({ ...p, version: e.target.value }))} disabled={!form.modelo}>
+                <option value="">Selecciona versión</option>
+                {catalogoVersiones.map((version) => <option key={version} value={version}>{version}</option>)}
+              </select>
+              <select name="anio" value={form.anio} onChange={(e) => setForm((p) => ({ ...p, anio: e.target.value }))}>
+                <option value="">Selecciona año</option>
+                {catalogoAnios.map((anio) => <option key={anio} value={anio}>{anio}</option>)}
+              </select>
+              <button className="primary" type="submit">Guardar vehículo</button>
+            </form>
+          </article>
+        </div>
+      ) : null}
     </section>
   )
 }
