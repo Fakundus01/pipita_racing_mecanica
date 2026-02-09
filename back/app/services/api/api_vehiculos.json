@@ -2528,9 +2528,14 @@
               "name": "Gol Trend",
               "body": "Car",
               "segment": "Hatchback",
-              "attributes": [],
+              "attributes": [
+                "1.6"
+              ],
               "status": "unknown",
-              "origin": "unknown"
+              "origin": "unknown",
+              "years": [
+                2015
+              ]
             },
             {
               "model_id": "nivus",

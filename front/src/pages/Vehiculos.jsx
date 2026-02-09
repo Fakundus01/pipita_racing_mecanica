@@ -9,6 +9,10 @@ import {
   listCatalogoMarcas,
   listCatalogoModelos,
   listCatalogoVersiones,
+  addCatalogoVehiculo,
+  createServicio,
+  deleteServicio,
+  listServicios,
   updateVehiculo,
 } from '../services/api'
 
@@ -30,9 +34,26 @@ function Vehiculos({ onAction, onAuthError }) {
   const [catalogoAnios, setCatalogoAnios] = useState([])
   const [catalogoModelosForm, setCatalogoModelosForm] = useState([])
   const [catalogoVersionesForm, setCatalogoVersionesForm] = useState([])
+  const [catalogoNuevo, setCatalogoNuevo] = useState({
+    marca: '',
+    modelo: '',
+    version: '',
+    anio: '',
+  })
+  const [catalogoNuevoStatus, setCatalogoNuevoStatus] = useState('')
   const [patenteBusqueda, setPatenteBusqueda] = useState('')
   const [patenteInfo, setPatenteInfo] = useState(null)  
   const [loading, setLoading] = useState(true)
+  const [serviciosLoading, setServiciosLoading] = useState(true)
+  const [servicios, setServicios] = useState([])
+  const [servicioForm, setServicioForm] = useState({
+    vehiculo_id: '',
+    descripcion: '',
+    fecha: '',
+    kilometraje: '',
+    costo: '',
+    notas: '',
+  })
   const [error, setError] = useState('')
   const [catalogoError, setCatalogoError] = useState('')
   const [patenteError, setPatenteError] = useState('')
@@ -61,6 +82,33 @@ function Vehiculos({ onAction, onAuthError }) {
       }
     }
     loadVehiculos()
+    return () => {
+      cancelled = true
+    }
+  }, [onAuthError])
+
+  useEffect(() => {
+    let cancelled = false
+    const loadServicios = async () => {
+      setServiciosLoading(true)
+      try {
+        const data = await listServicios()
+        if (!cancelled) {
+          setServicios(data)
+        }
+      } catch (err) {
+        if (!cancelled) {
+          if (err.status === 401) {
+            onAuthError()
+          }
+        }
+      } finally {
+        if (!cancelled) {
+          setServiciosLoading(false)
+        }
+      }
+    }
+    loadServicios()
     return () => {
       cancelled = true
     }
@@ -305,6 +353,88 @@ function Vehiculos({ onAction, onAuthError }) {
     }
   }
 
+  const handleCatalogoNuevoChange = (event) => {
+    const { name, value } = event.target
+    setCatalogoNuevo((prev) => ({ ...prev, [name]: value }))
+  }
+
+  const handleCatalogoNuevoSubmit = async (event) => {
+    event.preventDefault()
+    setCatalogoNuevoStatus('')
+    try {
+      const payload = {
+        marca: catalogoNuevo.marca.trim(),
+        modelo: catalogoNuevo.modelo.trim(),
+        version: catalogoNuevo.version.trim(),
+        anio: catalogoNuevo.anio ? Number(catalogoNuevo.anio) : null,
+      }
+      await addCatalogoVehiculo(payload)
+      setCatalogoNuevoStatus('Entrada agregada al catálogo.')
+      setCatalogoNuevo({ marca: '', modelo: '', version: '', anio: '' })
+      const marcasData = await listCatalogoMarcas()
+      setCatalogoMarcas(marcasData.marcas || [])
+      if (payload.marca) {
+        const modelosData = await listCatalogoModelos(payload.marca)
+        setCatalogoModelos(modelosData.modelos || [])
+      }
+    } catch (err) {
+      setCatalogoNuevoStatus(err.message)
+      if (err.status === 401) {
+        onAuthError()
+      }
+    }
+  }
+
+  const handleServicioChange = (event) => {
+    const { name, value } = event.target
+    setServicioForm((prev) => ({ ...prev, [name]: value }))
+  }
+
+  const handleServicioSubmit = async (event) => {
+    event.preventDefault()
+    setError('')
+    try {
+      const payload = {
+        vehiculo_id: Number(servicioForm.vehiculo_id),
+        descripcion: servicioForm.descripcion.trim(),
+        fecha: servicioForm.fecha || null,
+        kilometraje: servicioForm.kilometraje ? Number(servicioForm.kilometraje) : null,
+        costo: servicioForm.costo ? Number(servicioForm.costo) : 0,
+        notas: servicioForm.notas.trim() || null,
+      }
+      const nuevo = await createServicio(payload)
+      setServicios((prev) => [nuevo, ...prev])
+      setServicioForm({
+        vehiculo_id: '',
+        descripcion: '',
+        fecha: '',
+        kilometraje: '',
+        costo: '',
+        notas: '',
+      })
+      onAction('Servicio registrado en el historial.')
+    } catch (err) {
+      setError(err.message)
+      if (err.status === 401) {
+        onAuthError()
+      }
+    }
+  }
+
+  const handleServicioDelete = async (servicioId) => {
+    setError('')
+    try {
+      await deleteServicio(servicioId)
+      setServicios((prev) => prev.filter((servicio) => servicio.id !== servicioId))
+      onAction('Servicio eliminado del historial.')
+    } catch (err) {
+      setError(err.message)
+      if (err.status === 401) {
+        onAuthError()
+      }
+    }
+  }
+
   return (
     <section className="page">
       <header className="page-header">
@@ -442,6 +572,41 @@ function Vehiculos({ onAction, onAuthError }) {
           ) : null}
         </article>
         <article className="page-card">
+          <h3>Agregar al catálogo</h3>
+          <form className="mini-form" onSubmit={handleCatalogoNuevoSubmit}>
+            <input
+              name="marca"
+              value={catalogoNuevo.marca}
+              onChange={handleCatalogoNuevoChange}
+              placeholder="Marca"
+              required
+            />
+            <input
+              name="modelo"
+              value={catalogoNuevo.modelo}
+              onChange={handleCatalogoNuevoChange}
+              placeholder="Modelo"
+              required
+            />
+            <input
+              name="version"
+              value={catalogoNuevo.version}
+              onChange={handleCatalogoNuevoChange}
+              placeholder="Versión (opcional)"
+            />
+            <input
+              name="anio"
+              value={catalogoNuevo.anio}
+              onChange={handleCatalogoNuevoChange}
+              placeholder="Año (opcional)"
+              type="number"
+              min="1950"
+            />
+            <button className="secondary" type="submit">Agregar</button>
+          </form>
+          {catalogoNuevoStatus ? <p className="inline-error">{catalogoNuevoStatus}</p> : null}
+        </article>
+        <article className="page-card">
           <h3>Consultar por patente</h3>
           <form className="mini-form" onSubmit={handlePatenteLookup}>
             <input
@@ -459,6 +624,95 @@ function Vehiculos({ onAction, onAuthError }) {
               <p>Año: {patenteInfo.anio || 'N/D'} · Estado: {patenteInfo.estado}</p>
             </div>
           ) : null}
+        </article>
+        <article className="page-card">
+          <h3>Servicios realizados</h3>
+          <form className="mini-form" onSubmit={handleServicioSubmit}>
+            <select
+              name="vehiculo_id"
+              value={servicioForm.vehiculo_id}
+              onChange={handleServicioChange}
+              required
+            >
+              <option value="">Selecciona vehículo</option>
+              {vehiculos.map((vehiculo) => (
+                <option key={vehiculo.id} value={vehiculo.id}>
+                  {vehiculo.marca} {vehiculo.modelo} {vehiculo.patente ? `· ${vehiculo.patente}` : ''}
+                </option>
+              ))}
+            </select>
+            <input
+              name="descripcion"
+              value={servicioForm.descripcion}
+              onChange={handleServicioChange}
+              placeholder="Descripción del trabajo"
+              required
+            />
+            <input
+              name="fecha"
+              value={servicioForm.fecha}
+              onChange={handleServicioChange}
+              type="date"
+            />
+            <input
+              name="kilometraje"
+              value={servicioForm.kilometraje}
+              onChange={handleServicioChange}
+              placeholder="Kilometraje"
+              type="number"
+              min="0"
+            />
+            <input
+              name="costo"
+              value={servicioForm.costo}
+              onChange={handleServicioChange}
+              placeholder="Costo"
+              type="number"
+              min="0"
+              step="0.01"
+            />
+            <textarea
+              name="notas"
+              value={servicioForm.notas}
+              onChange={handleServicioChange}
+              placeholder="Notas adicionales"
+            />
+            <button className="secondary" type="submit">Guardar servicio</button>
+          </form>
+          {serviciosLoading ? <p>Cargando servicios...</p> : null}
+          {!serviciosLoading && servicios.length === 0 ? (
+            <p>No hay servicios registrados.</p>
+          ) : (
+            <ul className="data-list">
+              {servicios.map((servicio) => (
+                <li key={servicio.id}>
+                  <div>
+                    <strong>{servicio.descripcion}</strong>
+                    <span>
+                      {servicio.vehiculo
+                        ? `${servicio.vehiculo.marca} ${servicio.vehiculo.modelo}`
+                        : 'Vehículo N/D'}
+                    </span>
+                    <span>
+                      {servicio.fecha || 'Fecha N/D'} · {servicio.kilometraje ?? 'KM N/D'} km
+                    </span>
+                  </div>
+                  <div className="list-actions">
+                    <span>${Number(servicio.costo || 0).toFixed(2)}</span>
+                    <div className="list-buttons">
+                      <button
+                        className="secondary"
+                        type="button"
+                        onClick={() => handleServicioDelete(servicio.id)}
+                      >
+                        Eliminar
+                      </button>
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
         </article>
         <article className="page-card">
           <h3>Inventario activo</h3>
