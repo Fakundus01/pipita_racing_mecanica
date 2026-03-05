@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
 using System.IO;
@@ -41,12 +41,18 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private string _dashboardServiciosPeriodo = "0";
     private string _dashboardCostoServiciosPeriodo = "$0.00";
     private string _dashboardReportesPeriodo = "0";
+    private string _clienteHistorialTitulo = "Historial del cliente";
+    private string _clienteHistorialResumen = "Selecciona un cliente para ver su actividad.";
 
     public ObservableCollection<Cliente> Clientes { get; } = new();
     public ObservableCollection<VehiculoGridRow> Vehiculos { get; } = new();
     public ObservableCollection<Parte> Partes { get; } = new();
     public ObservableCollection<ServicioGridRow> Servicios { get; } = new();
     public ObservableCollection<Reporte> Reportes { get; } = new();
+    public ObservableCollection<VehiculoGridRow> ClienteHistorialVehiculos { get; } = new();
+    public ObservableCollection<SolicitudGridRow> ClienteHistorialSolicitudes { get; } = new();
+    public ObservableCollection<ServicioGridRow> ClienteHistorialServicios { get; } = new();
+    public ObservableCollection<TrabajoDistribuidoraGridRow> ClienteHistorialTrabajosDistribuidora { get; } = new();
     public ObservableCollection<ClienteLookupItem> ClienteOptions { get; } = new();
     public ObservableCollection<VehiculoLookupItem> VehiculoOptions { get; } = new();
     public ObservableCollection<ClienteLookupItem> ClienteFilterOptions { get; } = new();
@@ -116,6 +122,18 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     public string ReportesPaginacionTexto => _reportesState.PageText;
     public bool PuedeRetrocederReportes => _reportesState.Page > 1;
     public bool PuedeAvanzarReportes => _reportesState.Page < _reportesState.TotalPages;
+
+    public string ClienteHistorialTitulo
+    {
+        get => _clienteHistorialTitulo;
+        private set => SetField(ref _clienteHistorialTitulo, value);
+    }
+
+    public string ClienteHistorialResumen
+    {
+        get => _clienteHistorialResumen;
+        private set => SetField(ref _clienteHistorialResumen, value);
+    }
 
     public bool IsBusy
     {
@@ -212,6 +230,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             await LoadDistribuidorasModuleAsync();
             await LoadAgendaAsync();
             UpdateDashboardMetrics();
+            RefreshClienteHistorial(_editingClienteId);
             StatusMessage = status ?? $"Datos actualizados ({DateTime.Now:HH:mm:ss}).";
         }
         catch (Exception ex)
@@ -1146,6 +1165,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     {
         if (ClientesGrid.SelectedItem is not Cliente selected)
         {
+            ClearClienteHistorial();
             return;
         }
 
@@ -1158,6 +1178,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             : "activo";
 
         StatusMessage = $"Editando cliente: {selected.Nombre}";
+        RefreshClienteHistorial(selected.Id);
     }
 
     private async void GuardarVehiculoButton_Click(object sender, RoutedEventArgs e)
@@ -1675,6 +1696,58 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         StatusMessage = $"Editando reporte: {selected.Titulo}";
     }
 
+
+    private void RefreshClienteHistorial(int? clienteId)
+    {
+        if (!clienteId.HasValue)
+        {
+            ClearClienteHistorial();
+            return;
+        }
+
+        var cliente = _allClientes.FirstOrDefault(x => x.Id == clienteId.Value);
+        var nombre = cliente?.Nombre ?? "Cliente";
+
+        ClienteHistorialTitulo = $"Historial de {nombre}";
+
+        var vehiculos = _allVehiculos
+            .Where(x => x.ClienteId == clienteId.Value)
+            .OrderBy(x => x.Patente)
+            .ThenBy(x => x.Marca)
+            .ToList();
+
+        var solicitudes = _allSolicitudes
+            .Where(x => x.ClienteId == clienteId.Value)
+            .OrderByDescending(x => x.FechaHoraCita)
+            .ToList();
+
+        var servicios = _allServicios
+            .Where(x => string.Equals(x.ClienteNombre, nombre, StringComparison.OrdinalIgnoreCase))
+            .OrderByDescending(x => x.Fecha)
+            .ToList();
+
+        var trabajos = _allTrabajosDistribuidora
+            .Where(x => x.ClienteId == clienteId.Value)
+            .OrderByDescending(x => x.Fecha)
+            .ToList();
+
+        ReplaceCollection(ClienteHistorialVehiculos, vehiculos);
+        ReplaceCollection(ClienteHistorialSolicitudes, solicitudes);
+        ReplaceCollection(ClienteHistorialServicios, servicios);
+        ReplaceCollection(ClienteHistorialTrabajosDistribuidora, trabajos);
+
+        ClienteHistorialResumen = $"{vehiculos.Count} auto(s), {solicitudes.Count} solicitud(es), {servicios.Count} servicio(s), {trabajos.Count} trabajo(s) externo(s).";
+    }
+
+    private void ClearClienteHistorial()
+    {
+        ClienteHistorialTitulo = "Historial del cliente";
+        ClienteHistorialResumen = "Selecciona un cliente para ver su actividad.";
+        ReplaceCollection(ClienteHistorialVehiculos, Array.Empty<VehiculoGridRow>());
+        ReplaceCollection(ClienteHistorialSolicitudes, Array.Empty<SolicitudGridRow>());
+        ReplaceCollection(ClienteHistorialServicios, Array.Empty<ServicioGridRow>());
+        ReplaceCollection(ClienteHistorialTrabajosDistribuidora, Array.Empty<TrabajoDistribuidoraGridRow>());
+    }
     private void ClearClienteForm()
     {
         _editingClienteId = null;
@@ -1683,6 +1756,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         ClienteEmailInput.Text = string.Empty;
         ClienteEstadoCombo.SelectedItem = "activo";
         ClientesGrid.SelectedItem = null;
+        ClearClienteHistorial();
     }
 
     private void ClearVehiculoForm()
@@ -1959,3 +2033,4 @@ internal sealed class GridViewState
     public ListSortDirection SortDirection { get; set; } = ListSortDirection.Ascending;
     public string PageText => $"Pagina {Page}/{TotalPages} - {TotalItems} registros";
 }
+
