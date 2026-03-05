@@ -5,10 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Title="Pipita Garage Desktop"
-        Height="760"
-        Width="1280"
-        MinHeight="700"
-        MinWidth="1100"
+        Height="780"
+        Width="1320"
+        MinHeight="720"
+        MinWidth="1140"
         WindowStartupLocation="CenterScreen"
         Background="#FFF3F6FB">
     <Window.Resources>
@@ -49,6 +49,12 @@
         <Style TargetType="ComboBox">
             <Setter Property="Margin" Value="0,0,0,10" />
             <Setter Property="Padding" Value="8,6" />
+            <Setter Property="BorderBrush" Value="{StaticResource BorderBrushSoft}" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+
+        <Style TargetType="DatePicker">
+            <Setter Property="Margin" Value="0,0,0,10" />
             <Setter Property="BorderBrush" Value="{StaticResource BorderBrushSoft}" />
             <Setter Property="BorderThickness" Value="1" />
         </Style>
@@ -226,6 +232,204 @@
                     </Border>
                 </Grid>
             </TabItem>
+
+            <TabItem Header="Partes">
+                <Grid Margin="14">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="360" />
+                        <ColumnDefinition Width="14" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Border Grid.Column="0" Background="{StaticResource CardBrush}" BorderBrush="{StaticResource BorderBrushSoft}" BorderThickness="1" CornerRadius="10" Padding="16">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <StackPanel>
+                                <TextBlock Text="Ficha de parte" FontSize="18" FontWeight="SemiBold" />
+                                <TextBlock Margin="0,4,0,14" Text="Inventario de repuestos y accesorios." Foreground="#FF4A6075" />
+
+                                <TextBlock Text="Nombre" FontWeight="SemiBold" />
+                                <TextBox x:Name="ParteNombreInput" />
+
+                                <TextBlock Text="Stock" FontWeight="SemiBold" />
+                                <TextBox x:Name="ParteStockInput" />
+
+                                <TextBlock Text="Costo" FontWeight="SemiBold" />
+                                <TextBox x:Name="ParteCostoInput" />
+
+                                <WrapPanel Margin="0,8,0,0">
+                                    <Button Style="{StaticResource PrimaryButtonStyle}" Content="Guardar parte" Click="GuardarParteButton_Click" />
+                                    <Button Content="Nuevo" Click="NuevoParteButton_Click" />
+                                    <Button Content="Eliminar" Click="EliminarParteButton_Click" />
+                                </WrapPanel>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </Border>
+
+                    <Border Grid.Column="2" Background="{StaticResource CardBrush}" BorderBrush="{StaticResource BorderBrushSoft}" BorderThickness="1" CornerRadius="10" Padding="10">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <TextBlock Margin="8,4,8,10" Text="Partes cargadas" FontSize="16" FontWeight="SemiBold" />
+                            <DataGrid Grid.Row="1"
+                                      x:Name="PartesGrid"
+                                      ItemsSource="{Binding Partes}"
+                                      AutoGenerateColumns="False"
+                                      IsReadOnly="True"
+                                      SelectionMode="Single"
+                                      SelectionChanged="PartesGrid_SelectionChanged"
+                                      HeadersVisibility="Column"
+                                      GridLinesVisibility="Horizontal"
+                                      BorderThickness="0">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Nombre" Binding="{Binding Nombre}" Width="2*" />
+                                    <DataGridTextColumn Header="Stock" Binding="{Binding Stock}" Width="*" />
+                                    <DataGridTextColumn Header="Costo" Binding="{Binding Costo, StringFormat={}{0:C2}}" Width="*" />
+                                    <DataGridTextColumn Header="Creado" Binding="{Binding CreatedAt, StringFormat={}{0:dd/MM/yyyy HH:mm}}" Width="*" />
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="Servicios">
+                <Grid Margin="14">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="370" />
+                        <ColumnDefinition Width="14" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Border Grid.Column="0" Background="{StaticResource CardBrush}" BorderBrush="{StaticResource BorderBrushSoft}" BorderThickness="1" CornerRadius="10" Padding="16">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <StackPanel>
+                                <TextBlock Text="Ficha de servicio" FontSize="18" FontWeight="SemiBold" />
+                                <TextBlock Margin="0,4,0,14" Text="Historial de tareas por vehiculo." Foreground="#FF4A6075" />
+
+                                <TextBlock Text="Vehiculo" FontWeight="SemiBold" />
+                                <ComboBox x:Name="ServicioVehiculoCombo"
+                                          ItemsSource="{Binding VehiculoOptions}"
+                                          DisplayMemberPath="Display"
+                                          SelectedValuePath="Id" />
+
+                                <TextBlock Text="Descripcion" FontWeight="SemiBold" />
+                                <TextBox x:Name="ServicioDescripcionInput" />
+
+                                <TextBlock Text="Fecha" FontWeight="SemiBold" />
+                                <DatePicker x:Name="ServicioFechaInput" />
+
+                                <TextBlock Text="Kilometraje" FontWeight="SemiBold" />
+                                <TextBox x:Name="ServicioKilometrajeInput" />
+
+                                <TextBlock Text="Costo" FontWeight="SemiBold" />
+                                <TextBox x:Name="ServicioCostoInput" />
+
+                                <TextBlock Text="Notas" FontWeight="SemiBold" />
+                                <TextBox x:Name="ServicioNotasInput" Height="96" AcceptsReturn="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" />
+
+                                <WrapPanel Margin="0,8,0,0">
+                                    <Button Style="{StaticResource PrimaryButtonStyle}" Content="Guardar servicio" Click="GuardarServicioButton_Click" />
+                                    <Button Content="Nuevo" Click="NuevoServicioButton_Click" />
+                                    <Button Content="Eliminar" Click="EliminarServicioButton_Click" />
+                                </WrapPanel>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </Border>
+
+                    <Border Grid.Column="2" Background="{StaticResource CardBrush}" BorderBrush="{StaticResource BorderBrushSoft}" BorderThickness="1" CornerRadius="10" Padding="10">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <TextBlock Margin="8,4,8,10" Text="Servicios cargados" FontSize="16" FontWeight="SemiBold" />
+                            <DataGrid Grid.Row="1"
+                                      x:Name="ServiciosGrid"
+                                      ItemsSource="{Binding Servicios}"
+                                      AutoGenerateColumns="False"
+                                      IsReadOnly="True"
+                                      SelectionMode="Single"
+                                      SelectionChanged="ServiciosGrid_SelectionChanged"
+                                      HeadersVisibility="Column"
+                                      GridLinesVisibility="Horizontal"
+                                      BorderThickness="0">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Fecha" Binding="{Binding Fecha, StringFormat={}{0:dd/MM/yyyy}}" Width="*" />
+                                    <DataGridTextColumn Header="Patente" Binding="{Binding Patente}" Width="*" />
+                                    <DataGridTextColumn Header="Vehiculo" Binding="{Binding VehiculoNombre}" Width="2*" />
+                                    <DataGridTextColumn Header="Cliente" Binding="{Binding ClienteNombre}" Width="2*" />
+                                    <DataGridTextColumn Header="Descripcion" Binding="{Binding Descripcion}" Width="2*" />
+                                    <DataGridTextColumn Header="KM" Binding="{Binding Kilometraje}" Width="*" />
+                                    <DataGridTextColumn Header="Costo" Binding="{Binding Costo, StringFormat={}{0:C2}}" Width="*" />
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="Reportes">
+                <Grid Margin="14">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="360" />
+                        <ColumnDefinition Width="14" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Border Grid.Column="0" Background="{StaticResource CardBrush}" BorderBrush="{StaticResource BorderBrushSoft}" BorderThickness="1" CornerRadius="10" Padding="16">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <StackPanel>
+                                <TextBlock Text="Ficha de reporte" FontSize="18" FontWeight="SemiBold" />
+                                <TextBlock Margin="0,4,0,14" Text="Resumenes listos para seguimiento y exportacion." Foreground="#FF4A6075" />
+
+                                <TextBlock Text="Titulo" FontWeight="SemiBold" />
+                                <TextBox x:Name="ReporteTituloInput" />
+
+                                <TextBlock Text="Periodo" FontWeight="SemiBold" />
+                                <TextBox x:Name="ReportePeriodoInput" />
+
+                                <TextBlock Text="Generado" FontWeight="SemiBold" />
+                                <DatePicker x:Name="ReporteGeneradoElInput" />
+
+                                <WrapPanel Margin="0,8,0,0">
+                                    <Button Style="{StaticResource PrimaryButtonStyle}" Content="Guardar reporte" Click="GuardarReporteButton_Click" />
+                                    <Button Content="Nuevo" Click="NuevoReporteButton_Click" />
+                                    <Button Content="Eliminar" Click="EliminarReporteButton_Click" />
+                                </WrapPanel>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </Border>
+
+                    <Border Grid.Column="2" Background="{StaticResource CardBrush}" BorderBrush="{StaticResource BorderBrushSoft}" BorderThickness="1" CornerRadius="10" Padding="10">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <TextBlock Margin="8,4,8,10" Text="Reportes cargados" FontSize="16" FontWeight="SemiBold" />
+                            <DataGrid Grid.Row="1"
+                                      x:Name="ReportesGrid"
+                                      ItemsSource="{Binding Reportes}"
+                                      AutoGenerateColumns="False"
+                                      IsReadOnly="True"
+                                      SelectionMode="Single"
+                                      SelectionChanged="ReportesGrid_SelectionChanged"
+                                      HeadersVisibility="Column"
+                                      GridLinesVisibility="Horizontal"
+                                      BorderThickness="0">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Titulo" Binding="{Binding Titulo}" Width="2*" />
+                                    <DataGridTextColumn Header="Periodo" Binding="{Binding Periodo}" Width="*" />
+                                    <DataGridTextColumn Header="Generado" Binding="{Binding GeneradoEl, StringFormat={}{0:dd/MM/yyyy}}" Width="*" />
+                                    <DataGridTextColumn Header="Creado" Binding="{Binding CreatedAt, StringFormat={}{0:dd/MM/yyyy HH:mm}}" Width="*" />
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </TabItem>
         </TabControl>
 
         <Border Grid.Row="2" Margin="18,0,18,18" CornerRadius="10" Padding="12" Background="White" BorderBrush="{StaticResource BorderBrushSoft}" BorderThickness="1">
@@ -233,4 +437,3 @@
         </Border>
     </Grid>
 </Window>
-

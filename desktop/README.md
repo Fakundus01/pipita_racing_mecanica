@@ -5,7 +5,7 @@ Migracion a app de escritorio con .NET 8 + WPF.
 ## Incluye
 - App sin login.
 - Base local SQLite con EF Core.
-- Pantallas de carga para clientes y vehiculos (alta, edicion y eliminacion).
+- Pantallas de carga para clientes, vehiculos, partes, servicios y reportes (alta, edicion y eliminacion).
 - Exportacion a Excel profesional (hoja resumen + tablas por modulo con estilo, filtros y formatos).
 
 ## Estructura
@@ -35,3 +35,4 @@ El ejecutable queda en:
 ## Base de datos
 La app crea automaticamente el archivo SQLite en:
 `%LOCALAPPDATA%\PipitaGarageDesktop\pipita-desktop.db`
+
