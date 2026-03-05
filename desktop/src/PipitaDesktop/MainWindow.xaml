@@ -76,6 +76,7 @@
                     <TextBlock Margin="0,4,0,0" Text="App de escritorio para cargar datos de taller y vehiculos. Sin login." FontSize="14" Foreground="#FF4A6075" />
                 </StackPanel>
                 <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Button Style="{StaticResource PrimaryButtonStyle}" Content="Exportar Excel" Click="ExportarExcelButton_Click" />
                     <Button Content="Actualizar" Click="RefreshButton_Click" />
                     <TextBlock Margin="6,0,0,0" VerticalAlignment="Center" Foreground="#FF4A6075" Text="{Binding IsBusy, StringFormat=Cargando: {0}}" />
                 </StackPanel>
@@ -232,3 +233,4 @@
         </Border>
     </Grid>
 </Window>
+

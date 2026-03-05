@@ -3,8 +3,10 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Win32;
 using PipitaDesktop.Data;
 using PipitaDesktop.Models;
+using PipitaDesktop.Services;
 
 namespace PipitaDesktop;
 
@@ -153,6 +155,45 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private async void RefreshButton_Click(object sender, RoutedEventArgs e)
     {
         await RefreshAllAsync();
+    }
+
+    private async void ExportarExcelButton_Click(object sender, RoutedEventArgs e)
+    {
+        var dialog = new SaveFileDialog
+        {
+            Title = "Guardar reporte Excel",
+            Filter = "Excel Workbook (*.xlsx)|*.xlsx",
+            AddExtension = true,
+            DefaultExt = "xlsx",
+            FileName = $"pipita-datos-{DateTime.Now:yyyyMMdd-HHmm}.xlsx",
+        };
+
+        if (dialog.ShowDialog(this) != true)
+        {
+            return;
+        }
+
+        try
+        {
+            IsBusy = true;
+            using var db = CreateDbContext();
+            var data = await ExcelExportService.LoadAsync(db);
+            await Task.Run(() => ExcelExportService.ExportToFile(data, dialog.FileName));
+            StatusMessage = $"Excel exportado: {dialog.FileName}";
+            MessageBox.Show(
+                "Exportacion completada correctamente.",
+                "Exportar Excel",
+                MessageBoxButton.OK,
+                MessageBoxImage.Information);
+        }
+        catch (Exception ex)
+        {
+            ShowError("No se pudo exportar el archivo Excel.", ex);
+        }
+        finally
+        {
+            IsBusy = false;
+        }
     }
 
     private async void GuardarClienteButton_Click(object sender, RoutedEventArgs e)
@@ -510,3 +551,5 @@ public sealed class ClienteLookupItem
     public int? Id { get; init; }
     public string Display { get; init; } = string.Empty;
 }
+
+
