@@ -1093,17 +1093,38 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             return;
         }
 
-        var confirm = MessageBox.Show(
-            @"Se aplicara una importacion tipo merge desde Excel.
+        var importDialog = new ImportExcelDialog(dialog.FileName)
+        {
+            Owner = this,
+        };
+
+        if (importDialog.ShowDialog() != true)
+        {
+            return;
+        }
+
+        var isSyncExact = importDialog.ImportMode == ImportExcelMode.SyncExact;
+        var confirmMessage = isSyncExact
+            ? @"Se aplicara una sincronizacion exacta desde Excel.
+
+- Actualiza filas con ID
+- Crea filas nuevas sin ID
+- Elimina registros locales ausentes en las hojas presentes del archivo
+
+Queres continuar?"
+            : @"Se aplicara una importacion tipo merge desde Excel.
 
 - Actualiza filas con ID
 - Crea filas nuevas sin ID
 - No elimina registros locales
 
-Queres continuar?",
+Queres continuar?";
+
+        var confirm = MessageBox.Show(
+            confirmMessage,
             "Importar Excel",
             MessageBoxButton.YesNo,
-            MessageBoxImage.Question);
+            isSyncExact ? MessageBoxImage.Warning : MessageBoxImage.Question);
 
         if (confirm != MessageBoxResult.Yes)
         {
@@ -1114,8 +1135,8 @@ Queres continuar?",
         {
             IsBusy = true;
             using var db = CreateDbContext();
-            var result = await ExcelImportService.ImportAsync(db, dialog.FileName);
-            await RefreshAllAsync($"Importacion Excel completada. +{result.TotalCreated} / ~{result.TotalUpdated} / !{result.TotalSkipped}");
+            var result = await ExcelImportService.ImportAsync(db, dialog.FileName, importDialog.ImportMode);
+            await RefreshAllAsync($"Importacion Excel completada. +{result.TotalCreated} / ~{result.TotalUpdated} / -{result.TotalDeleted} / !{result.TotalSkipped}");
             MessageBox.Show(
                 result.BuildSummary(),
                 "Importar Excel",

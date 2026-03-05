@@ -12,7 +12,7 @@ public static class ExcelImportService
     private const int HeaderRow = 4;
     private const int DataRow = 5;
 
-    public sealed record ImportSectionResult(int Created, int Updated, int Skipped);
+    public sealed record ImportSectionResult(int Created, int Updated, int Skipped, int Deleted = 0);
 
     public sealed record ImportResult(
         ImportSectionResult Clientes,
@@ -27,6 +27,7 @@ public static class ExcelImportService
         public int TotalCreated => Clientes.Created + Vehiculos.Created + Partes.Created + Servicios.Created + Reportes.Created + Solicitudes.Created + Distribuidoras.Created + TrabajosDistribuidora.Created;
         public int TotalUpdated => Clientes.Updated + Vehiculos.Updated + Partes.Updated + Servicios.Updated + Reportes.Updated + Solicitudes.Updated + Distribuidoras.Updated + TrabajosDistribuidora.Updated;
         public int TotalSkipped => Clientes.Skipped + Vehiculos.Skipped + Partes.Skipped + Servicios.Skipped + Reportes.Skipped + Solicitudes.Skipped + Distribuidoras.Skipped + TrabajosDistribuidora.Skipped;
+        public int TotalDeleted => Clientes.Deleted + Vehiculos.Deleted + Partes.Deleted + Servicios.Deleted + Reportes.Deleted + Solicitudes.Deleted + Distribuidoras.Deleted + TrabajosDistribuidora.Deleted;
 
         public string BuildSummary()
         {
@@ -36,20 +37,21 @@ public static class ExcelImportService
                 string.Empty,
                 $"Creados: {TotalCreated}",
                 $"Actualizados: {TotalUpdated}",
+                $"Eliminados: {TotalDeleted}",
                 $"Saltados: {TotalSkipped}",
                 string.Empty,
-                $"Clientes -> +{Clientes.Created} / ~{Clientes.Updated} / !{Clientes.Skipped}",
-                $"Vehiculos -> +{Vehiculos.Created} / ~{Vehiculos.Updated} / !{Vehiculos.Skipped}",
-                $"Partes -> +{Partes.Created} / ~{Partes.Updated} / !{Partes.Skipped}",
-                $"Servicios -> +{Servicios.Created} / ~{Servicios.Updated} / !{Servicios.Skipped}",
-                $"Reportes -> +{Reportes.Created} / ~{Reportes.Updated} / !{Reportes.Skipped}",
-                $"Solicitudes -> +{Solicitudes.Created} / ~{Solicitudes.Updated} / !{Solicitudes.Skipped}",
-                $"Distribuidoras -> +{Distribuidoras.Created} / ~{Distribuidoras.Updated} / !{Distribuidoras.Skipped}",
-                $"Trabajos dist. -> +{TrabajosDistribuidora.Created} / ~{TrabajosDistribuidora.Updated} / !{TrabajosDistribuidora.Skipped}");
+                $"Clientes -> +{Clientes.Created} / ~{Clientes.Updated} / -{Clientes.Deleted} / !{Clientes.Skipped}",
+                $"Vehiculos -> +{Vehiculos.Created} / ~{Vehiculos.Updated} / -{Vehiculos.Deleted} / !{Vehiculos.Skipped}",
+                $"Partes -> +{Partes.Created} / ~{Partes.Updated} / -{Partes.Deleted} / !{Partes.Skipped}",
+                $"Servicios -> +{Servicios.Created} / ~{Servicios.Updated} / -{Servicios.Deleted} / !{Servicios.Skipped}",
+                $"Reportes -> +{Reportes.Created} / ~{Reportes.Updated} / -{Reportes.Deleted} / !{Reportes.Skipped}",
+                $"Solicitudes -> +{Solicitudes.Created} / ~{Solicitudes.Updated} / -{Solicitudes.Deleted} / !{Solicitudes.Skipped}",
+                $"Distribuidoras -> +{Distribuidoras.Created} / ~{Distribuidoras.Updated} / -{Distribuidoras.Deleted} / !{Distribuidoras.Skipped}",
+                $"Trabajos dist. -> +{TrabajosDistribuidora.Created} / ~{TrabajosDistribuidora.Updated} / -{TrabajosDistribuidora.Deleted} / !{TrabajosDistribuidora.Skipped}");
         }
     }
 
-    public static async Task<ImportResult> ImportAsync(AppDbContext db, string filePath)
+    public static async Task<ImportResult> ImportAsync(AppDbContext db, string filePath, ImportExcelMode importMode)
     {
         if (!File.Exists(filePath))
         {
@@ -102,6 +104,19 @@ public static class ExcelImportService
             .ToListAsync();
         var trabajosResult = ImportTrabajosDistribuidora(workbook, db, trabajos, distribuidoras, clientes, vehiculos, now);
         await db.SaveChangesAsync();
+
+        if (importMode == ImportExcelMode.SyncExact)
+        {
+            trabajosResult = trabajosResult with { Deleted = await DeleteMissingTrabajosDistribuidoraAsync(db, workbook) };
+            solicitudesResult = solicitudesResult with { Deleted = await DeleteMissingSolicitudesAsync(db, workbook) };
+            serviciosResult = serviciosResult with { Deleted = await DeleteMissingServiciosAsync(db, workbook) };
+            vehiculosResult = vehiculosResult with { Deleted = await DeleteMissingVehiculosAsync(db, workbook) };
+            partesResult = partesResult with { Deleted = await DeleteMissingPartesAsync(db, workbook) };
+            reportesResult = reportesResult with { Deleted = await DeleteMissingReportesAsync(db, workbook) };
+            distribuidorasResult = distribuidorasResult with { Deleted = await DeleteMissingDistribuidorasAsync(db, workbook) };
+            clientesResult = clientesResult with { Deleted = await DeleteMissingClientesAsync(db, workbook) };
+            await db.SaveChangesAsync();
+        }
 
         await transaction.CommitAsync();
 
@@ -645,6 +660,83 @@ public static class ExcelImportService
         }
 
         return new ImportSectionResult(created, updated, skipped);
+    }
+
+    private static async Task<int> DeleteMissingClientesAsync(AppDbContext db, XLWorkbook workbook)
+    {
+        return await DeleteMissingEntitiesAsync(db.Clientes, CollectSheetIds(workbook, "Clientes"));
+    }
+
+    private static async Task<int> DeleteMissingVehiculosAsync(AppDbContext db, XLWorkbook workbook)
+    {
+        return await DeleteMissingEntitiesAsync(db.Vehiculos, CollectSheetIds(workbook, "Vehiculos"));
+    }
+
+    private static async Task<int> DeleteMissingPartesAsync(AppDbContext db, XLWorkbook workbook)
+    {
+        return await DeleteMissingEntitiesAsync(db.Partes, CollectSheetIds(workbook, "Partes"));
+    }
+
+    private static async Task<int> DeleteMissingServiciosAsync(AppDbContext db, XLWorkbook workbook)
+    {
+        return await DeleteMissingEntitiesAsync(db.Servicios, CollectSheetIds(workbook, "Servicios"));
+    }
+
+    private static async Task<int> DeleteMissingReportesAsync(AppDbContext db, XLWorkbook workbook)
+    {
+        return await DeleteMissingEntitiesAsync(db.Reportes, CollectSheetIds(workbook, "Reportes"));
+    }
+
+    private static async Task<int> DeleteMissingSolicitudesAsync(AppDbContext db, XLWorkbook workbook)
+    {
+        return await DeleteMissingEntitiesAsync(db.SolicitudesCliente, CollectSheetIds(workbook, "Solicitudes"));
+    }
+
+    private static async Task<int> DeleteMissingDistribuidorasAsync(AppDbContext db, XLWorkbook workbook)
+    {
+        return await DeleteMissingEntitiesAsync(db.Distribuidoras, CollectSheetIds(workbook, "Distribuidoras"));
+    }
+
+    private static async Task<int> DeleteMissingTrabajosDistribuidoraAsync(AppDbContext db, XLWorkbook workbook)
+    {
+        return await DeleteMissingEntitiesAsync(db.TrabajosDistribuidora, CollectSheetIds(workbook, "Trabajos Dist."));
+    }
+
+    private static async Task<int> DeleteMissingEntitiesAsync<TEntity>(DbSet<TEntity> dbSet, HashSet<int>? idsPresent)
+        where TEntity : BaseEntity
+    {
+        if (idsPresent is null)
+        {
+            return 0;
+        }
+
+        var toDelete = await dbSet
+            .Where(x => !idsPresent.Contains(x.Id))
+            .ToListAsync();
+
+        if (toDelete.Count == 0)
+        {
+            return 0;
+        }
+
+        dbSet.RemoveRange(toDelete);
+        return toDelete.Count;
+    }
+
+    private static HashSet<int>? CollectSheetIds(XLWorkbook workbook, string sheetName)
+    {
+        var reader = SheetReader.TryCreate(workbook, sheetName);
+        if (reader is null)
+        {
+            return null;
+        }
+
+        return reader
+            .GetDataRows()
+            .Select(row => reader.GetNullableInt(row, "ID"))
+            .Where(id => id.HasValue && id.Value > 0)
+            .Select(id => id!.Value)
+            .ToHashSet();
     }
 
     private static Dictionary<string, TEntity> BuildLookup<TEntity>(IEnumerable<TEntity> source, Func<TEntity, string?> keySelector)
