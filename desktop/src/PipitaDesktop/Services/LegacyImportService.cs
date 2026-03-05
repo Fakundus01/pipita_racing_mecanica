@@ -66,6 +66,10 @@ public static class LegacyImportService
 
     private static async Task ClearCurrentDataAsync(AppDbContext db)
     {
+        await db.TrabajosDistribuidora.ExecuteDeleteAsync();
+        await db.Distribuidoras.ExecuteDeleteAsync();
+        await db.SolicitudesCliente.ExecuteDeleteAsync();
+        await db.Citas.ExecuteDeleteAsync();
         await db.Servicios.ExecuteDeleteAsync();
         await db.Reportes.ExecuteDeleteAsync();
         await db.Partes.ExecuteDeleteAsync();
@@ -330,6 +334,7 @@ internal static class SqliteDataReaderExtensions
         };
     }
 }
+
 
 
 

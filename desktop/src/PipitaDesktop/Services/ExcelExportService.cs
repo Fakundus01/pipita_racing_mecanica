@@ -15,7 +15,8 @@ public static class ExcelExportService
         IReadOnlyList<Reporte> Reportes,
         IReadOnlyList<SolicitudCliente> Solicitudes,
         IReadOnlyList<Distribuidora> Distribuidoras,
-        IReadOnlyList<TrabajoDistribuidora> TrabajosDistribuidora);
+        IReadOnlyList<TrabajoDistribuidora> TrabajosDistribuidora,
+        IReadOnlyList<Cita> Citas);
 
     public static async Task<ExportData> LoadAsync(AppDbContext db)
     {
@@ -70,6 +71,13 @@ public static class ExcelExportService
             .ThenByDescending(x => x.CreatedAt)
             .ToListAsync();
 
+        var citas = await db.Citas
+            .AsNoTracking()
+            .Include(x => x.Cliente)
+            .Include(x => x.Vehiculo)
+            .OrderBy(x => x.FechaHoraInicio)
+            .ToListAsync();
+
         return new ExportData(
             clientes,
             vehiculos,
@@ -78,7 +86,8 @@ public static class ExcelExportService
             reportes,
             solicitudes,
             distribuidoras,
-            trabajosDistribuidora);
+            trabajosDistribuidora,
+            citas);
     }
 
     public static void ExportToFile(ExportData data, string filePath)
@@ -94,6 +103,7 @@ public static class ExcelExportService
         BuildSolicitudesSheet(workbook, data.Solicitudes);
         BuildDistribuidorasSheet(workbook, data.Distribuidoras, data.TrabajosDistribuidora);
         BuildTrabajosDistribuidoraSheet(workbook, data.TrabajosDistribuidora);
+        BuildCitasSheet(workbook, data.Citas);
 
         workbook.SaveAs(filePath);
     }
@@ -127,6 +137,7 @@ public static class ExcelExportService
             new object[] { "Solicitudes de clientes", data.Solicitudes.Count },
             new object[] { "Distribuidoras", data.Distribuidoras.Count },
             new object[] { "Trabajos tercerizados", data.TrabajosDistribuidora.Count },
+            new object[] { "Citas", data.Citas.Count },
             new object[] { "Stock total de partes", data.Partes.Sum(x => x.Stock) },
             new object[] { "Precio total de partes", data.Partes.Sum(x => x.Costo) },
             new object[] { "Valor inventario (stock x precio c/u)", valorInventario },
@@ -407,6 +418,37 @@ public static class ExcelExportService
             });
     }
 
+
+    private static void BuildCitasSheet(XLWorkbook workbook, IReadOnlyList<Cita> citas)
+    {
+        var rows = citas
+            .Select(x => new object?[]
+            {
+                x.Id,
+                x.FechaHoraInicio,
+                x.DuracionMinutos,
+                x.Estado,
+                x.Cliente?.Nombre,
+                x.Vehiculo?.Patente,
+                x.Motivo,
+                x.Notas,
+                x.CreatedAt.ToLocalTime(),
+            })
+            .ToList();
+
+        BuildDataSheet(
+            workbook,
+            "Citas",
+            "Agenda de citas",
+            new[] { "ID", "Inicio", "Duracion (min)", "Estado", "Cliente", "Patente", "Motivo", "Notas", "Creado" },
+            rows,
+            new Dictionary<int, string>
+            {
+                [2] = "dd/MM/yyyy HH:mm",
+                [3] = "#,##0",
+                [9] = "dd/MM/yyyy HH:mm",
+            });
+    }
     private static void BuildDataSheet(
         XLWorkbook workbook,
         string sheetName,
@@ -530,3 +572,6 @@ public static class ExcelExportService
         headerRange.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
     }
 }
+
+
+

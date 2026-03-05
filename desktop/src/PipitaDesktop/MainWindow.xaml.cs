@@ -181,6 +181,11 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         DistribuidoraEstadoCombo.SelectedItem = "activa";
         TrabajoFechaInput.SelectedDate = DateTime.Today;
         TrabajoEstadoPagoCombo.SelectedItem = "pagado";
+        AgendaFiltroEstadoCombo.SelectedItem = "Todos";
+        CitaFechaInput.SelectedDate = DateTime.Today;
+        CitaHoraInput.Text = "09:00";
+        CitaDuracionInput.Text = "60";
+        CitaEstadoCombo.SelectedItem = "pendiente";
         DashboardDesdeInput.SelectedDate = DateTime.Today.AddDays(-30);
         DashboardHastaInput.SelectedDate = DateTime.Today;
 
@@ -208,6 +213,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             await LoadReportesAsync();
             await LoadSolicitudesAsync();
             await LoadDistribuidorasModuleAsync();
+            await LoadAgendaAsync();
             UpdateDashboardMetrics();
             StatusMessage = status ?? $"Datos actualizados ({DateTime.Now:HH:mm:ss}).";
         }
@@ -412,6 +418,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         ApplySolicitudesFilters();
         ApplyDistribuidorasFilters();
         ApplyTrabajosDistribuidoraFilters();
+        ApplyAgendaFilters();
     }
 
     private void ApplyClientesFilters()
@@ -1949,11 +1956,5 @@ internal sealed class GridViewState
     public ListSortDirection SortDirection { get; set; } = ListSortDirection.Ascending;
     public string PageText => $"Pagina {Page}/{TotalPages} - {TotalItems} registros";
 }
-
-
-
-
-
-
 
 

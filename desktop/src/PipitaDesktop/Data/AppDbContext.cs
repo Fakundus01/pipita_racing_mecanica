@@ -18,6 +18,7 @@ public sealed class AppDbContext : DbContext
     public DbSet<SolicitudCliente> SolicitudesCliente => Set<SolicitudCliente>();
     public DbSet<Distribuidora> Distribuidoras => Set<Distribuidora>();
     public DbSet<TrabajoDistribuidora> TrabajosDistribuidora => Set<TrabajoDistribuidora>();
+    public DbSet<Cita> Citas => Set<Cita>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -137,6 +138,30 @@ public sealed class AppDbContext : DbContext
                 .OnDelete(DeleteBehavior.SetNull);
         });
 
+
+        modelBuilder.Entity<Cita>(entity =>
+        {
+            entity.ToTable("citas");
+            entity.Property(x => x.FechaHoraInicio).IsRequired();
+            entity.Property(x => x.DuracionMinutos).HasDefaultValue(60);
+            entity.Property(x => x.Estado).HasMaxLength(30).HasDefaultValue("pendiente");
+            entity.Property(x => x.Motivo).HasMaxLength(250).IsRequired();
+            entity.Property(x => x.Notas).HasMaxLength(4000);
+            entity.HasIndex(x => x.FechaHoraInicio);
+            entity.HasIndex(x => x.Estado);
+
+            entity
+                .HasOne(x => x.Cliente)
+                .WithMany(x => x.Citas)
+                .HasForeignKey(x => x.ClienteId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            entity
+                .HasOne(x => x.Vehiculo)
+                .WithMany(x => x.Citas)
+                .HasForeignKey(x => x.VehiculoId)
+                .OnDelete(DeleteBehavior.SetNull);
+        });
         ConfigureBaseEntity<Cliente>(modelBuilder);
         ConfigureBaseEntity<Vehiculo>(modelBuilder);
         ConfigureBaseEntity<Parte>(modelBuilder);
@@ -145,6 +170,7 @@ public sealed class AppDbContext : DbContext
         ConfigureBaseEntity<SolicitudCliente>(modelBuilder);
         ConfigureBaseEntity<Distribuidora>(modelBuilder);
         ConfigureBaseEntity<TrabajoDistribuidora>(modelBuilder);
+        ConfigureBaseEntity<Cita>(modelBuilder);
     }
 
     private static void ConfigureBaseEntity<TEntity>(ModelBuilder modelBuilder)
@@ -158,3 +184,5 @@ public sealed class AppDbContext : DbContext
         });
     }
 }
+
+

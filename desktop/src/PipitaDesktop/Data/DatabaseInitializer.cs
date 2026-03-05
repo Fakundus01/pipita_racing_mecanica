@@ -81,5 +81,26 @@ public static class DatabaseInitializer
         db.Database.ExecuteSqlRaw("CREATE INDEX IF NOT EXISTS IX_trabajos_distribuidora_ClienteId ON trabajos_distribuidora (ClienteId);");
         db.Database.ExecuteSqlRaw("CREATE INDEX IF NOT EXISTS IX_trabajos_distribuidora_VehiculoId ON trabajos_distribuidora (VehiculoId);");
         db.Database.ExecuteSqlRaw("CREATE INDEX IF NOT EXISTS IX_trabajos_distribuidora_Fecha ON trabajos_distribuidora (Fecha);");
+        db.Database.ExecuteSqlRaw(
+            @"CREATE TABLE IF NOT EXISTS citas (
+                Id INTEGER NOT NULL CONSTRAINT PK_citas PRIMARY KEY AUTOINCREMENT,
+                ClienteId INTEGER NULL,
+                VehiculoId INTEGER NULL,
+                FechaHoraInicio TEXT NOT NULL,
+                DuracionMinutos INTEGER NOT NULL,
+                Estado TEXT NOT NULL,
+                Motivo TEXT NOT NULL,
+                Notas TEXT NULL,
+                CreatedAt TEXT NOT NULL,
+                UpdatedAt TEXT NOT NULL,
+                CONSTRAINT FK_citas_clientes_ClienteId FOREIGN KEY (ClienteId) REFERENCES clientes (Id) ON DELETE SET NULL,
+                CONSTRAINT FK_citas_vehiculos_VehiculoId FOREIGN KEY (VehiculoId) REFERENCES vehiculos (Id) ON DELETE SET NULL
+            );");
+
+        db.Database.ExecuteSqlRaw("CREATE INDEX IF NOT EXISTS IX_citas_ClienteId ON citas (ClienteId);");
+        db.Database.ExecuteSqlRaw("CREATE INDEX IF NOT EXISTS IX_citas_VehiculoId ON citas (VehiculoId);");
+        db.Database.ExecuteSqlRaw("CREATE INDEX IF NOT EXISTS IX_citas_FechaHoraInicio ON citas (FechaHoraInicio);");
+        db.Database.ExecuteSqlRaw("CREATE INDEX IF NOT EXISTS IX_citas_Estado ON citas (Estado);");
     }
 }
+

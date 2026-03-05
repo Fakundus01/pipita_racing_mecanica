@@ -15,4 +15,7 @@ public sealed class Vehiculo : BaseEntity
     public ICollection<Servicio> Servicios { get; set; } = new List<Servicio>();
     public ICollection<SolicitudCliente> Solicitudes { get; set; } = new List<SolicitudCliente>();
     public ICollection<TrabajoDistribuidora> TrabajosDistribuidora { get; set; } = new List<TrabajoDistribuidora>();
+    public ICollection<Cita> Citas { get; set; } = new List<Cita>();
 }
+
+
