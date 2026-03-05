@@ -173,8 +173,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         SolicitudesFiltroEstadoCombo.SelectedItem = "Todos";
         DistribuidorasFiltroEstadoCombo.SelectedItem = "Todos";
         TrabajosDistribuidoraFiltroDistribuidoraCombo.SelectedValue = null;
-
         SolicitudFechaInput.SelectedDate = DateTime.Today;
+        SolicitudHoraInput.Text = "09:00";
+        SolicitudDuracionInput.Text = "60";
         SolicitudEstadoCombo.SelectedItem = "pendiente";
         SolicitudPrioridadCombo.SelectedItem = "media";
         SolicitudCanalCombo.SelectedItem = "telefono";
@@ -182,10 +183,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         TrabajoFechaInput.SelectedDate = DateTime.Today;
         TrabajoEstadoPagoCombo.SelectedItem = "pagado";
         AgendaFiltroEstadoCombo.SelectedItem = "Todos";
-        CitaFechaInput.SelectedDate = DateTime.Today;
-        CitaHoraInput.Text = "09:00";
-        CitaDuracionInput.Text = "60";
-        CitaEstadoCombo.SelectedItem = "pendiente";
         DashboardDesdeInput.SelectedDate = DateTime.Today.AddDays(-30);
         DashboardHastaInput.SelectedDate = DateTime.Today;
 
@@ -1012,32 +1009,28 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private async void ExportarExcelButton_Click(object sender, RoutedEventArgs e)
     {
-        var dialog = new SaveFileDialog
-        {
-            Title = "Guardar reporte Excel",
-            Filter = "Excel Workbook (*.xlsx)|*.xlsx",
-            AddExtension = true,
-            DefaultExt = "xlsx",
-            FileName = $"pipita-datos-{DateTime.Now:yyyyMMdd-HHmm}.xlsx",
-        };
-
-        if (dialog.ShowDialog(this) != true)
-        {
-            return;
-        }
+        var masterPath = BuildMasterExcelPath();
 
         try
         {
             IsBusy = true;
             using var db = CreateDbContext();
             var data = await ExcelExportService.LoadAsync(db);
-            await Task.Run(() => ExcelExportService.ExportToFile(data, dialog.FileName));
-            StatusMessage = $"Excel exportado: {dialog.FileName}";
+            await Task.Run(() => ExcelExportService.ExportToFile(data, masterPath));
+            StatusMessage = $"Excel maestro actualizado: {masterPath}";
             MessageBox.Show(
-                "Exportacion completada correctamente.",
+                $"Exportacion completada.\n\nArchivo maestro:\n{masterPath}",
                 "Exportar Excel",
                 MessageBoxButton.OK,
                 MessageBoxImage.Information);
+        }
+        catch (IOException ioEx)
+        {
+            MessageBox.Show(
+                $"No se pudo actualizar el Excel maestro porque esta en uso.\n\nCierra el archivo y reintenta.\n\nDetalle: {ioEx.Message}",
+                "Excel en uso",
+                MessageBoxButton.OK,
+                MessageBoxImage.Warning);
         }
         catch (Exception ex)
         {
@@ -1868,6 +1861,16 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 "pipita.db"));
     }
 
+    private static string BuildMasterExcelPath()
+    {
+        var documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+        if (string.IsNullOrWhiteSpace(documentsPath))
+        {
+            documentsPath = AppContext.BaseDirectory;
+        }
+
+        return Path.Combine(documentsPath, "pipita-garage-maestro.xlsx");
+    }
     private void ShowError(string message, Exception ex)
     {
         MessageBox.Show(
@@ -1956,5 +1959,3 @@ internal sealed class GridViewState
     public ListSortDirection SortDirection { get; set; } = ListSortDirection.Ascending;
     public string PageText => $"Pagina {Page}/{TotalPages} - {TotalItems} registros";
 }
-
-

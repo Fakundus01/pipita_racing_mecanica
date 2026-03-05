@@ -47,7 +47,7 @@ public partial class MainWindow
             .AsNoTracking()
             .Include(x => x.Cliente)
             .Include(x => x.Vehiculo)
-            .OrderByDescending(x => x.FechaSolicitud)
+            .OrderByDescending(x => x.FechaHoraCita)
             .ThenByDescending(x => x.CreatedAt)
             .ToListAsync();
 
@@ -65,6 +65,8 @@ public partial class MainWindow
                         : $"{solicitud.Vehiculo.Marca} {solicitud.Vehiculo.Modelo}",
                     Descripcion = solicitud.Descripcion,
                     FechaSolicitud = solicitud.FechaSolicitud,
+                    FechaHoraCita = solicitud.FechaHoraCita,
+                    DuracionMinutos = solicitud.DuracionMinutos,
                     Estado = solicitud.Estado,
                     Prioridad = solicitud.Prioridad,
                     Canal = solicitud.Canal,
@@ -182,7 +184,7 @@ public partial class MainWindow
             query = query.Where(x => string.Equals(x.Estado, estado, StringComparison.OrdinalIgnoreCase));
         }
 
-        ReplaceCollection(Solicitudes, query.OrderByDescending(x => x.FechaSolicitud).ThenByDescending(x => x.Id));
+        ReplaceCollection(Solicitudes, query.OrderByDescending(x => x.FechaHoraCita).ThenByDescending(x => x.Id));
     }
 
     private void ApplyDistribuidorasFilters()
@@ -267,10 +269,74 @@ public partial class MainWindow
             return;
         }
 
+        if (!TryParseHora(SolicitudHoraInput.Text, out var hora))
+        {
+            MessageBox.Show("La hora debe estar en formato HH:mm.", "Validacion", MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
+
+        if (!TryParseNonNegativeInt(SolicitudDuracionInput.Text, out var duracion) || duracion <= 0)
+        {
+            MessageBox.Show("La duracion debe ser un numero mayor a cero.", "Validacion", MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
+
+        var fecha = (SolicitudFechaInput.SelectedDate ?? DateTime.Today).Date;
+        var inicio = fecha.Add(hora);
+        var fin = inicio.AddMinutes(duracion);
+
         try
         {
             IsBusy = true;
             using var db = CreateDbContext();
+
+            var currentId = _editingSolicitudId ?? -1;
+            var dayStart = inicio.Date;
+            var dayEnd = dayStart.AddDays(1);
+
+            var solicitudesMismoDia = await db.SolicitudesCliente
+                .AsNoTracking()
+                .Where(x => x.Id != currentId && x.FechaHoraCita >= dayStart && x.FechaHoraCita < dayEnd)
+                .OrderBy(x => x.FechaHoraCita)
+                .ToListAsync();
+
+            var exacta = solicitudesMismoDia.FirstOrDefault(x => x.FechaHoraCita == inicio);
+            if (exacta is not null)
+            {
+                MessageBox.Show(
+                    $"No se puede cargar otra cita el mismo dia a la misma hora ({inicio:dd/MM HH:mm}).",
+                    "Conflicto de horario",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+                return;
+            }
+
+            var solapada = solicitudesMismoDia
+                .Select(x => new
+                {
+                    Solicitud = x,
+                    Inicio = x.FechaHoraCita,
+                    Fin = x.FechaHoraCita.AddMinutes(Math.Max(1, x.DuracionMinutos)),
+                })
+                .FirstOrDefault(x => inicio < x.Fin && fin > x.Inicio);
+
+            if (solapada is not null)
+            {
+                var texto = string.Equals(solapada.Solicitud.Estado, "en_proceso", StringComparison.OrdinalIgnoreCase)
+                    ? $"Tenes en proceso una actividad ese dia de {solapada.Inicio:HH:mm} a {solapada.Fin:HH:mm} y esta cita entra en ese horario. Desea aplicar la cita?"
+                    : $"Ya hay una cita ese dia de {solapada.Inicio:HH:mm} a {solapada.Fin:HH:mm} y esta cita entra en ese horario. Desea aplicar la cita?";
+
+                var confirm = MessageBox.Show(
+                    texto,
+                    "Conflicto de horario",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Question);
+
+                if (confirm != MessageBoxResult.Yes)
+                {
+                    return;
+                }
+            }
 
             SolicitudCliente solicitud;
             if (_editingSolicitudId.HasValue)
@@ -287,7 +353,9 @@ public partial class MainWindow
             solicitud.ClienteId = ParseNullableInt(SolicitudClienteCombo.SelectedValue);
             solicitud.VehiculoId = ParseNullableInt(SolicitudVehiculoCombo.SelectedValue);
             solicitud.Descripcion = descripcion;
-            solicitud.FechaSolicitud = (SolicitudFechaInput.SelectedDate ?? DateTime.Today).Date;
+            solicitud.FechaSolicitud = fecha;
+            solicitud.FechaHoraCita = inicio;
+            solicitud.DuracionMinutos = duracion;
             solicitud.Estado = SolicitudEstadoCombo.SelectedItem as string ?? "pendiente";
             solicitud.Prioridad = SolicitudPrioridadCombo.SelectedItem as string ?? "media";
             solicitud.Canal = ToNullable(SolicitudCanalCombo.SelectedItem as string);
@@ -296,6 +364,7 @@ public partial class MainWindow
 
             await db.SaveChangesAsync();
 
+            _agendaFechaSeleccionada = inicio.Date;
             ClearSolicitudForm();
             await RefreshAllAsync("Request de cliente guardado.");
         }
@@ -371,7 +440,9 @@ public partial class MainWindow
         _editingSolicitudId = selected.Id;
         SolicitudClienteCombo.SelectedValue = selected.ClienteId;
         SolicitudVehiculoCombo.SelectedValue = selected.VehiculoId;
-        SolicitudFechaInput.SelectedDate = selected.FechaSolicitud;
+        SolicitudFechaInput.SelectedDate = selected.FechaHoraCita.Date;
+        SolicitudHoraInput.Text = selected.FechaHoraCita.ToString("HH:mm", CultureInfo.InvariantCulture);
+        SolicitudDuracionInput.Text = selected.DuracionMinutos.ToString(CultureInfo.InvariantCulture);
         SolicitudEstadoCombo.SelectedItem = EstadoSolicitudes.Contains(selected.Estado) ? selected.Estado : "pendiente";
         SolicitudPrioridadCombo.SelectedItem = PrioridadSolicitudes.Contains(selected.Prioridad) ? selected.Prioridad : "media";
         SolicitudCanalCombo.SelectedItem = CanalSolicitudes.Contains(selected.Canal ?? string.Empty) ? selected.Canal : null;
@@ -642,6 +713,8 @@ public partial class MainWindow
         SolicitudClienteCombo.SelectedValue = null;
         SolicitudVehiculoCombo.SelectedValue = null;
         SolicitudFechaInput.SelectedDate = DateTime.Today;
+        SolicitudHoraInput.Text = "09:00";
+        SolicitudDuracionInput.Text = "60";
         SolicitudEstadoCombo.SelectedItem = "pendiente";
         SolicitudPrioridadCombo.SelectedItem = "media";
         SolicitudCanalCombo.SelectedItem = "telefono";
@@ -687,6 +760,9 @@ public sealed class SolicitudGridRow
     public string VehiculoNombre { get; init; } = "Sin vehiculo";
     public string Descripcion { get; init; } = string.Empty;
     public DateTime FechaSolicitud { get; init; }
+    public DateTime FechaHoraCita { get; init; }
+    public int DuracionMinutos { get; init; }
+    public DateTime FechaHoraFin => FechaHoraCita.AddMinutes(Math.Max(1, DuracionMinutos));
     public string Estado { get; init; } = string.Empty;
     public string Prioridad { get; init; } = string.Empty;
     public string? Canal { get; init; }
@@ -728,5 +804,3 @@ public sealed class DistribuidoraLookupItem
     public int? Id { get; init; }
     public string Display { get; init; } = string.Empty;
 }
-
-

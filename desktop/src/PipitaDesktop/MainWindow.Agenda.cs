@@ -1,16 +1,13 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using Microsoft.EntityFrameworkCore;
-using PipitaDesktop.Models;
 
 namespace PipitaDesktop;
 
 public partial class MainWindow
 {
-    private int? _editingCitaId;
     private DateTime _agendaMesActual = new(DateTime.Today.Year, DateTime.Today.Month, 1);
     private DateTime _agendaFechaSeleccionada = DateTime.Today;
     private List<CitaGridRow> _allCitas = new();
@@ -22,9 +19,6 @@ public partial class MainWindow
     public ObservableCollection<CitaGridRow> CitasDiaSeleccionado { get; } = new();
     public ObservableCollection<AgendaDayCell> AgendaDiasMes { get; } = new();
     public ObservableCollection<AgendaWeekSlotRow> AgendaSemanaSlots { get; } = new();
-
-    public ObservableCollection<string> EstadoCitas { get; } = new(new[] { "pendiente", "confirmada", "en_proceso", "completada", "cancelada" });
-    public ObservableCollection<string> EstadoCitasConTodos { get; } = new(new[] { "Todos", "pendiente", "confirmada", "en_proceso", "completada", "cancelada" });
 
     public string AgendaMesTitulo
     {
@@ -44,37 +38,28 @@ public partial class MainWindow
         private set => SetField(ref _agendaSemanaRango, value);
     }
 
-    private async Task LoadAgendaAsync()
+    private Task LoadAgendaAsync()
     {
-        using var db = CreateDbContext();
-        var citas = await db.Citas
-            .AsNoTracking()
-            .Include(x => x.Cliente)
-            .Include(x => x.Vehiculo)
-            .OrderBy(x => x.FechaHoraInicio)
-            .ThenBy(x => x.CreatedAt)
-            .ToListAsync();
-
-        _allCitas = citas
+        _allCitas = _allSolicitudes
+            .OrderBy(x => x.FechaHoraCita)
+            .ThenBy(x => x.Id)
             .Select(
-                cita =>
+                solicitud =>
                 {
-                    var badge = BuildStatusBadge(cita.Estado);
+                    var badge = BuildStatusBadge(solicitud.Estado);
                     return new CitaGridRow
                     {
-                        Id = cita.Id,
-                        ClienteId = cita.ClienteId,
-                        VehiculoId = cita.VehiculoId,
-                        ClienteNombre = cita.Cliente?.Nombre ?? "Sin cliente",
-                        Patente = cita.Vehiculo?.Patente,
-                        VehiculoNombre = cita.Vehiculo is null
-                            ? "Sin vehiculo"
-                            : $"{cita.Vehiculo.Marca} {cita.Vehiculo.Modelo}",
-                        FechaHoraInicio = cita.FechaHoraInicio,
-                        DuracionMinutos = cita.DuracionMinutos,
-                        Estado = cita.Estado,
-                        Motivo = cita.Motivo,
-                        Notas = cita.Notas,
+                        Id = solicitud.Id,
+                        ClienteId = solicitud.ClienteId,
+                        VehiculoId = solicitud.VehiculoId,
+                        ClienteNombre = solicitud.ClienteNombre,
+                        Patente = solicitud.Patente,
+                        VehiculoNombre = solicitud.VehiculoNombre,
+                        FechaHoraInicio = solicitud.FechaHoraCita,
+                        DuracionMinutos = solicitud.DuracionMinutos,
+                        Estado = solicitud.Estado,
+                        Motivo = solicitud.Descripcion,
+                        Notas = solicitud.Notas,
                         EstadoBadgeText = badge.Text,
                         EstadoBadgeBackground = badge.Background,
                         EstadoBadgeForeground = badge.Foreground,
@@ -84,6 +69,7 @@ public partial class MainWindow
 
         _agendaMesActual = new DateTime(_agendaFechaSeleccionada.Year, _agendaFechaSeleccionada.Month, 1);
         RefreshAgendaCalendar();
+        return Task.CompletedTask;
     }
 
     private void ApplyAgendaFilters()
@@ -305,194 +291,6 @@ public partial class MainWindow
         return text.Length <= max ? text : $"{text[..max]}...";
     }
 
-    private async void GuardarCitaButton_Click(object sender, RoutedEventArgs e)
-    {
-        var motivo = CitaMotivoInput.Text.Trim();
-        if (string.IsNullOrWhiteSpace(motivo))
-        {
-            MessageBox.Show("El motivo es obligatorio.", "Validacion", MessageBoxButton.OK, MessageBoxImage.Warning);
-            return;
-        }
-
-        if (!TryParseHora(CitaHoraInput.Text, out var hora))
-        {
-            MessageBox.Show("La hora debe estar en formato HH:mm.", "Validacion", MessageBoxButton.OK, MessageBoxImage.Warning);
-            return;
-        }
-
-        if (!TryParseNonNegativeInt(CitaDuracionInput.Text, out var duracion) || duracion <= 0)
-        {
-            MessageBox.Show("La duracion debe ser un numero mayor a cero.", "Validacion", MessageBoxButton.OK, MessageBoxImage.Warning);
-            return;
-        }
-
-        var fecha = (CitaFechaInput.SelectedDate ?? _agendaFechaSeleccionada).Date;
-        var inicio = fecha.Add(hora);
-        var fin = inicio.AddMinutes(duracion);
-
-        try
-        {
-            IsBusy = true;
-            using var db = CreateDbContext();
-
-            var dayStart = inicio.Date;
-            var dayEnd = dayStart.AddDays(1);
-            var currentId = _editingCitaId ?? -1;
-
-            var citasMismoDia = await db.Citas
-                .AsNoTracking()
-                .Where(x => x.Id != currentId && x.FechaHoraInicio >= dayStart && x.FechaHoraInicio < dayEnd)
-                .OrderBy(x => x.FechaHoraInicio)
-                .ToListAsync();
-
-            var exacta = citasMismoDia.FirstOrDefault(x => x.FechaHoraInicio == inicio);
-            if (exacta is not null)
-            {
-                MessageBox.Show(
-                    $"No se puede cargar otra cita el mismo dia a la misma hora ({inicio:dd/MM HH:mm}).",
-                    "Conflicto de horario",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
-                return;
-            }
-
-            var solapada = citasMismoDia
-                .Select(x => new
-                {
-                    Cita = x,
-                    Inicio = x.FechaHoraInicio,
-                    Fin = x.FechaHoraInicio.AddMinutes(Math.Max(1, x.DuracionMinutos)),
-                })
-                .FirstOrDefault(x => inicio < x.Fin && fin > x.Inicio);
-
-            if (solapada is not null)
-            {
-                var texto = string.Equals(solapada.Cita.Estado, "en_proceso", StringComparison.OrdinalIgnoreCase)
-                    ? $"Tenes en proceso una actividad ese dia de {solapada.Inicio:HH:mm} a {solapada.Fin:HH:mm} y esta cita entra en ese horario. Desea aplicar la cita?"
-                    : $"Ya hay una cita ese dia de {solapada.Inicio:HH:mm} a {solapada.Fin:HH:mm} y esta cita entra en ese horario. Desea aplicar la cita?";
-
-                var confirm = MessageBox.Show(
-                    texto,
-                    "Conflicto de horario",
-                    MessageBoxButton.YesNo,
-                    MessageBoxImage.Question);
-
-                if (confirm != MessageBoxResult.Yes)
-                {
-                    return;
-                }
-            }
-
-            Cita cita;
-            if (_editingCitaId.HasValue)
-            {
-                cita = await db.Citas.FirstOrDefaultAsync(x => x.Id == _editingCitaId.Value)
-                    ?? throw new InvalidOperationException("Cita no encontrada.");
-            }
-            else
-            {
-                cita = new Cita { CreatedAt = DateTime.UtcNow };
-                await db.Citas.AddAsync(cita);
-            }
-
-            cita.ClienteId = ParseNullableInt(CitaClienteCombo.SelectedValue);
-            cita.VehiculoId = ParseNullableInt(CitaVehiculoCombo.SelectedValue);
-            cita.FechaHoraInicio = inicio;
-            cita.DuracionMinutos = duracion;
-            cita.Estado = CitaEstadoCombo.SelectedItem as string ?? "pendiente";
-            cita.Motivo = motivo;
-            cita.Notas = ToNullable(CitaNotasInput.Text);
-            cita.UpdatedAt = DateTime.UtcNow;
-
-            await db.SaveChangesAsync();
-
-            _agendaFechaSeleccionada = inicio.Date;
-            _agendaMesActual = new DateTime(inicio.Year, inicio.Month, 1);
-            ClearCitaForm();
-            await RefreshAllAsync("Cita guardada.");
-        }
-        catch (Exception ex)
-        {
-            ShowError("No se pudo guardar la cita.", ex);
-        }
-        finally
-        {
-            IsBusy = false;
-        }
-    }
-
-    private async void EliminarCitaButton_Click(object sender, RoutedEventArgs e)
-    {
-        if (CitasDiaGrid.SelectedItem is not CitaGridRow selected)
-        {
-            MessageBox.Show("Selecciona una cita para eliminar.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
-            return;
-        }
-
-        var confirm = MessageBox.Show(
-            "Se eliminara la cita seleccionada. Queres continuar?",
-            "Confirmar eliminacion",
-            MessageBoxButton.YesNo,
-            MessageBoxImage.Warning);
-
-        if (confirm != MessageBoxResult.Yes)
-        {
-            return;
-        }
-
-        try
-        {
-            IsBusy = true;
-            using var db = CreateDbContext();
-            var cita = await db.Citas.FirstOrDefaultAsync(x => x.Id == selected.Id);
-            if (cita is null)
-            {
-                MessageBox.Show("La cita ya no existe.", "Aviso", MessageBoxButton.OK, MessageBoxImage.Information);
-                await RefreshAllAsync();
-                return;
-            }
-
-            db.Citas.Remove(cita);
-            await db.SaveChangesAsync();
-
-            ClearCitaForm();
-            await RefreshAllAsync("Cita eliminada.");
-        }
-        catch (Exception ex)
-        {
-            ShowError("No se pudo eliminar la cita.", ex);
-        }
-        finally
-        {
-            IsBusy = false;
-        }
-    }
-
-    private void NuevoCitaButton_Click(object sender, RoutedEventArgs e)
-    {
-        ClearCitaForm();
-    }
-
-    private void CitasDiaGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
-        if (CitasDiaGrid.SelectedItem is not CitaGridRow selected)
-        {
-            return;
-        }
-
-        _editingCitaId = selected.Id;
-        CitaClienteCombo.SelectedValue = selected.ClienteId;
-        CitaVehiculoCombo.SelectedValue = selected.VehiculoId;
-        CitaFechaInput.SelectedDate = selected.FechaHoraInicio.Date;
-        CitaHoraInput.Text = selected.FechaHoraInicio.ToString("HH:mm");
-        CitaDuracionInput.Text = selected.DuracionMinutos.ToString(CultureInfo.InvariantCulture);
-        CitaEstadoCombo.SelectedItem = EstadoCitas.Contains(selected.Estado) ? selected.Estado : "pendiente";
-        CitaMotivoInput.Text = selected.Motivo;
-        CitaNotasInput.Text = selected.Notas ?? string.Empty;
-
-        StatusMessage = $"Editando cita: {selected.Motivo}";
-    }
-
     private void AgendaMesAnteriorButton_Click(object sender, RoutedEventArgs e)
     {
         _agendaMesActual = _agendaMesActual.AddMonths(-1);
@@ -509,7 +307,6 @@ public partial class MainWindow
     {
         _agendaFechaSeleccionada = DateTime.Today;
         _agendaMesActual = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
-        CitaFechaInput.SelectedDate = _agendaFechaSeleccionada;
         RefreshAgendaCalendar();
     }
 
@@ -522,40 +319,12 @@ public partial class MainWindow
 
         _agendaFechaSeleccionada = day.Date;
         _agendaMesActual = new DateTime(day.Date.Year, day.Date.Month, 1);
-        CitaFechaInput.SelectedDate = day.Date;
         RefreshAgendaCalendar();
     }
 
     private void AgendaFiltroEstadoCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         RefreshAgendaCalendar();
-    }
-
-    private void CitaFechaInput_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
-    {
-        if (!IsLoaded || !CitaFechaInput.SelectedDate.HasValue)
-        {
-            return;
-        }
-
-        var date = CitaFechaInput.SelectedDate.Value.Date;
-        _agendaFechaSeleccionada = date;
-        _agendaMesActual = new DateTime(date.Year, date.Month, 1);
-        RefreshAgendaCalendar();
-    }
-
-    private void ClearCitaForm()
-    {
-        _editingCitaId = null;
-        CitaClienteCombo.SelectedValue = null;
-        CitaVehiculoCombo.SelectedValue = null;
-        CitaFechaInput.SelectedDate = _agendaFechaSeleccionada;
-        CitaHoraInput.Text = "09:00";
-        CitaDuracionInput.Text = "60";
-        CitaEstadoCombo.SelectedItem = "pendiente";
-        CitaMotivoInput.Text = string.Empty;
-        CitaNotasInput.Text = string.Empty;
-        CitasDiaGrid.SelectedItem = null;
     }
 
     private static bool TryParseHora(string rawValue, out TimeSpan time)
@@ -641,6 +410,3 @@ public sealed class AgendaWeekCell
     public Brush Background { get; init; } = Brushes.Transparent;
     public Brush Foreground { get; init; } = Brushes.Transparent;
 }
-
-
-

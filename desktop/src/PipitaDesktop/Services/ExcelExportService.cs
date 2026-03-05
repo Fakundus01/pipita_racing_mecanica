@@ -1,3 +1,4 @@
+using System.IO;
 using ClosedXML.Excel;
 using Microsoft.EntityFrameworkCore;
 using PipitaDesktop.Data;
@@ -15,8 +16,7 @@ public static class ExcelExportService
         IReadOnlyList<Reporte> Reportes,
         IReadOnlyList<SolicitudCliente> Solicitudes,
         IReadOnlyList<Distribuidora> Distribuidoras,
-        IReadOnlyList<TrabajoDistribuidora> TrabajosDistribuidora,
-        IReadOnlyList<Cita> Citas);
+        IReadOnlyList<TrabajoDistribuidora> TrabajosDistribuidora);
 
     public static async Task<ExportData> LoadAsync(AppDbContext db)
     {
@@ -53,7 +53,7 @@ public static class ExcelExportService
             .AsNoTracking()
             .Include(x => x.Cliente)
             .Include(x => x.Vehiculo)
-            .OrderByDescending(x => x.FechaSolicitud)
+            .OrderByDescending(x => x.FechaHoraCita)
             .ThenByDescending(x => x.CreatedAt)
             .ToListAsync();
 
@@ -71,13 +71,6 @@ public static class ExcelExportService
             .ThenByDescending(x => x.CreatedAt)
             .ToListAsync();
 
-        var citas = await db.Citas
-            .AsNoTracking()
-            .Include(x => x.Cliente)
-            .Include(x => x.Vehiculo)
-            .OrderBy(x => x.FechaHoraInicio)
-            .ToListAsync();
-
         return new ExportData(
             clientes,
             vehiculos,
@@ -86,13 +79,14 @@ public static class ExcelExportService
             reportes,
             solicitudes,
             distribuidoras,
-            trabajosDistribuidora,
-            citas);
+            trabajosDistribuidora);
     }
 
     public static void ExportToFile(ExportData data, string filePath)
     {
-        using var workbook = new XLWorkbook();
+        using var workbook = File.Exists(filePath)
+            ? new XLWorkbook(filePath)
+            : new XLWorkbook();
 
         BuildSummarySheet(workbook, data);
         BuildClientesSheet(workbook, data.Clientes);
@@ -103,14 +97,20 @@ public static class ExcelExportService
         BuildSolicitudesSheet(workbook, data.Solicitudes);
         BuildDistribuidorasSheet(workbook, data.Distribuidoras, data.TrabajosDistribuidora);
         BuildTrabajosDistribuidoraSheet(workbook, data.TrabajosDistribuidora);
-        BuildCitasSheet(workbook, data.Citas);
 
         workbook.SaveAs(filePath);
     }
 
+    private static IXLWorksheet ReplaceWorksheet(XLWorkbook workbook, string sheetName)
+    {
+        var existing = workbook.Worksheets.FirstOrDefault(x => string.Equals(x.Name, sheetName, StringComparison.OrdinalIgnoreCase));
+        existing?.Delete();
+        return workbook.Worksheets.Add(sheetName);
+    }
+
     private static void BuildSummarySheet(XLWorkbook workbook, ExportData data)
     {
-        var ws = workbook.Worksheets.Add("Resumen");
+        var ws = ReplaceWorksheet(workbook, "Resumen");
 
         ws.Cell(1, 1).Value = "Pipita Garage - Reporte General";
         ws.Range(1, 1, 1, 4).Merge();
@@ -137,7 +137,6 @@ public static class ExcelExportService
             new object[] { "Solicitudes de clientes", data.Solicitudes.Count },
             new object[] { "Distribuidoras", data.Distribuidoras.Count },
             new object[] { "Trabajos tercerizados", data.TrabajosDistribuidora.Count },
-            new object[] { "Citas", data.Citas.Count },
             new object[] { "Stock total de partes", data.Partes.Sum(x => x.Stock) },
             new object[] { "Precio total de partes", data.Partes.Sum(x => x.Costo) },
             new object[] { "Valor inventario (stock x precio c/u)", valorInventario },
@@ -319,7 +318,9 @@ public static class ExcelExportService
             .Select(x => new object?[]
             {
                 x.Id,
-                x.FechaSolicitud,
+                x.FechaHoraCita,
+                x.FechaHoraCita.AddMinutes(Math.Max(1, x.DuracionMinutos)),
+                x.DuracionMinutos,
                 x.Estado,
                 x.Prioridad,
                 x.Canal,
@@ -334,13 +335,15 @@ public static class ExcelExportService
         BuildDataSheet(
             workbook,
             "Solicitudes",
-            "Historial de solicitudes de clientes",
-            new[] { "ID", "Fecha", "Estado", "Prioridad", "Canal", "Cliente", "Patente", "Descripcion", "Notas", "Creado" },
+            "Historial de solicitudes/citas de clientes",
+            new[] { "ID", "Inicio", "Fin", "Duracion (min)", "Estado", "Prioridad", "Canal", "Cliente", "Patente", "Descripcion", "Notas", "Creado" },
             rows,
             new Dictionary<int, string>
             {
-                [2] = "dd/MM/yyyy",
-                [10] = "dd/MM/yyyy HH:mm",
+                [2] = "dd/MM/yyyy HH:mm",
+                [3] = "dd/MM/yyyy HH:mm",
+                [4] = "#,##0",
+                [12] = "dd/MM/yyyy HH:mm",
             });
     }
 
@@ -418,37 +421,6 @@ public static class ExcelExportService
             });
     }
 
-
-    private static void BuildCitasSheet(XLWorkbook workbook, IReadOnlyList<Cita> citas)
-    {
-        var rows = citas
-            .Select(x => new object?[]
-            {
-                x.Id,
-                x.FechaHoraInicio,
-                x.DuracionMinutos,
-                x.Estado,
-                x.Cliente?.Nombre,
-                x.Vehiculo?.Patente,
-                x.Motivo,
-                x.Notas,
-                x.CreatedAt.ToLocalTime(),
-            })
-            .ToList();
-
-        BuildDataSheet(
-            workbook,
-            "Citas",
-            "Agenda de citas",
-            new[] { "ID", "Inicio", "Duracion (min)", "Estado", "Cliente", "Patente", "Motivo", "Notas", "Creado" },
-            rows,
-            new Dictionary<int, string>
-            {
-                [2] = "dd/MM/yyyy HH:mm",
-                [3] = "#,##0",
-                [9] = "dd/MM/yyyy HH:mm",
-            });
-    }
     private static void BuildDataSheet(
         XLWorkbook workbook,
         string sheetName,
@@ -457,7 +429,7 @@ public static class ExcelExportService
         IReadOnlyList<object?[]> rows,
         IReadOnlyDictionary<int, string>? numberFormats = null)
     {
-        var ws = workbook.Worksheets.Add(sheetName);
+        var ws = ReplaceWorksheet(workbook, sheetName);
         var colCount = headers.Count;
 
         ws.Cell(1, 1).Value = title;
@@ -572,6 +544,3 @@ public static class ExcelExportService
         headerRange.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
     }
 }
-
-
-

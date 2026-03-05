@@ -77,11 +77,14 @@ public sealed class AppDbContext : DbContext
         {
             entity.ToTable("solicitudes_cliente");
             entity.Property(x => x.Descripcion).HasMaxLength(250).IsRequired();
+            entity.Property(x => x.FechaHoraCita).IsRequired();
+            entity.Property(x => x.DuracionMinutos).HasDefaultValue(60);
             entity.Property(x => x.Estado).HasMaxLength(30).HasDefaultValue("pendiente");
             entity.Property(x => x.Prioridad).HasMaxLength(20).HasDefaultValue("media");
             entity.Property(x => x.Canal).HasMaxLength(40);
             entity.Property(x => x.Notas).HasMaxLength(4000);
             entity.HasIndex(x => x.FechaSolicitud);
+            entity.HasIndex(x => x.FechaHoraCita);
             entity.HasIndex(x => x.Estado);
 
             entity
@@ -184,5 +187,3 @@ public sealed class AppDbContext : DbContext
         });
     }
 }
-
-

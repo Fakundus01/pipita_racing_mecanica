@@ -1,3 +1,5 @@
+using System;
+using System.Data;
 using System.IO;
 using Microsoft.EntityFrameworkCore;
 
@@ -29,6 +31,8 @@ public static class DatabaseInitializer
                 VehiculoId INTEGER NULL,
                 Descripcion TEXT NOT NULL,
                 FechaSolicitud TEXT NOT NULL,
+                FechaHoraCita TEXT NULL,
+                DuracionMinutos INTEGER NOT NULL DEFAULT 60,
                 Estado TEXT NOT NULL,
                 Prioridad TEXT NOT NULL,
                 Canal TEXT NULL,
@@ -43,6 +47,13 @@ public static class DatabaseInitializer
         db.Database.ExecuteSqlRaw("CREATE INDEX IF NOT EXISTS IX_solicitudes_cliente_VehiculoId ON solicitudes_cliente (VehiculoId);");
         db.Database.ExecuteSqlRaw("CREATE INDEX IF NOT EXISTS IX_solicitudes_cliente_Estado ON solicitudes_cliente (Estado);");
         db.Database.ExecuteSqlRaw("CREATE INDEX IF NOT EXISTS IX_solicitudes_cliente_FechaSolicitud ON solicitudes_cliente (FechaSolicitud);");
+        db.Database.ExecuteSqlRaw("CREATE INDEX IF NOT EXISTS IX_solicitudes_cliente_FechaHoraCita ON solicitudes_cliente (FechaHoraCita);");
+
+        EnsureColumnExists(db, "solicitudes_cliente", "FechaHoraCita", "TEXT NULL");
+        EnsureColumnExists(db, "solicitudes_cliente", "DuracionMinutos", "INTEGER NOT NULL DEFAULT 60");
+
+        db.Database.ExecuteSqlRaw("UPDATE solicitudes_cliente SET FechaHoraCita = COALESCE(FechaHoraCita, FechaSolicitud);");
+        db.Database.ExecuteSqlRaw("UPDATE solicitudes_cliente SET DuracionMinutos = COALESCE(DuracionMinutos, 60) WHERE DuracionMinutos IS NULL OR DuracionMinutos <= 0;");
 
         db.Database.ExecuteSqlRaw(
             @"CREATE TABLE IF NOT EXISTS distribuidoras (
@@ -81,6 +92,7 @@ public static class DatabaseInitializer
         db.Database.ExecuteSqlRaw("CREATE INDEX IF NOT EXISTS IX_trabajos_distribuidora_ClienteId ON trabajos_distribuidora (ClienteId);");
         db.Database.ExecuteSqlRaw("CREATE INDEX IF NOT EXISTS IX_trabajos_distribuidora_VehiculoId ON trabajos_distribuidora (VehiculoId);");
         db.Database.ExecuteSqlRaw("CREATE INDEX IF NOT EXISTS IX_trabajos_distribuidora_Fecha ON trabajos_distribuidora (Fecha);");
+
         db.Database.ExecuteSqlRaw(
             @"CREATE TABLE IF NOT EXISTS citas (
                 Id INTEGER NOT NULL CONSTRAINT PK_citas PRIMARY KEY AUTOINCREMENT,
@@ -101,6 +113,71 @@ public static class DatabaseInitializer
         db.Database.ExecuteSqlRaw("CREATE INDEX IF NOT EXISTS IX_citas_VehiculoId ON citas (VehiculoId);");
         db.Database.ExecuteSqlRaw("CREATE INDEX IF NOT EXISTS IX_citas_FechaHoraInicio ON citas (FechaHoraInicio);");
         db.Database.ExecuteSqlRaw("CREATE INDEX IF NOT EXISTS IX_citas_Estado ON citas (Estado);");
+
+        db.Database.ExecuteSqlRaw(
+            @"INSERT INTO solicitudes_cliente (
+                ClienteId,
+                VehiculoId,
+                Descripcion,
+                FechaSolicitud,
+                FechaHoraCita,
+                DuracionMinutos,
+                Estado,
+                Prioridad,
+                Canal,
+                Notas,
+                CreatedAt,
+                UpdatedAt)
+              SELECT
+                c.ClienteId,
+                c.VehiculoId,
+                c.Motivo,
+                date(c.FechaHoraInicio),
+                c.FechaHoraInicio,
+                CASE
+                    WHEN c.DuracionMinutos IS NULL OR c.DuracionMinutos <= 0 THEN 60
+                    ELSE c.DuracionMinutos
+                END,
+                COALESCE(c.Estado, 'pendiente'),
+                'media',
+                NULL,
+                c.Notas,
+                COALESCE(c.CreatedAt, CURRENT_TIMESTAMP),
+                COALESCE(c.UpdatedAt, CURRENT_TIMESTAMP)
+              FROM citas c
+              WHERE NOT EXISTS (
+                SELECT 1
+                FROM solicitudes_cliente s
+                WHERE IFNULL(s.ClienteId, -1) = IFNULL(c.ClienteId, -1)
+                  AND IFNULL(s.VehiculoId, -1) = IFNULL(c.VehiculoId, -1)
+                  AND s.FechaHoraCita = c.FechaHoraInicio
+                  AND s.Descripcion = c.Motivo
+              );");
+    }
+
+    private static void EnsureColumnExists(AppDbContext db, string tableName, string columnName, string definition)
+    {
+        using var connection = db.Database.GetDbConnection();
+        if (connection.State != ConnectionState.Open)
+        {
+            connection.Open();
+        }
+
+        using var command = connection.CreateCommand();
+        command.CommandText = $"PRAGMA table_info({tableName});";
+
+        using var reader = command.ExecuteReader();
+        while (reader.Read())
+        {
+            var existingColumn = reader[1]?.ToString();
+            if (string.Equals(existingColumn, columnName, StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
+        }
+
+        using var alterCommand = connection.CreateCommand();
+        alterCommand.CommandText = $"ALTER TABLE {tableName} ADD COLUMN {columnName} {definition};";
+        alterCommand.ExecuteNonQuery();
     }
 }
-

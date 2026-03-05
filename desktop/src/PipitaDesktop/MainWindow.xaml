@@ -1,4 +1,4 @@
-﻿<Window x:Class="PipitaDesktop.MainWindow"
+<Window x:Class="PipitaDesktop.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -714,7 +714,21 @@
 
                                 <TextBlock Text="Fecha" FontWeight="SemiBold" />
                                 <DatePicker x:Name="SolicitudFechaInput" />
-
+                                <Grid Margin="0,0,0,6">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="10" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Text="Hora (HH:mm)" FontWeight="SemiBold" />
+                                        <TextBox x:Name="SolicitudHoraInput" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="2">
+                                        <TextBlock Text="Duracion (min)" FontWeight="SemiBold" />
+                                        <TextBox x:Name="SolicitudDuracionInput" />
+                                    </StackPanel>
+                                </Grid>
                                 <TextBlock Text="Estado" FontWeight="SemiBold" />
                                 <ComboBox x:Name="SolicitudEstadoCombo" ItemsSource="{Binding EstadoSolicitudes}" />
 
@@ -768,7 +782,8 @@
                                       GridLinesVisibility="Horizontal"
                                       BorderThickness="0">
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn Header="Fecha" Binding="{Binding FechaSolicitud, StringFormat={}{0:dd/MM/yyyy}}" Width="*" />
+                                    <DataGridTextColumn Header="Inicio" Binding="{Binding FechaHoraCita, StringFormat={}{0:dd/MM HH:mm}}" Width="*" />
+                                    <DataGridTextColumn Header="Fin" Binding="{Binding FechaHoraFin, StringFormat={}{0:HH:mm}}" Width="*" />
                                     <DataGridTextColumn Header="Cliente" Binding="{Binding ClienteNombre}" Width="2*" />
                                     <DataGridTextColumn Header="Patente" Binding="{Binding Patente}" Width="*" />
                                     <DataGridTextColumn Header="Estado" Binding="{Binding Estado}" Width="*" />
@@ -952,68 +967,7 @@
             </TabItem>
             <TabItem Header="Agenda">
                 <Grid Margin="14">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="390" />
-                        <ColumnDefinition Width="14" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-
-                    <Border Grid.Column="0" Background="{StaticResource CardBrush}" BorderBrush="{StaticResource BorderBrushSoft}" BorderThickness="1" CornerRadius="10" Padding="16" Effect="{StaticResource CardShadowEffect}">
-                        <ScrollViewer VerticalScrollBarVisibility="Auto">
-                            <StackPanel>
-                                <TextBlock Text="Nueva cita" FontSize="18" FontWeight="SemiBold" />
-                                <TextBlock Margin="0,4,0,14" Text="Agenda de turnos del taller (mes, dia y semana)." Foreground="{StaticResource MutedTextBrush}" />
-
-                                <TextBlock Text="Cliente" FontWeight="SemiBold" />
-                                <ComboBox x:Name="CitaClienteCombo"
-                                          ItemsSource="{Binding ClienteOptions}"
-                                          DisplayMemberPath="Display"
-                                          SelectedValuePath="Id" />
-
-                                <TextBlock Text="Vehiculo" FontWeight="SemiBold" />
-                                <ComboBox x:Name="CitaVehiculoCombo"
-                                          ItemsSource="{Binding VehiculoOptions}"
-                                          DisplayMemberPath="Display"
-                                          SelectedValuePath="Id" />
-
-                                <TextBlock Text="Fecha" FontWeight="SemiBold" />
-                                <DatePicker x:Name="CitaFechaInput" SelectedDateChanged="CitaFechaInput_SelectedDateChanged" />
-
-                                <Grid Margin="0,0,0,6">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="10" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
-                                    <StackPanel Grid.Column="0">
-                                        <TextBlock Text="Hora (HH:mm)" FontWeight="SemiBold" />
-                                        <TextBox x:Name="CitaHoraInput" />
-                                    </StackPanel>
-                                    <StackPanel Grid.Column="2">
-                                        <TextBlock Text="Duracion (min)" FontWeight="SemiBold" />
-                                        <TextBox x:Name="CitaDuracionInput" />
-                                    </StackPanel>
-                                </Grid>
-
-                                <TextBlock Text="Estado" FontWeight="SemiBold" />
-                                <ComboBox x:Name="CitaEstadoCombo" ItemsSource="{Binding EstadoCitas}" />
-
-                                <TextBlock Text="Motivo" FontWeight="SemiBold" />
-                                <TextBox x:Name="CitaMotivoInput" />
-
-                                <TextBlock Text="Notas" FontWeight="SemiBold" />
-                                <TextBox x:Name="CitaNotasInput" Height="90" AcceptsReturn="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" />
-
-                                <WrapPanel Margin="0,8,0,0">
-                                    <Button Style="{StaticResource PrimaryButtonStyle}" Content="Guardar cita" Click="GuardarCitaButton_Click" />
-                                    <Button Content="Nuevo" Click="NuevoCitaButton_Click" />
-                                    <Button Content="Eliminar" Click="EliminarCitaButton_Click" />
-                                </WrapPanel>
-                            </StackPanel>
-                        </ScrollViewer>
-                    </Border>
-
-                    <Border Grid.Column="2" Background="{StaticResource CardBrush}" BorderBrush="{StaticResource BorderBrushSoft}" BorderThickness="1" CornerRadius="10" Padding="12" Effect="{StaticResource CardShadowEffect}">
+                    <Border Background="{StaticResource CardBrush}" BorderBrush="{StaticResource BorderBrushSoft}" BorderThickness="1" CornerRadius="10" Padding="12" Effect="{StaticResource CardShadowEffect}">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
@@ -1038,7 +992,7 @@
 
                             <WrapPanel Grid.Row="1" Margin="4,0,4,8">
                                 <TextBlock Margin="0,0,8,0" VerticalAlignment="Center" Text="Estado" FontWeight="SemiBold" />
-                                <ComboBox x:Name="AgendaFiltroEstadoCombo" Width="170" ItemsSource="{Binding EstadoCitasConTodos}" SelectionChanged="AgendaFiltroEstadoCombo_SelectionChanged" />
+                                <ComboBox x:Name="AgendaFiltroEstadoCombo" Width="170" ItemsSource="{Binding EstadoSolicitudesConTodos}" SelectionChanged="AgendaFiltroEstadoCombo_SelectionChanged" />
                             </WrapPanel>
 
                             <UniformGrid Grid.Row="2" Columns="7" Margin="4,0,4,6">
@@ -1057,52 +1011,52 @@
                                         <UniformGrid Columns="7" />
                                     </ItemsPanelTemplate>
                                 </ItemsControl.ItemsPanel>
-                                                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <Button Click="AgendaDiaButton_Click" Style="{x:Null}" Margin="3" Padding="0" BorderThickness="0" Background="Transparent">
-                                        <Border x:Name="DayCellBorder" CornerRadius="8" BorderBrush="#D6E2F2" BorderThickness="1" Background="White" Padding="10" MinHeight="124">
-                                            <Grid>
-                                                <Border x:Name="DayNumberBadge"
-                                                        HorizontalAlignment="Left"
-                                                        VerticalAlignment="Top"
-                                                        CornerRadius="10"
-                                                        Padding="8,3"
-                                                        Background="{Binding DayNumberBackground}">
-                                                    <TextBlock x:Name="DayNumberText"
-                                                               FontWeight="SemiBold"
-                                                               Foreground="{Binding DayNumberForeground}"
-                                                               Text="{Binding DayNumber}" />
-                                                </Border>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Button Click="AgendaDiaButton_Click" Style="{x:Null}" Margin="3" Padding="0" BorderThickness="0" Background="Transparent">
+                                            <Border x:Name="DayCellBorder" CornerRadius="8" BorderBrush="#D6E2F2" BorderThickness="1" Background="White" Padding="10" MinHeight="124">
+                                                <Grid>
+                                                    <Border x:Name="DayNumberBadge"
+                                                            HorizontalAlignment="Left"
+                                                            VerticalAlignment="Top"
+                                                            CornerRadius="10"
+                                                            Padding="8,3"
+                                                            Background="{Binding DayNumberBackground}">
+                                                        <TextBlock x:Name="DayNumberText"
+                                                                   FontWeight="SemiBold"
+                                                                   Foreground="{Binding DayNumberForeground}"
+                                                                   Text="{Binding DayNumber}" />
+                                                    </Border>
 
-                                                <Ellipse x:Name="DayEventDot"
-                                                         Width="8"
-                                                         Height="8"
-                                                         HorizontalAlignment="Right"
-                                                         VerticalAlignment="Bottom"
-                                                         Margin="0,0,2,2"
-                                                         Fill="{Binding DayNumberBackground}"
-                                                         Visibility="Collapsed" />
-                                            </Grid>
-                                        </Border>
-                                    </Button>
-                                    <DataTemplate.Triggers>
-                                        <DataTrigger Binding="{Binding HasCitas}" Value="True">
-                                            <Setter TargetName="DayEventDot" Property="Visibility" Value="Visible" />
-                                        </DataTrigger>
-                                        <DataTrigger Binding="{Binding IsCurrentMonth}" Value="False">
-                                            <Setter TargetName="DayCellBorder" Property="Opacity" Value="0.55" />
-                                        </DataTrigger>
-                                        <DataTrigger Binding="{Binding IsToday}" Value="True">
-                                            <Setter TargetName="DayCellBorder" Property="BorderBrush" Value="#FF4E8CD5" />
-                                            <Setter TargetName="DayCellBorder" Property="BorderThickness" Value="2" />
-                                        </DataTrigger>
-                                        <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                                            <Setter TargetName="DayCellBorder" Property="Background" Value="#FFDDEBFE" />
-                                            <Setter TargetName="DayCellBorder" Property="BorderBrush" Value="#FF165BB5" />
-                                        </DataTrigger>
-                                    </DataTemplate.Triggers>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
+                                                    <Ellipse x:Name="DayEventDot"
+                                                             Width="8"
+                                                             Height="8"
+                                                             HorizontalAlignment="Right"
+                                                             VerticalAlignment="Bottom"
+                                                             Margin="0,0,2,2"
+                                                             Fill="{Binding DayNumberBackground}"
+                                                             Visibility="Collapsed" />
+                                                </Grid>
+                                            </Border>
+                                        </Button>
+                                        <DataTemplate.Triggers>
+                                            <DataTrigger Binding="{Binding HasCitas}" Value="True">
+                                                <Setter TargetName="DayEventDot" Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding IsCurrentMonth}" Value="False">
+                                                <Setter TargetName="DayCellBorder" Property="Opacity" Value="0.55" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding IsToday}" Value="True">
+                                                <Setter TargetName="DayCellBorder" Property="BorderBrush" Value="#FF4E8CD5" />
+                                                <Setter TargetName="DayCellBorder" Property="BorderThickness" Value="2" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                <Setter TargetName="DayCellBorder" Property="Background" Value="#FFDDEBFE" />
+                                                <Setter TargetName="DayCellBorder" Property="BorderBrush" Value="#FF165BB5" />
+                                            </DataTrigger>
+                                        </DataTemplate.Triggers>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
                             </ItemsControl>
 
                             <TextBlock Grid.Row="4" Margin="4,10,4,8" FontWeight="SemiBold" Foreground="{StaticResource MutedTextBrush}" Text="{Binding AgendaResumenDia}" />
@@ -1115,7 +1069,6 @@
                                       AutoGenerateColumns="False"
                                       IsReadOnly="True"
                                       SelectionMode="Single"
-                                      SelectionChanged="CitasDiaGrid_SelectionChanged"
                                       HeadersVisibility="Column"
                                       BorderThickness="0">
                                 <DataGrid.Columns>
@@ -1293,21 +1246,3 @@
         </Border>
     </Grid>
 </Window>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
