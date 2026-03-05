@@ -22,6 +22,12 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private bool _isBusy;
     private string _statusMessage = "Listo para cargar datos.";
 
+    private List<Cliente> _allClientes = new();
+    private List<VehiculoGridRow> _allVehiculos = new();
+    private List<Parte> _allPartes = new();
+    private List<ServicioGridRow> _allServicios = new();
+    private List<Reporte> _allReportes = new();
+
     public ObservableCollection<Cliente> Clientes { get; } = new();
     public ObservableCollection<VehiculoGridRow> Vehiculos { get; } = new();
     public ObservableCollection<Parte> Partes { get; } = new();
@@ -29,8 +35,11 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     public ObservableCollection<Reporte> Reportes { get; } = new();
     public ObservableCollection<ClienteLookupItem> ClienteOptions { get; } = new();
     public ObservableCollection<VehiculoLookupItem> VehiculoOptions { get; } = new();
+    public ObservableCollection<ClienteLookupItem> ClienteFilterOptions { get; } = new();
     public ObservableCollection<string> EstadoClientes { get; } = new(new[] { "activo", "inactivo" });
     public ObservableCollection<string> EstadoVehiculos { get; } = new(new[] { "disponible", "reservado", "en_taller", "vendido" });
+    public ObservableCollection<string> EstadoClientesConTodos { get; } = new(new[] { "Todos", "activo", "inactivo" });
+    public ObservableCollection<string> EstadoVehiculosConTodos { get; } = new(new[] { "Todos", "disponible", "reservado", "en_taller", "vendido" });
 
     public bool IsBusy
     {
@@ -77,6 +86,15 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         VehiculoEstadoCombo.SelectedItem = "disponible";
         ServicioFechaInput.SelectedDate = DateTime.Today;
         ReporteGeneradoElInput.SelectedDate = DateTime.Today;
+
+        ClientesFiltroEstadoCombo.SelectedItem = "Todos";
+        VehiculosFiltroEstadoCombo.SelectedItem = "Todos";
+        VehiculosFiltroClienteCombo.SelectedValue = null;
+        ServiciosFiltroDesdeInput.SelectedDate = null;
+        ServiciosFiltroHastaInput.SelectedDate = null;
+        ReportesFiltroDesdeInput.SelectedDate = null;
+        ReportesFiltroHastaInput.SelectedDate = null;
+
         await RefreshAllAsync("Aplicacion lista.");
     }
 
@@ -119,23 +137,22 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             .OrderBy(x => x.Nombre)
             .ToListAsync();
 
-        Clientes.Clear();
-        foreach (var cliente in clientes)
-        {
-            Clientes.Add(cliente);
-        }
+        _allClientes = clientes;
 
         ClienteOptions.Clear();
         ClienteOptions.Add(new ClienteLookupItem { Id = null, Display = "Sin cliente asignado" });
+
+        ClienteFilterOptions.Clear();
+        ClienteFilterOptions.Add(new ClienteLookupItem { Id = null, Display = "Todos los clientes" });
+
         foreach (var cliente in clientes)
         {
-            ClienteOptions.Add(
-                new ClienteLookupItem
-                {
-                    Id = cliente.Id,
-                    Display = $"{cliente.Nombre} ({cliente.Telefono ?? "sin telefono"})",
-                });
+            var label = $"{cliente.Nombre} ({cliente.Telefono ?? "sin telefono"})";
+            ClienteOptions.Add(new ClienteLookupItem { Id = cliente.Id, Display = label });
+            ClienteFilterOptions.Add(new ClienteLookupItem { Id = cliente.Id, Display = label });
         }
+
+        ApplyClientesFilters();
     }
 
     private async Task LoadVehiculosAsync()
@@ -147,11 +164,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             .OrderByDescending(x => x.CreatedAt)
             .ToListAsync();
 
-        Vehiculos.Clear();
-        foreach (var vehiculo in vehiculos)
-        {
-            Vehiculos.Add(
-                new VehiculoGridRow
+        _allVehiculos = vehiculos
+            .Select(
+                vehiculo => new VehiculoGridRow
                 {
                     Id = vehiculo.Id,
                     Patente = vehiculo.Patente,
@@ -162,8 +177,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                     Estado = vehiculo.Estado,
                     ClienteId = vehiculo.ClienteId,
                     ClienteNombre = vehiculo.Cliente?.Nombre ?? "Sin cliente",
-                });
-        }
+                })
+            .ToList();
 
         VehiculoOptions.Clear();
         foreach (var vehiculo in vehiculos.OrderBy(x => x.Patente).ThenBy(x => x.Marca).ThenBy(x => x.Modelo))
@@ -177,6 +192,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                     Display = $"{patente} · {vehiculo.Marca} {vehiculo.Modelo} ({cliente})",
                 });
         }
+
+        ApplyVehiculosFilters();
     }
 
     private async Task LoadPartesAsync()
@@ -187,11 +204,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             .OrderBy(x => x.Nombre)
             .ToListAsync();
 
-        Partes.Clear();
-        foreach (var parte in partes)
-        {
-            Partes.Add(parte);
-        }
+        _allPartes = partes;
+        ApplyPartesFilters();
     }
 
     private async Task LoadServiciosAsync()
@@ -205,11 +219,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             .ThenByDescending(x => x.CreatedAt)
             .ToListAsync();
 
-        Servicios.Clear();
-        foreach (var servicio in servicios)
-        {
-            Servicios.Add(
-                new ServicioGridRow
+        _allServicios = servicios
+            .Select(
+                servicio => new ServicioGridRow
                 {
                     Id = servicio.Id,
                     VehiculoId = servicio.VehiculoId,
@@ -223,8 +235,10 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                     Kilometraje = servicio.Kilometraje,
                     Costo = servicio.Costo,
                     Notas = servicio.Notas,
-                });
-        }
+                })
+            .ToList();
+
+        ApplyServiciosFilters();
     }
 
     private async Task LoadReportesAsync()
@@ -236,11 +250,215 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             .ThenByDescending(x => x.CreatedAt)
             .ToListAsync();
 
-        Reportes.Clear();
-        foreach (var reporte in reportes)
+        _allReportes = reportes;
+        ApplyReportesFilters();
+    }
+
+    private void AnyFilter_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+    {
+        ApplyAllFilters();
+    }
+
+    private void AnyFilter_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+    {
+        ApplyAllFilters();
+    }
+
+    private void LimpiarFiltroClientesButton_Click(object sender, RoutedEventArgs e)
+    {
+        ClientesFiltroTextoInput.Text = string.Empty;
+        ClientesFiltroEstadoCombo.SelectedItem = "Todos";
+        ApplyClientesFilters();
+    }
+
+    private void LimpiarFiltroVehiculosButton_Click(object sender, RoutedEventArgs e)
+    {
+        VehiculosFiltroTextoInput.Text = string.Empty;
+        VehiculosFiltroEstadoCombo.SelectedItem = "Todos";
+        VehiculosFiltroClienteCombo.SelectedValue = null;
+        ApplyVehiculosFilters();
+    }
+
+    private void LimpiarFiltroPartesButton_Click(object sender, RoutedEventArgs e)
+    {
+        PartesFiltroTextoInput.Text = string.Empty;
+        ApplyPartesFilters();
+    }
+
+    private void LimpiarFiltroServiciosButton_Click(object sender, RoutedEventArgs e)
+    {
+        ServiciosFiltroPatenteInput.Text = string.Empty;
+        ServiciosFiltroClienteInput.Text = string.Empty;
+        ServiciosFiltroDesdeInput.SelectedDate = null;
+        ServiciosFiltroHastaInput.SelectedDate = null;
+        ApplyServiciosFilters();
+    }
+
+    private void LimpiarFiltroReportesButton_Click(object sender, RoutedEventArgs e)
+    {
+        ReportesFiltroTextoInput.Text = string.Empty;
+        ReportesFiltroDesdeInput.SelectedDate = null;
+        ReportesFiltroHastaInput.SelectedDate = null;
+        ApplyReportesFilters();
+    }
+
+    private void ApplyAllFilters()
+    {
+        if (!IsLoaded)
         {
-            Reportes.Add(reporte);
+            return;
         }
+
+        ApplyClientesFilters();
+        ApplyVehiculosFilters();
+        ApplyPartesFilters();
+        ApplyServiciosFilters();
+        ApplyReportesFilters();
+    }
+
+    private void ApplyClientesFilters()
+    {
+        if (!IsLoaded)
+        {
+            return;
+        }
+
+        var query = _allClientes.AsEnumerable();
+        var text = ToNullable(ClientesFiltroTextoInput.Text);
+        var estado = ClientesFiltroEstadoCombo.SelectedItem as string;
+
+        if (!string.IsNullOrWhiteSpace(text))
+        {
+            query = query.Where(
+                x => ContainsIgnoreCase(x.Nombre, text)
+                    || ContainsIgnoreCase(x.Telefono, text)
+                    || ContainsIgnoreCase(x.Email, text));
+        }
+
+        if (!string.IsNullOrWhiteSpace(estado) && !estado.Equals("Todos", StringComparison.OrdinalIgnoreCase))
+        {
+            query = query.Where(x => string.Equals(x.Estado, estado, StringComparison.OrdinalIgnoreCase));
+        }
+
+        ReplaceCollection(Clientes, query.OrderBy(x => x.Nombre));
+    }
+
+    private void ApplyVehiculosFilters()
+    {
+        if (!IsLoaded)
+        {
+            return;
+        }
+
+        var query = _allVehiculos.AsEnumerable();
+        var text = ToNullable(VehiculosFiltroTextoInput.Text);
+        var estado = VehiculosFiltroEstadoCombo.SelectedItem as string;
+        var clienteId = ParseNullableInt(VehiculosFiltroClienteCombo.SelectedValue);
+
+        if (!string.IsNullOrWhiteSpace(text))
+        {
+            query = query.Where(
+                x => ContainsIgnoreCase(x.Patente, text)
+                    || ContainsIgnoreCase(x.Marca, text)
+                    || ContainsIgnoreCase(x.Modelo, text)
+                    || ContainsIgnoreCase(x.ClienteNombre, text));
+        }
+
+        if (!string.IsNullOrWhiteSpace(estado) && !estado.Equals("Todos", StringComparison.OrdinalIgnoreCase))
+        {
+            query = query.Where(x => string.Equals(x.Estado, estado, StringComparison.OrdinalIgnoreCase));
+        }
+
+        if (clienteId.HasValue)
+        {
+            query = query.Where(x => x.ClienteId == clienteId.Value);
+        }
+
+        ReplaceCollection(Vehiculos, query.OrderByDescending(x => x.Id));
+    }
+
+    private void ApplyPartesFilters()
+    {
+        if (!IsLoaded)
+        {
+            return;
+        }
+
+        var query = _allPartes.AsEnumerable();
+        var text = ToNullable(PartesFiltroTextoInput.Text);
+
+        if (!string.IsNullOrWhiteSpace(text))
+        {
+            query = query.Where(x => ContainsIgnoreCase(x.Nombre, text));
+        }
+
+        ReplaceCollection(Partes, query.OrderBy(x => x.Nombre));
+    }
+
+    private void ApplyServiciosFilters()
+    {
+        if (!IsLoaded)
+        {
+            return;
+        }
+
+        var query = _allServicios.AsEnumerable();
+        var patente = ToNullable(ServiciosFiltroPatenteInput.Text);
+        var cliente = ToNullable(ServiciosFiltroClienteInput.Text);
+        var desde = ServiciosFiltroDesdeInput.SelectedDate?.Date;
+        var hasta = ServiciosFiltroHastaInput.SelectedDate?.Date;
+
+        if (!string.IsNullOrWhiteSpace(patente))
+        {
+            query = query.Where(x => ContainsIgnoreCase(x.Patente, patente));
+        }
+
+        if (!string.IsNullOrWhiteSpace(cliente))
+        {
+            query = query.Where(x => ContainsIgnoreCase(x.ClienteNombre, cliente));
+        }
+
+        if (desde.HasValue)
+        {
+            query = query.Where(x => x.Fecha.Date >= desde.Value);
+        }
+
+        if (hasta.HasValue)
+        {
+            query = query.Where(x => x.Fecha.Date <= hasta.Value);
+        }
+
+        ReplaceCollection(Servicios, query.OrderByDescending(x => x.Fecha).ThenByDescending(x => x.Id));
+    }
+
+    private void ApplyReportesFilters()
+    {
+        if (!IsLoaded)
+        {
+            return;
+        }
+
+        var query = _allReportes.AsEnumerable();
+        var text = ToNullable(ReportesFiltroTextoInput.Text);
+        var desde = ReportesFiltroDesdeInput.SelectedDate?.Date;
+        var hasta = ReportesFiltroHastaInput.SelectedDate?.Date;
+
+        if (!string.IsNullOrWhiteSpace(text))
+        {
+            query = query.Where(x => ContainsIgnoreCase(x.Titulo, text) || ContainsIgnoreCase(x.Periodo, text));
+        }
+
+        if (desde.HasValue)
+        {
+            query = query.Where(x => x.GeneradoEl.Date >= desde.Value);
+        }
+
+        if (hasta.HasValue)
+        {
+            query = query.Where(x => x.GeneradoEl.Date <= hasta.Value);
+        }
+
+        ReplaceCollection(Reportes, query.OrderByDescending(x => x.GeneradoEl).ThenByDescending(x => x.Id));
     }
 
     private async void RefreshButton_Click(object sender, RoutedEventArgs e)
@@ -1125,6 +1343,30 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         };
     }
 
+    private static bool ContainsIgnoreCase(string? source, string? text)
+    {
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            return true;
+        }
+
+        if (string.IsNullOrWhiteSpace(source))
+        {
+            return false;
+        }
+
+        return source.Contains(text, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static void ReplaceCollection<T>(ObservableCollection<T> target, IEnumerable<T> source)
+    {
+        target.Clear();
+        foreach (var item in source)
+        {
+            target.Add(item);
+        }
+    }
+
     private static string BuildLegacyImportDefaultPath()
     {
         return Path.GetFullPath(
@@ -1193,6 +1435,10 @@ public sealed class ServicioGridRow
     public decimal Costo { get; init; }
     public string? Notas { get; init; }
 }
+
+
+
+
 
 
 

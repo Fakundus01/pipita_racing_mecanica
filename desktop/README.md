@@ -1,4 +1,4 @@
-﻿# Pipita Desktop (fase 1-4)
+﻿# Pipita Desktop (fase 1-5)
 
 Migracion a app de escritorio con .NET 8 + WPF.
 
@@ -8,6 +8,7 @@ Migracion a app de escritorio con .NET 8 + WPF.
 - Pantallas de carga para clientes, vehiculos, partes, servicios y reportes (alta, edicion y eliminacion).
 - Exportacion a Excel profesional (hoja resumen + tablas por modulo con estilo, filtros y formatos).
 - Importacion de datos legacy desde una DB SQLite existente (reemplaza datos actuales).
+- Filtros rapidos en todas las grillas (texto, estado, cliente y rangos de fechas segun modulo).
 
 ## Estructura
 - `desktop/src/PipitaDesktop`: proyecto WPF.

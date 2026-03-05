@@ -130,10 +130,18 @@
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
                                 <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
                             <TextBlock Margin="8,4,8,10" Text="Clientes cargados" FontSize="16" FontWeight="SemiBold" />
-                            <DataGrid Grid.Row="1"
+                            <StackPanel Grid.Row="1" Margin="8,0,8,10">
+                                <WrapPanel>
+                                    <TextBox x:Name="ClientesFiltroTextoInput" Width="260" ToolTip="Buscar por nombre, telefono o email" TextChanged="AnyFilter_TextChanged" />
+                                    <ComboBox x:Name="ClientesFiltroEstadoCombo" Width="160" ItemsSource="{Binding EstadoClientesConTodos}" SelectionChanged="AnyFilter_SelectionChanged" />
+                                    <Button Content="Limpiar" Click="LimpiarFiltroClientesButton_Click" />
+                                </WrapPanel>
+                            </StackPanel>
+                            <DataGrid Grid.Row="2"
                                       x:Name="ClientesGrid"
                                       ItemsSource="{Binding Clientes}"
                                       AutoGenerateColumns="False"
@@ -206,10 +214,19 @@
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
                                 <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
                             <TextBlock Margin="8,4,8,10" Text="Vehiculos cargados" FontSize="16" FontWeight="SemiBold" />
-                            <DataGrid Grid.Row="1"
+                            <StackPanel Grid.Row="1" Margin="8,0,8,10">
+                                <WrapPanel>
+                                    <TextBox x:Name="VehiculosFiltroTextoInput" Width="230" ToolTip="Buscar por patente, marca o modelo" TextChanged="AnyFilter_TextChanged" />
+                                    <ComboBox x:Name="VehiculosFiltroEstadoCombo" Width="160" ItemsSource="{Binding EstadoVehiculosConTodos}" SelectionChanged="AnyFilter_SelectionChanged" />
+                                    <ComboBox x:Name="VehiculosFiltroClienteCombo" Width="220" ItemsSource="{Binding ClienteFilterOptions}" DisplayMemberPath="Display" SelectedValuePath="Id" SelectionChanged="AnyFilter_SelectionChanged" />
+                                    <Button Content="Limpiar" Click="LimpiarFiltroVehiculosButton_Click" />
+                                </WrapPanel>
+                            </StackPanel>
+                            <DataGrid Grid.Row="2"
                                       x:Name="VehiculosGrid"
                                       ItemsSource="{Binding Vehiculos}"
                                       AutoGenerateColumns="False"
@@ -270,10 +287,17 @@
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
                                 <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
                             <TextBlock Margin="8,4,8,10" Text="Partes cargadas" FontSize="16" FontWeight="SemiBold" />
-                            <DataGrid Grid.Row="1"
+                            <StackPanel Grid.Row="1" Margin="8,0,8,10">
+                                <WrapPanel>
+                                    <TextBox x:Name="PartesFiltroTextoInput" Width="320" ToolTip="Buscar por nombre" TextChanged="AnyFilter_TextChanged" />
+                                    <Button Content="Limpiar" Click="LimpiarFiltroPartesButton_Click" />
+                                </WrapPanel>
+                            </StackPanel>
+                            <DataGrid Grid.Row="2"
                                       x:Name="PartesGrid"
                                       ItemsSource="{Binding Partes}"
                                       AutoGenerateColumns="False"
@@ -343,10 +367,20 @@
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
                                 <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
                             <TextBlock Margin="8,4,8,10" Text="Servicios cargados" FontSize="16" FontWeight="SemiBold" />
-                            <DataGrid Grid.Row="1"
+                            <StackPanel Grid.Row="1" Margin="8,0,8,10">
+                                <WrapPanel>
+                                    <TextBox x:Name="ServiciosFiltroPatenteInput" Width="170" ToolTip="Filtrar por patente" TextChanged="AnyFilter_TextChanged" />
+                                    <TextBox x:Name="ServiciosFiltroClienteInput" Width="190" ToolTip="Filtrar por cliente" TextChanged="AnyFilter_TextChanged" />
+                                    <DatePicker x:Name="ServiciosFiltroDesdeInput" SelectedDateChanged="AnyFilter_SelectionChanged" />
+                                    <DatePicker x:Name="ServiciosFiltroHastaInput" SelectedDateChanged="AnyFilter_SelectionChanged" />
+                                    <Button Content="Limpiar" Click="LimpiarFiltroServiciosButton_Click" />
+                                </WrapPanel>
+                            </StackPanel>
+                            <DataGrid Grid.Row="2"
                                       x:Name="ServiciosGrid"
                                       ItemsSource="{Binding Servicios}"
                                       AutoGenerateColumns="False"
@@ -407,10 +441,19 @@
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
                                 <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
                             <TextBlock Margin="8,4,8,10" Text="Reportes cargados" FontSize="16" FontWeight="SemiBold" />
-                            <DataGrid Grid.Row="1"
+                            <StackPanel Grid.Row="1" Margin="8,0,8,10">
+                                <WrapPanel>
+                                    <TextBox x:Name="ReportesFiltroTextoInput" Width="240" ToolTip="Filtrar por titulo o periodo" TextChanged="AnyFilter_TextChanged" />
+                                    <DatePicker x:Name="ReportesFiltroDesdeInput" SelectedDateChanged="AnyFilter_SelectionChanged" />
+                                    <DatePicker x:Name="ReportesFiltroHastaInput" SelectedDateChanged="AnyFilter_SelectionChanged" />
+                                    <Button Content="Limpiar" Click="LimpiarFiltroReportesButton_Click" />
+                                </WrapPanel>
+                            </StackPanel>
+                            <DataGrid Grid.Row="2"
                                       x:Name="ReportesGrid"
                                       ItemsSource="{Binding Reportes}"
                                       AutoGenerateColumns="False"
@@ -438,4 +481,5 @@
         </Border>
     </Grid>
 </Window>
+
 
