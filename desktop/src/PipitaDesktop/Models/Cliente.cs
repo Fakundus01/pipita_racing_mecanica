@@ -1,0 +1,11 @@
+﻿namespace PipitaDesktop.Models;
+
+public sealed class Cliente : BaseEntity
+{
+    public string Nombre { get; set; } = string.Empty;
+    public string? Telefono { get; set; }
+    public string? Email { get; set; }
+    public string Estado { get; set; } = "activo";
+
+    public ICollection<Vehiculo> Vehiculos { get; set; } = new List<Vehiculo>();
+}

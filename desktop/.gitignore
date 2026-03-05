@@ -1,0 +1,9 @@
+﻿# Desktop build artifacts and local tooling folders
+.appdata/
+.dotnet/
+.nuget/
+.templateengine/
+
+# .NET build output
+**/bin/
+**/obj/
