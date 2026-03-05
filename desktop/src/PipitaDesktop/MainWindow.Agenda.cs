@@ -110,8 +110,8 @@ public partial class MainWindow
         var title = firstDayOfMonth.ToString("MMMM yyyy", culture);
         AgendaMesTitulo = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(title);
 
-        var mondayBasedOffset = ((int)firstDayOfMonth.DayOfWeek + 6) % 7;
-        var gridStart = firstDayOfMonth.AddDays(-mondayBasedOffset);
+        var sundayBasedOffset = (int)firstDayOfMonth.DayOfWeek;
+        var gridStart = firstDayOfMonth.AddDays(-sundayBasedOffset);
 
         var citasPorDia = filtered
             .GroupBy(x => x.FechaHoraInicio.Date)
