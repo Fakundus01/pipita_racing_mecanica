@@ -1,4 +1,4 @@
-﻿# Pipita Desktop (fase 1-3)
+﻿# Pipita Desktop (fase 1-4)
 
 Migracion a app de escritorio con .NET 8 + WPF.
 
@@ -7,12 +7,14 @@ Migracion a app de escritorio con .NET 8 + WPF.
 - Base local SQLite con EF Core.
 - Pantallas de carga para clientes, vehiculos, partes, servicios y reportes (alta, edicion y eliminacion).
 - Exportacion a Excel profesional (hoja resumen + tablas por modulo con estilo, filtros y formatos).
+- Importacion de datos legacy desde una DB SQLite existente (reemplaza datos actuales).
 
 ## Estructura
 - `desktop/src/PipitaDesktop`: proyecto WPF.
 - `desktop/src/PipitaDesktop/Data`: contexto y configuracion de base local.
 - `desktop/src/PipitaDesktop/Models`: entidades del dominio.
 - `desktop/src/PipitaDesktop/Services/ExcelExportService.cs`: generacion de Excel.
+- `desktop/src/PipitaDesktop/Services/LegacyImportService.cs`: importacion de base legacy.
 
 ## Comandos
 Desde la raiz del repo:
@@ -35,4 +37,3 @@ El ejecutable queda en:
 ## Base de datos
 La app crea automaticamente el archivo SQLite en:
 `%LOCALAPPDATA%\PipitaGarageDesktop\pipita-desktop.db`
-

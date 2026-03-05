@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
+using System.IO;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using Microsoft.EntityFrameworkCore;
@@ -245,6 +246,64 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private async void RefreshButton_Click(object sender, RoutedEventArgs e)
     {
         await RefreshAllAsync();
+    }
+
+    private async void ImportarLegacyDbButton_Click(object sender, RoutedEventArgs e)
+    {
+        var dialog = new OpenFileDialog
+        {
+            Title = "Seleccionar base legacy",
+            Filter = "SQLite DB (*.db;*.sqlite)|*.db;*.sqlite|Todos los archivos (*.*)|*.*",
+            CheckFileExists = true,
+            FileName = "pipita.db",
+        };
+
+        var defaultLegacyPath = BuildLegacyImportDefaultPath();
+        if (File.Exists(defaultLegacyPath))
+        {
+            dialog.InitialDirectory = Path.GetDirectoryName(defaultLegacyPath);
+            dialog.FileName = Path.GetFileName(defaultLegacyPath);
+        }
+
+        if (dialog.ShowDialog(this) != true)
+        {
+            return;
+        }
+
+        var confirm = MessageBox.Show(
+            "Esta accion reemplazara los datos actuales de la app desktop por los datos de la base seleccionada.\n\nQueres continuar?",
+            "Importar base legacy",
+            MessageBoxButton.YesNo,
+            MessageBoxImage.Warning);
+
+        if (confirm != MessageBoxResult.Yes)
+        {
+            return;
+        }
+
+        try
+        {
+            IsBusy = true;
+            using var db = CreateDbContext();
+            var result = await LegacyImportService.ImportAsync(db, dialog.FileName, replaceExistingData: true);
+
+            await RefreshAllAsync(
+                $"Importacion completada. C:{result.Clientes} V:{result.Vehiculos} P:{result.Partes} S:{result.Servicios} R:{result.Reportes}");
+
+            MessageBox.Show(
+                $"Importacion finalizada.\n\nClientes: {result.Clientes}\nVehiculos: {result.Vehiculos}\nPartes: {result.Partes}\nServicios: {result.Servicios}\nReportes: {result.Reportes}",
+                "Importar base legacy",
+                MessageBoxButton.OK,
+                MessageBoxImage.Information);
+        }
+        catch (Exception ex)
+        {
+            ShowError("No se pudo importar la base legacy.", ex);
+        }
+        finally
+        {
+            IsBusy = false;
+        }
     }
 
     private async void ExportarExcelButton_Click(object sender, RoutedEventArgs e)
@@ -1066,6 +1125,21 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         };
     }
 
+    private static string BuildLegacyImportDefaultPath()
+    {
+        return Path.GetFullPath(
+            Path.Combine(
+                AppContext.BaseDirectory,
+                "..",
+                "..",
+                "..",
+                "..",
+                "..",
+                "back",
+                "instance",
+                "pipita.db"));
+    }
+
     private void ShowError(string message, Exception ex)
     {
         MessageBox.Show(
@@ -1119,3 +1193,7 @@ public sealed class ServicioGridRow
     public decimal Costo { get; init; }
     public string? Notas { get; init; }
 }
+
+
+
+
