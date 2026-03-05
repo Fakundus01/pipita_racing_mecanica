@@ -362,10 +362,44 @@
                                     <DataGridTextColumn Header="Estado" Binding="{Binding Estado}" Width="*" SortMemberPath="Estado" />
                                 </DataGrid.Columns>
                             </DataGrid>
-                            <DockPanel Grid.Row="4" Margin="8,14,8,10">
-                                <TextBlock Text="{Binding ClienteHistorialTitulo}" FontSize="16" FontWeight="SemiBold" />
-                                <TextBlock Margin="12,0,0,0" VerticalAlignment="Center" Foreground="#FF4A6075" Text="{Binding ClienteHistorialResumen}" />
-                            </DockPanel>
+                            <StackPanel Grid.Row="4" Margin="8,14,8,10">
+                                <DockPanel>
+                                    <TextBlock Text="{Binding ClienteHistorialTitulo}" FontSize="16" FontWeight="SemiBold" />
+                                    <TextBlock Margin="12,0,0,0" VerticalAlignment="Center" Foreground="#FF4A6075" Text="{Binding ClienteHistorialResumen}" />
+                                </DockPanel>
+                                <UniformGrid Columns="5" Margin="0,12,0,0">
+                                    <Border Margin="0,0,10,0" Padding="12" Background="#FFF7FAFE" BorderBrush="#D8E4F2" BorderThickness="1" CornerRadius="12">
+                                        <StackPanel>
+                                            <TextBlock Foreground="{StaticResource MutedTextBrush}" Text="Autos" />
+                                            <TextBlock Margin="0,6,0,0" FontSize="24" FontWeight="Bold" Text="{Binding ClienteHistorialAutosMetric}" />
+                                        </StackPanel>
+                                    </Border>
+                                    <Border Margin="0,0,10,0" Padding="12" Background="#FFF7FAFE" BorderBrush="#D8E4F2" BorderThickness="1" CornerRadius="12">
+                                        <StackPanel>
+                                            <TextBlock Foreground="{StaticResource MutedTextBrush}" Text="Solicitudes" />
+                                            <TextBlock Margin="0,6,0,0" FontSize="24" FontWeight="Bold" Text="{Binding ClienteHistorialSolicitudesMetric}" />
+                                        </StackPanel>
+                                    </Border>
+                                    <Border Margin="0,0,10,0" Padding="12" Background="#FFFFFBF1" BorderBrush="#E9DDBD" BorderThickness="1" CornerRadius="12">
+                                        <StackPanel>
+                                            <TextBlock Foreground="{StaticResource MutedTextBrush}" Text="Servicios" />
+                                            <TextBlock Margin="0,6,0,0" FontSize="24" FontWeight="Bold" Text="{Binding ClienteHistorialServiciosMetric}" />
+                                        </StackPanel>
+                                    </Border>
+                                    <Border Margin="0,0,10,0" Padding="12" Background="#FFFFF8F3" BorderBrush="#EED9C9" BorderThickness="1" CornerRadius="12">
+                                        <StackPanel>
+                                            <TextBlock Foreground="{StaticResource MutedTextBrush}" Text="Distribuidoras" />
+                                            <TextBlock Margin="0,6,0,0" FontSize="24" FontWeight="Bold" Text="{Binding ClienteHistorialTercerosMetric}" />
+                                        </StackPanel>
+                                    </Border>
+                                    <Border Padding="12" Background="#FFEFF7F2" BorderBrush="#D6E7DB" BorderThickness="1" CornerRadius="12">
+                                        <StackPanel>
+                                            <TextBlock Foreground="{StaticResource MutedTextBrush}" Text="Total operativo" />
+                                            <TextBlock Margin="0,6,0,0" FontSize="24" FontWeight="Bold" Text="{Binding ClienteHistorialTotalMetric}" />
+                                        </StackPanel>
+                                    </Border>
+                                </UniformGrid>
+                            </StackPanel>
                             <Grid Grid.Row="5" Margin="8,0,8,4">
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="*" />

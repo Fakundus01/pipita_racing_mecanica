@@ -1,0 +1,14 @@
+# Build outputs
+**/bin/
+**/obj/
+
+# Publish / distributables
+desktop/dist/
+desktop/src/PipitaDesktop/bin/
+desktop/src/PipitaDesktop/obj/
+*.zip
+*.pdb
+
+# Local app data
+*.db-shm
+*.db-wal

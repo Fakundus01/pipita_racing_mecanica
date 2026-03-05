@@ -43,6 +43,11 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private string _dashboardReportesPeriodo = "0";
     private string _clienteHistorialTitulo = "Historial del cliente";
     private string _clienteHistorialResumen = "Selecciona un cliente para ver su actividad.";
+    private string _clienteHistorialAutosMetric = "0";
+    private string _clienteHistorialSolicitudesMetric = "0";
+    private string _clienteHistorialServiciosMetric = "$0.00";
+    private string _clienteHistorialTercerosMetric = "$0.00";
+    private string _clienteHistorialTotalMetric = "$0.00";
 
     public ObservableCollection<Cliente> Clientes { get; } = new();
     public ObservableCollection<VehiculoGridRow> Vehiculos { get; } = new();
@@ -133,6 +138,36 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     {
         get => _clienteHistorialResumen;
         private set => SetField(ref _clienteHistorialResumen, value);
+    }
+
+    public string ClienteHistorialAutosMetric
+    {
+        get => _clienteHistorialAutosMetric;
+        private set => SetField(ref _clienteHistorialAutosMetric, value);
+    }
+
+    public string ClienteHistorialSolicitudesMetric
+    {
+        get => _clienteHistorialSolicitudesMetric;
+        private set => SetField(ref _clienteHistorialSolicitudesMetric, value);
+    }
+
+    public string ClienteHistorialServiciosMetric
+    {
+        get => _clienteHistorialServiciosMetric;
+        private set => SetField(ref _clienteHistorialServiciosMetric, value);
+    }
+
+    public string ClienteHistorialTercerosMetric
+    {
+        get => _clienteHistorialTercerosMetric;
+        private set => SetField(ref _clienteHistorialTercerosMetric, value);
+    }
+
+    public string ClienteHistorialTotalMetric
+    {
+        get => _clienteHistorialTotalMetric;
+        private set => SetField(ref _clienteHistorialTotalMetric, value);
     }
 
     public bool IsBusy
@@ -1137,11 +1172,13 @@ Queres continuar?";
             using var db = CreateDbContext();
             var result = await ExcelImportService.ImportAsync(db, dialog.FileName, importDialog.ImportMode);
             await RefreshAllAsync($"Importacion Excel completada. +{result.TotalCreated} / ~{result.TotalUpdated} / -{result.TotalDeleted} / !{result.TotalSkipped}");
-            MessageBox.Show(
-                result.BuildSummary(),
-                "Importar Excel",
-                MessageBoxButton.OK,
-                MessageBoxImage.Information);
+            var importSummary = importDialog.ImportMode == ImportExcelMode.SyncExact
+                ? "La base local quedo sincronizada con las hojas presentes del Excel."
+                : "Los cambios del Excel se mezclaron con la base local sin eliminar registros.";
+            new OperationResultDialog("Importacion Excel completada", importSummary, result.BuildSummary())
+            {
+                Owner = this,
+            }.ShowDialog();
         }
         catch (Exception ex)
         {
@@ -1828,6 +1865,15 @@ Queres continuar?";
         ReplaceCollection(ClienteHistorialServicios, servicios);
         ReplaceCollection(ClienteHistorialTrabajosDistribuidora, trabajos);
 
+        var costoServicios = servicios.Sum(x => x.Costo);
+        var gastoTerceros = trabajos.Sum(x => x.Costo);
+        var costoTotal = costoServicios + gastoTerceros;
+
+        ClienteHistorialAutosMetric = vehiculos.Count.ToString(CultureInfo.InvariantCulture);
+        ClienteHistorialSolicitudesMetric = solicitudes.Count.ToString(CultureInfo.InvariantCulture);
+        ClienteHistorialServiciosMetric = costoServicios.ToString("C2", CultureInfo.CurrentCulture);
+        ClienteHistorialTercerosMetric = gastoTerceros.ToString("C2", CultureInfo.CurrentCulture);
+        ClienteHistorialTotalMetric = costoTotal.ToString("C2", CultureInfo.CurrentCulture);
         ClienteHistorialResumen = $"{vehiculos.Count} auto(s), {solicitudes.Count} solicitud(es), {servicios.Count} servicio(s), {trabajos.Count} trabajo(s) externo(s).";
     }
 
@@ -1835,6 +1881,11 @@ Queres continuar?";
     {
         ClienteHistorialTitulo = "Historial del cliente";
         ClienteHistorialResumen = "Selecciona un cliente para ver su actividad.";
+        ClienteHistorialAutosMetric = "0";
+        ClienteHistorialSolicitudesMetric = "0";
+        ClienteHistorialServiciosMetric = "$0.00";
+        ClienteHistorialTercerosMetric = "$0.00";
+        ClienteHistorialTotalMetric = "$0.00";
         ReplaceCollection(ClienteHistorialVehiculos, Array.Empty<VehiculoGridRow>());
         ReplaceCollection(ClienteHistorialSolicitudes, Array.Empty<SolicitudGridRow>());
         ReplaceCollection(ClienteHistorialServicios, Array.Empty<ServicioGridRow>());
