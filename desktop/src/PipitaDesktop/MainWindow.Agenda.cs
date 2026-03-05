@@ -138,9 +138,8 @@ public partial class MainWindow
             citasPorDia.TryGetValue(date, out var citasDia);
             citasDia ??= new List<CitaGridRow>();
 
-            var preview1 = citasDia.Count > 0 ? BuildAgendaPreview(citasDia[0]) : AgendaBadge.Empty;
-            var preview2 = citasDia.Count > 1 ? BuildAgendaPreview(citasDia[1]) : AgendaBadge.Empty;
-            var extra = citasDia.Count > 2 ? $"+{citasDia.Count - 2} mas" : null;
+            var hasCitas = citasDia.Count > 0;
+            var dayBadge = hasCitas ? BuildStatusBadge(citasDia[0].Estado) : null;
 
             cells.Add(
                 new AgendaDayCell
@@ -150,9 +149,9 @@ public partial class MainWindow
                     IsCurrentMonth = date.Month == firstDayOfMonth.Month && date.Year == firstDayOfMonth.Year,
                     IsToday = date == DateTime.Today,
                     IsSelected = date == _agendaFechaSeleccionada.Date,
-                    Preview1 = preview1,
-                    Preview2 = preview2,
-                    ExtraLabel = extra,
+                    HasCitas = hasCitas,
+                    DayNumberBackground = hasCitas ? dayBadge!.Background : CreateBrush("#FFF7FAFF"),
+                    DayNumberForeground = hasCitas ? dayBadge!.Foreground : CreateBrush("#FF344861"),
                     TotalCitas = citasDia.Count,
                 });
         }
@@ -243,17 +242,6 @@ public partial class MainWindow
         return _allCitas
             .Where(x => string.Equals(x.Estado, estado, StringComparison.OrdinalIgnoreCase))
             .ToList();
-    }
-
-    private static AgendaBadge BuildAgendaPreview(CitaGridRow cita)
-    {
-        var badge = BuildStatusBadge(cita.Estado);
-        return new AgendaBadge
-        {
-            Text = $"{cita.FechaHoraInicio:HH:mm} {Shorten(cita.Motivo, 12)}",
-            Background = badge.Background,
-            Foreground = badge.Foreground,
-        };
     }
 
     private static AgendaBadge BuildStatusBadge(string? estado)
@@ -617,9 +605,9 @@ public sealed class AgendaDayCell
     public bool IsCurrentMonth { get; init; }
     public bool IsToday { get; init; }
     public bool IsSelected { get; init; }
-    public AgendaBadge Preview1 { get; init; } = AgendaBadge.Empty;
-    public AgendaBadge Preview2 { get; init; } = AgendaBadge.Empty;
-    public string? ExtraLabel { get; init; }
+    public bool HasCitas { get; init; }
+    public Brush DayNumberBackground { get; init; } = Brushes.Transparent;
+    public Brush DayNumberForeground { get; init; } = Brushes.Black;
     public int TotalCitas { get; init; }
 }
 
@@ -653,3 +641,6 @@ public sealed class AgendaWeekCell
     public Brush Background { get; init; } = Brushes.Transparent;
     public Brush Foreground { get; init; } = Brushes.Transparent;
 }
+
+
+

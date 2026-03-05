@@ -1019,7 +1019,7 @@
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="Auto" />
-                                <RowDefinition Height="3*" />
+                                <RowDefinition Height="4*" />
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="2*" />
@@ -1057,60 +1057,52 @@
                                         <UniformGrid Columns="7" />
                                     </ItemsPanelTemplate>
                                 </ItemsControl.ItemsPanel>
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <Button Click="AgendaDiaButton_Click" Style="{x:Null}" Margin="3" Padding="0" BorderThickness="0" Background="Transparent">
-                                            <Border x:Name="DayCellBorder" CornerRadius="8" BorderBrush="#D6E2F2" BorderThickness="1" Background="White" Padding="6" MinHeight="84">
-                                                <Grid>
-                                                    <Grid.RowDefinitions>
-                                                        <RowDefinition Height="Auto" />
-                                                        <RowDefinition Height="Auto" />
-                                                        <RowDefinition Height="Auto" />
-                                                        <RowDefinition Height="Auto" />
-                                                    </Grid.RowDefinitions>
+                                                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Button Click="AgendaDiaButton_Click" Style="{x:Null}" Margin="3" Padding="0" BorderThickness="0" Background="Transparent">
+                                        <Border x:Name="DayCellBorder" CornerRadius="8" BorderBrush="#D6E2F2" BorderThickness="1" Background="White" Padding="10" MinHeight="124">
+                                            <Grid>
+                                                <Border x:Name="DayNumberBadge"
+                                                        HorizontalAlignment="Left"
+                                                        VerticalAlignment="Top"
+                                                        CornerRadius="10"
+                                                        Padding="8,3"
+                                                        Background="{Binding DayNumberBackground}">
+                                                    <TextBlock x:Name="DayNumberText"
+                                                               FontWeight="SemiBold"
+                                                               Foreground="{Binding DayNumberForeground}"
+                                                               Text="{Binding DayNumber}" />
+                                                </Border>
 
-                                                    <DockPanel>
-                                                        <TextBlock x:Name="DayNumberText" FontWeight="SemiBold" Text="{Binding DayNumber}" />
-                                                        <TextBlock x:Name="DayCountText" DockPanel.Dock="Right" FontSize="10" Foreground="#5A7595" Text="{Binding TotalCitas, StringFormat={}#{0}}" />
-                                                    </DockPanel>
-
-                                                    <Border x:Name="Preview1Badge" Grid.Row="1" Margin="0,4,0,0" Padding="4,1" CornerRadius="4" Background="{Binding Preview1.Background}" Visibility="Collapsed">
-                                                        <TextBlock FontSize="10" Foreground="{Binding Preview1.Foreground}" Text="{Binding Preview1.Text}" />
-                                                    </Border>
-
-                                                    <Border x:Name="Preview2Badge" Grid.Row="2" Margin="0,2,0,0" Padding="4,1" CornerRadius="4" Background="{Binding Preview2.Background}" Visibility="Collapsed">
-                                                        <TextBlock FontSize="10" Foreground="{Binding Preview2.Foreground}" Text="{Binding Preview2.Text}" />
-                                                    </Border>
-
-                                                    <TextBlock Grid.Row="3" Margin="0,2,0,0" FontSize="10" Foreground="#FF4B6A8E" Text="{Binding ExtraLabel}" />
-                                                </Grid>
-                                            </Border>
-                                        </Button>
-                                        <DataTemplate.Triggers>
-                                            <DataTrigger Binding="{Binding TotalCitas}" Value="0">
-                                                <Setter TargetName="DayCountText" Property="Visibility" Value="Collapsed" />
-                                            </DataTrigger>
-                                            <DataTrigger Binding="{Binding Preview1.HasContent}" Value="True">
-                                                <Setter TargetName="Preview1Badge" Property="Visibility" Value="Visible" />
-                                            </DataTrigger>
-                                            <DataTrigger Binding="{Binding Preview2.HasContent}" Value="True">
-                                                <Setter TargetName="Preview2Badge" Property="Visibility" Value="Visible" />
-                                            </DataTrigger>
-                                            <DataTrigger Binding="{Binding IsCurrentMonth}" Value="False">
-                                                <Setter TargetName="DayCellBorder" Property="Opacity" Value="0.55" />
-                                            </DataTrigger>
-                                            <DataTrigger Binding="{Binding IsToday}" Value="True">
-                                                <Setter TargetName="DayCellBorder" Property="BorderBrush" Value="#FF4E8CD5" />
-                                                <Setter TargetName="DayCellBorder" Property="BorderThickness" Value="2" />
-                                                <Setter TargetName="DayNumberText" Property="Foreground" Value="#FF165BB5" />
-                                            </DataTrigger>
-                                            <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                                                <Setter TargetName="DayCellBorder" Property="Background" Value="#FFDDEBFE" />
-                                                <Setter TargetName="DayCellBorder" Property="BorderBrush" Value="#FF165BB5" />
-                                            </DataTrigger>
-                                        </DataTemplate.Triggers>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
+                                                <Ellipse x:Name="DayEventDot"
+                                                         Width="8"
+                                                         Height="8"
+                                                         HorizontalAlignment="Right"
+                                                         VerticalAlignment="Bottom"
+                                                         Margin="0,0,2,2"
+                                                         Fill="{Binding DayNumberBackground}"
+                                                         Visibility="Collapsed" />
+                                            </Grid>
+                                        </Border>
+                                    </Button>
+                                    <DataTemplate.Triggers>
+                                        <DataTrigger Binding="{Binding HasCitas}" Value="True">
+                                            <Setter TargetName="DayEventDot" Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding IsCurrentMonth}" Value="False">
+                                            <Setter TargetName="DayCellBorder" Property="Opacity" Value="0.55" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding IsToday}" Value="True">
+                                            <Setter TargetName="DayCellBorder" Property="BorderBrush" Value="#FF4E8CD5" />
+                                            <Setter TargetName="DayCellBorder" Property="BorderThickness" Value="2" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                            <Setter TargetName="DayCellBorder" Property="Background" Value="#FFDDEBFE" />
+                                            <Setter TargetName="DayCellBorder" Property="BorderBrush" Value="#FF165BB5" />
+                                        </DataTrigger>
+                                    </DataTemplate.Triggers>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
                             </ItemsControl>
 
                             <TextBlock Grid.Row="4" Margin="4,10,4,8" FontWeight="SemiBold" Foreground="{StaticResource MutedTextBrush}" Text="{Binding AgendaResumenDia}" />
@@ -1301,6 +1293,9 @@
         </Border>
     </Grid>
 </Window>
+
+
+
 
 
 
