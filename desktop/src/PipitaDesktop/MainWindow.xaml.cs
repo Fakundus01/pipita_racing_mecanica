@@ -1028,17 +1028,35 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private async void ExportarExcelButton_Click(object sender, RoutedEventArgs e)
     {
-        var masterPath = BuildMasterExcelPath();
+        var exportDirectory = GetExcelExportDirectory();
+        var dialog = new ExportExcelDialog(exportDirectory, GetDefaultExcelFileName())
+        {
+            Owner = this,
+        };
+
+        if (dialog.ShowDialog() != true)
+        {
+            return;
+        }
+
+        var requestedPath = Path.Combine(exportDirectory, dialog.FileName);
+        var exportPath = ResolveExcelExportPath(exportDirectory, dialog.FileName, dialog.ExportMode);
+        var generatedNewPath = !string.Equals(requestedPath, exportPath, StringComparison.OrdinalIgnoreCase);
 
         try
         {
             IsBusy = true;
             using var db = CreateDbContext();
             var data = await ExcelExportService.LoadAsync(db);
-            await Task.Run(() => ExcelExportService.ExportToFile(data, masterPath));
-            StatusMessage = $"Excel maestro actualizado: {masterPath}";
+            await Task.Run(() => ExcelExportService.ExportToFile(data, exportPath));
+            StatusMessage = $"Excel exportado: {exportPath}";
+
+            var extraMessage = generatedNewPath
+                ? "\n\nSe genero un archivo nuevo porque el nombre elegido ya existia."
+                : string.Empty;
+
             MessageBox.Show(
-                $"Exportacion completada.\n\nArchivo maestro:\n{masterPath}",
+                $"Exportacion completada.\n\nArchivo:\n{exportPath}{extraMessage}",
                 "Exportar Excel",
                 MessageBoxButton.OK,
                 MessageBoxImage.Information);
@@ -1046,7 +1064,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         catch (IOException ioEx)
         {
             MessageBox.Show(
-                $"No se pudo actualizar el Excel maestro porque esta en uso.\n\nCierra el archivo y reintenta.\n\nDetalle: {ioEx.Message}",
+                $"No se pudo exportar el Excel porque el archivo esta en uso.\n\nCierra el archivo y reintenta.\n\nDetalle: {ioEx.Message}",
                 "Excel en uso",
                 MessageBoxButton.OK,
                 MessageBoxImage.Warning);
@@ -1060,7 +1078,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             IsBusy = false;
         }
     }
-
     private async void GuardarClienteButton_Click(object sender, RoutedEventArgs e)
     {
         var nombre = ClienteNombreInput.Text.Trim();
@@ -1929,13 +1946,17 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 "..",
                 "..",
                 "..",
-                "..",
                 "back",
                 "instance",
                 "pipita.db"));
     }
 
-    private static string BuildMasterExcelPath()
+    private static string GetDefaultExcelFileName()
+    {
+        return "pipita-garage-maestro.xlsx";
+    }
+
+    private static string GetExcelExportDirectory()
     {
         var documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
         if (string.IsNullOrWhiteSpace(documentsPath))
@@ -1943,8 +1964,46 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             documentsPath = AppContext.BaseDirectory;
         }
 
-        return Path.Combine(documentsPath, "pipita-garage-maestro.xlsx");
+        return documentsPath;
     }
+
+    private static string ResolveExcelExportPath(string directoryPath, string fileName, ExportExcelMode exportMode)
+    {
+        var normalizedFileName = NormalizeExcelFileName(fileName);
+        var requestedPath = Path.Combine(directoryPath, normalizedFileName);
+        if (exportMode == ExportExcelMode.ReplaceExisting || !File.Exists(requestedPath))
+        {
+            return requestedPath;
+        }
+
+        var baseName = Path.GetFileNameWithoutExtension(normalizedFileName);
+        var extension = Path.GetExtension(normalizedFileName);
+        var counter = 2;
+        while (true)
+        {
+            var candidatePath = Path.Combine(directoryPath, $"{baseName} ({counter}){extension}");
+            if (!File.Exists(candidatePath))
+            {
+                return candidatePath;
+            }
+
+            counter++;
+        }
+    }
+
+    private static string NormalizeExcelFileName(string fileName)
+    {
+        var trimmed = fileName.Trim();
+        if (string.IsNullOrWhiteSpace(trimmed))
+        {
+            return GetDefaultExcelFileName();
+        }
+
+        return trimmed.EndsWith(".xlsx", StringComparison.OrdinalIgnoreCase)
+            ? trimmed
+            : $"{trimmed}.xlsx";
+    }
+
     private void ShowError(string message, Exception ex)
     {
         MessageBox.Show(
@@ -2033,4 +2092,7 @@ internal sealed class GridViewState
     public ListSortDirection SortDirection { get; set; } = ListSortDirection.Ascending;
     public string PageText => $"Pagina {Page}/{TotalPages} - {TotalItems} registros";
 }
+
+
+
 
