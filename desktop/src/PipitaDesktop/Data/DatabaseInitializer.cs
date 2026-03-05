@@ -47,13 +47,13 @@ public static class DatabaseInitializer
         db.Database.ExecuteSqlRaw("CREATE INDEX IF NOT EXISTS IX_solicitudes_cliente_VehiculoId ON solicitudes_cliente (VehiculoId);");
         db.Database.ExecuteSqlRaw("CREATE INDEX IF NOT EXISTS IX_solicitudes_cliente_Estado ON solicitudes_cliente (Estado);");
         db.Database.ExecuteSqlRaw("CREATE INDEX IF NOT EXISTS IX_solicitudes_cliente_FechaSolicitud ON solicitudes_cliente (FechaSolicitud);");
-        db.Database.ExecuteSqlRaw("CREATE INDEX IF NOT EXISTS IX_solicitudes_cliente_FechaHoraCita ON solicitudes_cliente (FechaHoraCita);");
 
         EnsureColumnExists(db, "solicitudes_cliente", "FechaHoraCita", "TEXT NULL");
         EnsureColumnExists(db, "solicitudes_cliente", "DuracionMinutos", "INTEGER NOT NULL DEFAULT 60");
 
         db.Database.ExecuteSqlRaw("UPDATE solicitudes_cliente SET FechaHoraCita = COALESCE(FechaHoraCita, FechaSolicitud);");
         db.Database.ExecuteSqlRaw("UPDATE solicitudes_cliente SET DuracionMinutos = COALESCE(DuracionMinutos, 60) WHERE DuracionMinutos IS NULL OR DuracionMinutos <= 0;");
+        db.Database.ExecuteSqlRaw("CREATE INDEX IF NOT EXISTS IX_solicitudes_cliente_FechaHoraCita ON solicitudes_cliente (FechaHoraCita);");
 
         db.Database.ExecuteSqlRaw(
             @"CREATE TABLE IF NOT EXISTS distribuidoras (
