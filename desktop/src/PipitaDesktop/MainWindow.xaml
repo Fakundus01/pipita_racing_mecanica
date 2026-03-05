@@ -1,4 +1,4 @@
-<Window x:Class="PipitaDesktop.MainWindow"
+﻿<Window x:Class="PipitaDesktop.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -962,7 +962,7 @@
                         <ScrollViewer VerticalScrollBarVisibility="Auto">
                             <StackPanel>
                                 <TextBlock Text="Nueva cita" FontSize="18" FontWeight="SemiBold" />
-                                <TextBlock Margin="0,4,0,14" Text="Agenda de turnos del taller con vista mensual." Foreground="{StaticResource MutedTextBrush}" />
+                                <TextBlock Margin="0,4,0,14" Text="Agenda de turnos del taller (mes, dia y semana)." Foreground="{StaticResource MutedTextBrush}" />
 
                                 <TextBlock Text="Cliente" FontWeight="SemiBold" />
                                 <ComboBox x:Name="CitaClienteCombo"
@@ -977,7 +977,7 @@
                                           SelectedValuePath="Id" />
 
                                 <TextBlock Text="Fecha" FontWeight="SemiBold" />
-                                <DatePicker x:Name="CitaFechaInput" />
+                                <DatePicker x:Name="CitaFechaInput" SelectedDateChanged="CitaFechaInput_SelectedDateChanged" />
 
                                 <Grid Margin="0,0,0,6">
                                     <Grid.ColumnDefinitions>
@@ -1019,8 +1019,10 @@
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="Auto" />
-                                <RowDefinition Height="*" />
+                                <RowDefinition Height="3*" />
                                 <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="2*" />
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="2*" />
                             </Grid.RowDefinitions>
@@ -1119,6 +1121,30 @@
                                     <DataGridTextColumn Header="Motivo" Binding="{Binding Motivo}" Width="2*" />
                                 </DataGrid.Columns>
                             </DataGrid>
+
+                            <DockPanel Grid.Row="7" Margin="4,10,4,8">
+                                <TextBlock Text="Vista semanal" FontSize="16" FontWeight="SemiBold" />
+                                <TextBlock Margin="10,0,0,0" VerticalAlignment="Center" Foreground="{StaticResource MutedTextBrush}" Text="{Binding AgendaSemanaRango}" />
+                            </DockPanel>
+
+                            <DataGrid Grid.Row="8"
+                                      x:Name="AgendaSemanaGrid"
+                                      ItemsSource="{Binding AgendaSemanaSlots}"
+                                      AutoGenerateColumns="False"
+                                      IsReadOnly="True"
+                                      HeadersVisibility="Column"
+                                      BorderThickness="0">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Hora" Binding="{Binding Hora}" Width="*" />
+                                    <DataGridTextColumn Header="Lun" Binding="{Binding Lunes}" Width="*" />
+                                    <DataGridTextColumn Header="Mar" Binding="{Binding Martes}" Width="*" />
+                                    <DataGridTextColumn Header="Mie" Binding="{Binding Miercoles}" Width="*" />
+                                    <DataGridTextColumn Header="Jue" Binding="{Binding Jueves}" Width="*" />
+                                    <DataGridTextColumn Header="Vie" Binding="{Binding Viernes}" Width="*" />
+                                    <DataGridTextColumn Header="Sab" Binding="{Binding Sabado}" Width="*" />
+                                    <DataGridTextColumn Header="Dom" Binding="{Binding Domingo}" Width="*" />
+                                </DataGrid.Columns>
+                            </DataGrid>
                         </Grid>
                     </Border>
                 </Grid>
@@ -1190,6 +1216,7 @@
         </Border>
     </Grid>
 </Window>
+
 
 
 

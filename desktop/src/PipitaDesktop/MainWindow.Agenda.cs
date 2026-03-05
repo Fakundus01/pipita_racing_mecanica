@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
@@ -16,9 +16,11 @@ public partial class MainWindow
 
     private string _agendaMesTitulo = string.Empty;
     private string _agendaResumenDia = "Sin citas para el dia seleccionado.";
+    private string _agendaSemanaRango = string.Empty;
 
     public ObservableCollection<CitaGridRow> CitasDiaSeleccionado { get; } = new();
     public ObservableCollection<AgendaDayCell> AgendaDiasMes { get; } = new();
+    public ObservableCollection<AgendaWeekSlotRow> AgendaSemanaSlots { get; } = new();
 
     public ObservableCollection<string> EstadoCitas { get; } = new(new[] { "pendiente", "confirmada", "en_proceso", "completada", "cancelada" });
     public ObservableCollection<string> EstadoCitasConTodos { get; } = new(new[] { "Todos", "pendiente", "confirmada", "en_proceso", "completada", "cancelada" });
@@ -33,6 +35,12 @@ public partial class MainWindow
     {
         get => _agendaResumenDia;
         private set => SetField(ref _agendaResumenDia, value);
+    }
+
+    public string AgendaSemanaRango
+    {
+        get => _agendaSemanaRango;
+        private set => SetField(ref _agendaSemanaRango, value);
     }
 
     private async Task LoadAgendaAsync()
@@ -77,23 +85,25 @@ public partial class MainWindow
             return;
         }
 
-        var estado = AgendaFiltroEstadoCombo.SelectedItem as string;
+        var filtered = GetAgendaFilteredCitas();
+        ApplyAgendaFilters(filtered);
+    }
+
+    private void ApplyAgendaFilters(List<CitaGridRow> filtered)
+    {
         var selectedDate = _agendaFechaSeleccionada.Date;
 
-        var query = _allCitas
+        var dayItems = filtered
             .Where(x => x.FechaHoraInicio.Date == selectedDate)
-            .AsEnumerable();
+            .OrderBy(x => x.FechaHoraInicio)
+            .ToList();
 
-        if (!string.IsNullOrWhiteSpace(estado) && !estado.Equals("Todos", StringComparison.OrdinalIgnoreCase))
-        {
-            query = query.Where(x => string.Equals(x.Estado, estado, StringComparison.OrdinalIgnoreCase));
-        }
-
-        var dayItems = query.OrderBy(x => x.FechaHoraInicio).ToList();
         ReplaceCollection(CitasDiaSeleccionado, dayItems);
 
         var culture = CultureInfo.GetCultureInfo("es-AR");
         AgendaResumenDia = $"{selectedDate.ToString("dddd dd 'de' MMMM yyyy", culture)} - {dayItems.Count} cita(s)";
+
+        RefreshAgendaWeekView(filtered);
     }
 
     private void RefreshAgendaCalendar()
@@ -101,6 +111,7 @@ public partial class MainWindow
         var firstDayOfMonth = new DateTime(_agendaMesActual.Year, _agendaMesActual.Month, 1);
         _agendaMesActual = firstDayOfMonth;
 
+        var filtered = GetAgendaFilteredCitas();
         var culture = CultureInfo.GetCultureInfo("es-AR");
         var title = firstDayOfMonth.ToString("MMMM yyyy", culture);
         AgendaMesTitulo = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(title);
@@ -108,7 +119,7 @@ public partial class MainWindow
         var mondayBasedOffset = ((int)firstDayOfMonth.DayOfWeek + 6) % 7;
         var gridStart = firstDayOfMonth.AddDays(-mondayBasedOffset);
 
-        var citasPorDia = _allCitas
+        var citasPorDia = filtered
             .GroupBy(x => x.FechaHoraInicio.Date)
             .ToDictionary(x => x.Key, x => x.OrderBy(y => y.FechaHoraInicio).ToList());
 
@@ -139,7 +150,87 @@ public partial class MainWindow
         }
 
         ReplaceCollection(AgendaDiasMes, cells);
-        ApplyAgendaFilters();
+        ApplyAgendaFilters(filtered);
+    }
+
+    private void RefreshAgendaWeekView(List<CitaGridRow> filtered)
+    {
+        var weekStart = GetWeekStartMonday(_agendaFechaSeleccionada);
+        var weekEnd = weekStart.AddDays(6);
+        AgendaSemanaRango = $"Semana {weekStart:dd/MM} - {weekEnd:dd/MM}";
+
+        var citasPorDia = filtered
+            .GroupBy(x => x.FechaHoraInicio.Date)
+            .ToDictionary(x => x.Key, x => x.OrderBy(y => y.FechaHoraInicio).ToList());
+
+        var rows = new List<AgendaWeekSlotRow>();
+        for (var hour = 7; hour <= 21; hour++)
+        {
+            var row = new AgendaWeekSlotRow
+            {
+                Hora = $"{hour:00}:00",
+                Lunes = BuildWeekCell(citasPorDia, weekStart, hour),
+                Martes = BuildWeekCell(citasPorDia, weekStart.AddDays(1), hour),
+                Miercoles = BuildWeekCell(citasPorDia, weekStart.AddDays(2), hour),
+                Jueves = BuildWeekCell(citasPorDia, weekStart.AddDays(3), hour),
+                Viernes = BuildWeekCell(citasPorDia, weekStart.AddDays(4), hour),
+                Sabado = BuildWeekCell(citasPorDia, weekStart.AddDays(5), hour),
+                Domingo = BuildWeekCell(citasPorDia, weekStart.AddDays(6), hour),
+            };
+
+            rows.Add(row);
+        }
+
+        ReplaceCollection(AgendaSemanaSlots, rows);
+    }
+
+    private static DateTime GetWeekStartMonday(DateTime date)
+    {
+        var offset = ((int)date.DayOfWeek + 6) % 7;
+        return date.Date.AddDays(-offset);
+    }
+
+    private static string BuildWeekCell(Dictionary<DateTime, List<CitaGridRow>> citasPorDia, DateTime day, int hour)
+    {
+        if (!citasPorDia.TryGetValue(day.Date, out var dayCitas))
+        {
+            return string.Empty;
+        }
+
+        var slotStart = day.Date.AddHours(hour);
+        var slotEnd = slotStart.AddHours(1);
+
+        var inSlot = dayCitas
+            .Where(cita => cita.FechaHoraInicio < slotEnd && cita.FechaHoraFin > slotStart)
+            .OrderBy(cita => cita.FechaHoraInicio)
+            .ToList();
+
+        if (inSlot.Count == 0)
+        {
+            return string.Empty;
+        }
+
+        var first = inSlot[0];
+        var shortMotivo = first.Motivo.Length <= 12 ? first.Motivo : $"{first.Motivo[..12]}...";
+        if (inSlot.Count == 1)
+        {
+            return $"{first.FechaHoraInicio:HH:mm} {shortMotivo}";
+        }
+
+        return $"{first.FechaHoraInicio:HH:mm} {shortMotivo} +{inSlot.Count - 1}";
+    }
+
+    private List<CitaGridRow> GetAgendaFilteredCitas()
+    {
+        var estado = AgendaFiltroEstadoCombo.SelectedItem as string;
+        if (string.IsNullOrWhiteSpace(estado) || estado.Equals("Todos", StringComparison.OrdinalIgnoreCase))
+        {
+            return _allCitas.ToList();
+        }
+
+        return _allCitas
+            .Where(x => string.Equals(x.Estado, estado, StringComparison.OrdinalIgnoreCase))
+            .ToList();
     }
 
     private static string BuildAgendaPreview(CitaGridRow cita)
@@ -171,11 +262,60 @@ public partial class MainWindow
 
         var fecha = (CitaFechaInput.SelectedDate ?? _agendaFechaSeleccionada).Date;
         var inicio = fecha.Add(hora);
+        var fin = inicio.AddMinutes(duracion);
 
         try
         {
             IsBusy = true;
             using var db = CreateDbContext();
+
+            var dayStart = inicio.Date;
+            var dayEnd = dayStart.AddDays(1);
+            var currentId = _editingCitaId ?? -1;
+
+            var citasMismoDia = await db.Citas
+                .AsNoTracking()
+                .Where(x => x.Id != currentId && x.FechaHoraInicio >= dayStart && x.FechaHoraInicio < dayEnd)
+                .OrderBy(x => x.FechaHoraInicio)
+                .ToListAsync();
+
+            var exacta = citasMismoDia.FirstOrDefault(x => x.FechaHoraInicio == inicio);
+            if (exacta is not null)
+            {
+                MessageBox.Show(
+                    $"No se puede cargar otra cita el mismo dia a la misma hora ({inicio:dd/MM HH:mm}).",
+                    "Conflicto de horario",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+                return;
+            }
+
+            var solapada = citasMismoDia
+                .Select(x => new
+                {
+                    Cita = x,
+                    Inicio = x.FechaHoraInicio,
+                    Fin = x.FechaHoraInicio.AddMinutes(Math.Max(1, x.DuracionMinutos)),
+                })
+                .FirstOrDefault(x => inicio < x.Fin && fin > x.Inicio);
+
+            if (solapada is not null)
+            {
+                var texto = string.Equals(solapada.Cita.Estado, "en_proceso", StringComparison.OrdinalIgnoreCase)
+                    ? $"Tenes en proceso una actividad ese dia de {solapada.Inicio:HH:mm} a {solapada.Fin:HH:mm} y esta cita entra en ese horario. Desea aplicar la cita?"
+                    : $"Ya hay una cita ese dia de {solapada.Inicio:HH:mm} a {solapada.Fin:HH:mm} y esta cita entra en ese horario. Desea aplicar la cita?";
+
+                var confirm = MessageBox.Show(
+                    texto,
+                    "Conflicto de horario",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Question);
+
+                if (confirm != MessageBoxResult.Yes)
+                {
+                    return;
+                }
+            }
 
             Cita cita;
             if (_editingCitaId.HasValue)
@@ -322,7 +462,20 @@ public partial class MainWindow
 
     private void AgendaFiltroEstadoCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        ApplyAgendaFilters();
+        RefreshAgendaCalendar();
+    }
+
+    private void CitaFechaInput_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (!IsLoaded || !CitaFechaInput.SelectedDate.HasValue)
+        {
+            return;
+        }
+
+        var date = CitaFechaInput.SelectedDate.Value.Date;
+        _agendaFechaSeleccionada = date;
+        _agendaMesActual = new DateTime(date.Year, date.Month, 1);
+        RefreshAgendaCalendar();
     }
 
     private void ClearCitaForm()
@@ -373,7 +526,7 @@ public sealed class CitaGridRow
     public string Estado { get; init; } = string.Empty;
     public string Motivo { get; init; } = string.Empty;
     public string? Notas { get; init; }
-    public DateTime FechaHoraFin => FechaHoraInicio.AddMinutes(DuracionMinutos);
+    public DateTime FechaHoraFin => FechaHoraInicio.AddMinutes(Math.Max(1, DuracionMinutos));
 }
 
 public sealed class AgendaDayCell
@@ -387,4 +540,16 @@ public sealed class AgendaDayCell
     public string? Preview2 { get; init; }
     public string? ExtraLabel { get; init; }
     public int TotalCitas { get; init; }
+}
+
+public sealed class AgendaWeekSlotRow
+{
+    public string Hora { get; init; } = string.Empty;
+    public string Lunes { get; init; } = string.Empty;
+    public string Martes { get; init; } = string.Empty;
+    public string Miercoles { get; init; } = string.Empty;
+    public string Jueves { get; init; } = string.Empty;
+    public string Viernes { get; init; } = string.Empty;
+    public string Sabado { get; init; } = string.Empty;
+    public string Domingo { get; init; } = string.Empty;
 }
