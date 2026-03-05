@@ -250,6 +250,7 @@
                 <StackPanel Grid.Column="1" VerticalAlignment="Center">
                     <WrapPanel HorizontalAlignment="Right">
                         <Button Content="Importar DB vieja" Click="ImportarLegacyDbButton_Click" />
+                        <Button Content="Importar Excel" Click="ImportarExcelButton_Click" />
                         <Button Style="{StaticResource PrimaryButtonStyle}" Content="Exportar Excel" Click="ExportarExcelButton_Click" />
                         <Button Content="Actualizar" Click="RefreshButton_Click" />
                     </WrapPanel>

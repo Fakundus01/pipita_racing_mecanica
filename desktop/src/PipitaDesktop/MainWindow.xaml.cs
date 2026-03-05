@@ -1078,6 +1078,60 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             IsBusy = false;
         }
     }
+
+    private async void ImportarExcelButton_Click(object sender, RoutedEventArgs e)
+    {
+        var dialog = new OpenFileDialog
+        {
+            Title = "Seleccionar Excel para importar",
+            Filter = "Excel (*.xlsx)|*.xlsx",
+            CheckFileExists = true,
+        };
+
+        if (dialog.ShowDialog() != true)
+        {
+            return;
+        }
+
+        var confirm = MessageBox.Show(
+            @"Se aplicara una importacion tipo merge desde Excel.
+
+- Actualiza filas con ID
+- Crea filas nuevas sin ID
+- No elimina registros locales
+
+Queres continuar?",
+            "Importar Excel",
+            MessageBoxButton.YesNo,
+            MessageBoxImage.Question);
+
+        if (confirm != MessageBoxResult.Yes)
+        {
+            return;
+        }
+
+        try
+        {
+            IsBusy = true;
+            using var db = CreateDbContext();
+            var result = await ExcelImportService.ImportAsync(db, dialog.FileName);
+            await RefreshAllAsync($"Importacion Excel completada. +{result.TotalCreated} / ~{result.TotalUpdated} / !{result.TotalSkipped}");
+            MessageBox.Show(
+                result.BuildSummary(),
+                "Importar Excel",
+                MessageBoxButton.OK,
+                MessageBoxImage.Information);
+        }
+        catch (Exception ex)
+        {
+            ShowError("No se pudo importar el archivo Excel.", ex);
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
     private async void GuardarClienteButton_Click(object sender, RoutedEventArgs e)
     {
         var nombre = ClienteNombreInput.Text.Trim();
