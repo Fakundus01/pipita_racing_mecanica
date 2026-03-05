@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using Microsoft.EntityFrameworkCore;
 using PipitaDesktop.Models;
 
@@ -56,21 +57,28 @@ public partial class MainWindow
 
         _allCitas = citas
             .Select(
-                cita => new CitaGridRow
+                cita =>
                 {
-                    Id = cita.Id,
-                    ClienteId = cita.ClienteId,
-                    VehiculoId = cita.VehiculoId,
-                    ClienteNombre = cita.Cliente?.Nombre ?? "Sin cliente",
-                    Patente = cita.Vehiculo?.Patente,
-                    VehiculoNombre = cita.Vehiculo is null
-                        ? "Sin vehiculo"
-                        : $"{cita.Vehiculo.Marca} {cita.Vehiculo.Modelo}",
-                    FechaHoraInicio = cita.FechaHoraInicio,
-                    DuracionMinutos = cita.DuracionMinutos,
-                    Estado = cita.Estado,
-                    Motivo = cita.Motivo,
-                    Notas = cita.Notas,
+                    var badge = BuildStatusBadge(cita.Estado);
+                    return new CitaGridRow
+                    {
+                        Id = cita.Id,
+                        ClienteId = cita.ClienteId,
+                        VehiculoId = cita.VehiculoId,
+                        ClienteNombre = cita.Cliente?.Nombre ?? "Sin cliente",
+                        Patente = cita.Vehiculo?.Patente,
+                        VehiculoNombre = cita.Vehiculo is null
+                            ? "Sin vehiculo"
+                            : $"{cita.Vehiculo.Marca} {cita.Vehiculo.Modelo}",
+                        FechaHoraInicio = cita.FechaHoraInicio,
+                        DuracionMinutos = cita.DuracionMinutos,
+                        Estado = cita.Estado,
+                        Motivo = cita.Motivo,
+                        Notas = cita.Notas,
+                        EstadoBadgeText = badge.Text,
+                        EstadoBadgeBackground = badge.Background,
+                        EstadoBadgeForeground = badge.Foreground,
+                    };
                 })
             .ToList();
 
@@ -130,8 +138,8 @@ public partial class MainWindow
             citasPorDia.TryGetValue(date, out var citasDia);
             citasDia ??= new List<CitaGridRow>();
 
-            var preview1 = citasDia.Count > 0 ? BuildAgendaPreview(citasDia[0]) : null;
-            var preview2 = citasDia.Count > 1 ? BuildAgendaPreview(citasDia[1]) : null;
+            var preview1 = citasDia.Count > 0 ? BuildAgendaPreview(citasDia[0]) : AgendaBadge.Empty;
+            var preview2 = citasDia.Count > 1 ? BuildAgendaPreview(citasDia[1]) : AgendaBadge.Empty;
             var extra = citasDia.Count > 2 ? $"+{citasDia.Count - 2} mas" : null;
 
             cells.Add(
@@ -166,19 +174,18 @@ public partial class MainWindow
         var rows = new List<AgendaWeekSlotRow>();
         for (var hour = 7; hour <= 21; hour++)
         {
-            var row = new AgendaWeekSlotRow
-            {
-                Hora = $"{hour:00}:00",
-                Lunes = BuildWeekCell(citasPorDia, weekStart, hour),
-                Martes = BuildWeekCell(citasPorDia, weekStart.AddDays(1), hour),
-                Miercoles = BuildWeekCell(citasPorDia, weekStart.AddDays(2), hour),
-                Jueves = BuildWeekCell(citasPorDia, weekStart.AddDays(3), hour),
-                Viernes = BuildWeekCell(citasPorDia, weekStart.AddDays(4), hour),
-                Sabado = BuildWeekCell(citasPorDia, weekStart.AddDays(5), hour),
-                Domingo = BuildWeekCell(citasPorDia, weekStart.AddDays(6), hour),
-            };
-
-            rows.Add(row);
+            rows.Add(
+                new AgendaWeekSlotRow
+                {
+                    Hora = $"{hour:00}:00",
+                    Lunes = BuildWeekCell(citasPorDia, weekStart, hour),
+                    Martes = BuildWeekCell(citasPorDia, weekStart.AddDays(1), hour),
+                    Miercoles = BuildWeekCell(citasPorDia, weekStart.AddDays(2), hour),
+                    Jueves = BuildWeekCell(citasPorDia, weekStart.AddDays(3), hour),
+                    Viernes = BuildWeekCell(citasPorDia, weekStart.AddDays(4), hour),
+                    Sabado = BuildWeekCell(citasPorDia, weekStart.AddDays(5), hour),
+                    Domingo = BuildWeekCell(citasPorDia, weekStart.AddDays(6), hour),
+                });
         }
 
         ReplaceCollection(AgendaSemanaSlots, rows);
@@ -190,11 +197,11 @@ public partial class MainWindow
         return date.Date.AddDays(-offset);
     }
 
-    private static string BuildWeekCell(Dictionary<DateTime, List<CitaGridRow>> citasPorDia, DateTime day, int hour)
+    private static AgendaWeekCell BuildWeekCell(Dictionary<DateTime, List<CitaGridRow>> citasPorDia, DateTime day, int hour)
     {
         if (!citasPorDia.TryGetValue(day.Date, out var dayCitas))
         {
-            return string.Empty;
+            return AgendaWeekCell.Empty;
         }
 
         var slotStart = day.Date.AddHours(hour);
@@ -207,17 +214,22 @@ public partial class MainWindow
 
         if (inSlot.Count == 0)
         {
-            return string.Empty;
+            return AgendaWeekCell.Empty;
         }
 
         var first = inSlot[0];
-        var shortMotivo = first.Motivo.Length <= 12 ? first.Motivo : $"{first.Motivo[..12]}...";
-        if (inSlot.Count == 1)
-        {
-            return $"{first.FechaHoraInicio:HH:mm} {shortMotivo}";
-        }
+        var badge = BuildStatusBadge(first.Estado);
+        var shortMotivo = Shorten(first.Motivo, 12);
+        var text = inSlot.Count == 1
+            ? $"{first.FechaHoraInicio:HH:mm} {shortMotivo}"
+            : $"{first.FechaHoraInicio:HH:mm} {shortMotivo} +{inSlot.Count - 1}";
 
-        return $"{first.FechaHoraInicio:HH:mm} {shortMotivo} +{inSlot.Count - 1}";
+        return new AgendaWeekCell
+        {
+            Text = text,
+            Background = badge.Background,
+            Foreground = badge.Foreground,
+        };
     }
 
     private List<CitaGridRow> GetAgendaFilteredCitas()
@@ -233,10 +245,76 @@ public partial class MainWindow
             .ToList();
     }
 
-    private static string BuildAgendaPreview(CitaGridRow cita)
+    private static AgendaBadge BuildAgendaPreview(CitaGridRow cita)
     {
-        var raw = $"{cita.FechaHoraInicio:HH:mm} {cita.Motivo}";
-        return raw.Length <= 22 ? raw : $"{raw[..22]}...";
+        var badge = BuildStatusBadge(cita.Estado);
+        return new AgendaBadge
+        {
+            Text = $"{cita.FechaHoraInicio:HH:mm} {Shorten(cita.Motivo, 12)}",
+            Background = badge.Background,
+            Foreground = badge.Foreground,
+        };
+    }
+
+    private static AgendaBadge BuildStatusBadge(string? estado)
+    {
+        var key = estado?.Trim().ToLowerInvariant();
+        return key switch
+        {
+            "pendiente" => new AgendaBadge
+            {
+                Text = "Pendiente",
+                Background = CreateBrush("#FFFDF0C4"),
+                Foreground = CreateBrush("#FF7A4F00"),
+            },
+            "confirmada" => new AgendaBadge
+            {
+                Text = "Confirmada",
+                Background = CreateBrush("#FFD9F1FF"),
+                Foreground = CreateBrush("#FF0B5276"),
+            },
+            "en_proceso" => new AgendaBadge
+            {
+                Text = "En proceso",
+                Background = CreateBrush("#FFFEDFCF"),
+                Foreground = CreateBrush("#FF8A3F00"),
+            },
+            "completada" => new AgendaBadge
+            {
+                Text = "Completada",
+                Background = CreateBrush("#FFDDF7E5"),
+                Foreground = CreateBrush("#FF166B2F"),
+            },
+            "cancelada" => new AgendaBadge
+            {
+                Text = "Cancelada",
+                Background = CreateBrush("#FFF1D9DC"),
+                Foreground = CreateBrush("#FF8E2430"),
+            },
+            _ => new AgendaBadge
+            {
+                Text = "Sin estado",
+                Background = CreateBrush("#FFE9EDF3"),
+                Foreground = CreateBrush("#FF37485D"),
+            },
+        };
+    }
+
+    private static SolidColorBrush CreateBrush(string hex)
+    {
+        var brush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(hex)!);
+        brush.Freeze();
+        return brush;
+    }
+
+    private static string Shorten(string? text, int max)
+    {
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            return string.Empty;
+        }
+
+        return text.Length <= max ? text : $"{text[..max]}...";
     }
 
     private async void GuardarCitaButton_Click(object sender, RoutedEventArgs e)
@@ -526,6 +604,9 @@ public sealed class CitaGridRow
     public string Estado { get; init; } = string.Empty;
     public string Motivo { get; init; } = string.Empty;
     public string? Notas { get; init; }
+    public string EstadoBadgeText { get; init; } = string.Empty;
+    public Brush EstadoBadgeBackground { get; init; } = Brushes.Transparent;
+    public Brush EstadoBadgeForeground { get; init; } = Brushes.Black;
     public DateTime FechaHoraFin => FechaHoraInicio.AddMinutes(Math.Max(1, DuracionMinutos));
 }
 
@@ -536,20 +617,39 @@ public sealed class AgendaDayCell
     public bool IsCurrentMonth { get; init; }
     public bool IsToday { get; init; }
     public bool IsSelected { get; init; }
-    public string? Preview1 { get; init; }
-    public string? Preview2 { get; init; }
+    public AgendaBadge Preview1 { get; init; } = AgendaBadge.Empty;
+    public AgendaBadge Preview2 { get; init; } = AgendaBadge.Empty;
     public string? ExtraLabel { get; init; }
     public int TotalCitas { get; init; }
+}
+
+public sealed class AgendaBadge
+{
+    public static AgendaBadge Empty { get; } = new();
+
+    public string Text { get; init; } = string.Empty;
+    public Brush Background { get; init; } = Brushes.Transparent;
+    public Brush Foreground { get; init; } = Brushes.Transparent;
+    public bool HasContent => !string.IsNullOrWhiteSpace(Text);
 }
 
 public sealed class AgendaWeekSlotRow
 {
     public string Hora { get; init; } = string.Empty;
-    public string Lunes { get; init; } = string.Empty;
-    public string Martes { get; init; } = string.Empty;
-    public string Miercoles { get; init; } = string.Empty;
-    public string Jueves { get; init; } = string.Empty;
-    public string Viernes { get; init; } = string.Empty;
-    public string Sabado { get; init; } = string.Empty;
-    public string Domingo { get; init; } = string.Empty;
+    public AgendaWeekCell Lunes { get; init; } = AgendaWeekCell.Empty;
+    public AgendaWeekCell Martes { get; init; } = AgendaWeekCell.Empty;
+    public AgendaWeekCell Miercoles { get; init; } = AgendaWeekCell.Empty;
+    public AgendaWeekCell Jueves { get; init; } = AgendaWeekCell.Empty;
+    public AgendaWeekCell Viernes { get; init; } = AgendaWeekCell.Empty;
+    public AgendaWeekCell Sabado { get; init; } = AgendaWeekCell.Empty;
+    public AgendaWeekCell Domingo { get; init; } = AgendaWeekCell.Empty;
+}
+
+public sealed class AgendaWeekCell
+{
+    public static AgendaWeekCell Empty { get; } = new();
+
+    public string Text { get; init; } = string.Empty;
+    public Brush Background { get; init; } = Brushes.Transparent;
+    public Brush Foreground { get; init; } = Brushes.Transparent;
 }

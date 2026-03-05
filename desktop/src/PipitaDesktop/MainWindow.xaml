@@ -1068,12 +1068,20 @@
                                                         <RowDefinition Height="Auto" />
                                                         <RowDefinition Height="Auto" />
                                                     </Grid.RowDefinitions>
+
                                                     <DockPanel>
                                                         <TextBlock x:Name="DayNumberText" FontWeight="SemiBold" Text="{Binding DayNumber}" />
                                                         <TextBlock x:Name="DayCountText" DockPanel.Dock="Right" FontSize="10" Foreground="#5A7595" Text="{Binding TotalCitas, StringFormat={}#{0}}" />
                                                     </DockPanel>
-                                                    <TextBlock Grid.Row="1" Margin="0,4,0,0" FontSize="11" Foreground="#FF375A80" Text="{Binding Preview1}" />
-                                                    <TextBlock Grid.Row="2" Margin="0,2,0,0" FontSize="11" Foreground="#FF375A80" Text="{Binding Preview2}" />
+
+                                                    <Border x:Name="Preview1Badge" Grid.Row="1" Margin="0,4,0,0" Padding="4,1" CornerRadius="4" Background="{Binding Preview1.Background}" Visibility="Collapsed">
+                                                        <TextBlock FontSize="10" Foreground="{Binding Preview1.Foreground}" Text="{Binding Preview1.Text}" />
+                                                    </Border>
+
+                                                    <Border x:Name="Preview2Badge" Grid.Row="2" Margin="0,2,0,0" Padding="4,1" CornerRadius="4" Background="{Binding Preview2.Background}" Visibility="Collapsed">
+                                                        <TextBlock FontSize="10" Foreground="{Binding Preview2.Foreground}" Text="{Binding Preview2.Text}" />
+                                                    </Border>
+
                                                     <TextBlock Grid.Row="3" Margin="0,2,0,0" FontSize="10" Foreground="#FF4B6A8E" Text="{Binding ExtraLabel}" />
                                                 </Grid>
                                             </Border>
@@ -1081,6 +1089,12 @@
                                         <DataTemplate.Triggers>
                                             <DataTrigger Binding="{Binding TotalCitas}" Value="0">
                                                 <Setter TargetName="DayCountText" Property="Visibility" Value="Collapsed" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Preview1.HasContent}" Value="True">
+                                                <Setter TargetName="Preview1Badge" Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Preview2.HasContent}" Value="True">
+                                                <Setter TargetName="Preview2Badge" Property="Visibility" Value="Visible" />
                                             </DataTrigger>
                                             <DataTrigger Binding="{Binding IsCurrentMonth}" Value="False">
                                                 <Setter TargetName="DayCellBorder" Property="Opacity" Value="0.55" />
@@ -1117,7 +1131,15 @@
                                     <DataGridTextColumn Header="Fin" Binding="{Binding FechaHoraFin, StringFormat={}{0:HH:mm}}" Width="*" />
                                     <DataGridTextColumn Header="Cliente" Binding="{Binding ClienteNombre}" Width="2*" />
                                     <DataGridTextColumn Header="Patente" Binding="{Binding Patente}" Width="*" />
-                                    <DataGridTextColumn Header="Estado" Binding="{Binding Estado}" Width="*" />
+                                    <DataGridTemplateColumn Header="Estado" Width="*">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Border Background="{Binding EstadoBadgeBackground}" CornerRadius="4" Padding="6,2">
+                                                    <TextBlock Text="{Binding EstadoBadgeText}" Foreground="{Binding EstadoBadgeForeground}" FontSize="10" FontWeight="SemiBold" HorizontalAlignment="Center" />
+                                                </Border>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
                                     <DataGridTextColumn Header="Motivo" Binding="{Binding Motivo}" Width="2*" />
                                 </DataGrid.Columns>
                             </DataGrid>
@@ -1136,13 +1158,76 @@
                                       BorderThickness="0">
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Header="Hora" Binding="{Binding Hora}" Width="*" />
-                                    <DataGridTextColumn Header="Lun" Binding="{Binding Lunes}" Width="*" />
-                                    <DataGridTextColumn Header="Mar" Binding="{Binding Martes}" Width="*" />
-                                    <DataGridTextColumn Header="Mie" Binding="{Binding Miercoles}" Width="*" />
-                                    <DataGridTextColumn Header="Jue" Binding="{Binding Jueves}" Width="*" />
-                                    <DataGridTextColumn Header="Vie" Binding="{Binding Viernes}" Width="*" />
-                                    <DataGridTextColumn Header="Sab" Binding="{Binding Sabado}" Width="*" />
-                                    <DataGridTextColumn Header="Dom" Binding="{Binding Domingo}" Width="*" />
+
+                                    <DataGridTemplateColumn Header="Lun" Width="*">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Border Background="{Binding Lunes.Background}" CornerRadius="4" Padding="4,2" Margin="1">
+                                                    <TextBlock Text="{Binding Lunes.Text}" Foreground="{Binding Lunes.Foreground}" FontSize="10" TextTrimming="CharacterEllipsis" />
+                                                </Border>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+
+                                    <DataGridTemplateColumn Header="Mar" Width="*">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Border Background="{Binding Martes.Background}" CornerRadius="4" Padding="4,2" Margin="1">
+                                                    <TextBlock Text="{Binding Martes.Text}" Foreground="{Binding Martes.Foreground}" FontSize="10" TextTrimming="CharacterEllipsis" />
+                                                </Border>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+
+                                    <DataGridTemplateColumn Header="Mie" Width="*">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Border Background="{Binding Miercoles.Background}" CornerRadius="4" Padding="4,2" Margin="1">
+                                                    <TextBlock Text="{Binding Miercoles.Text}" Foreground="{Binding Miercoles.Foreground}" FontSize="10" TextTrimming="CharacterEllipsis" />
+                                                </Border>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+
+                                    <DataGridTemplateColumn Header="Jue" Width="*">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Border Background="{Binding Jueves.Background}" CornerRadius="4" Padding="4,2" Margin="1">
+                                                    <TextBlock Text="{Binding Jueves.Text}" Foreground="{Binding Jueves.Foreground}" FontSize="10" TextTrimming="CharacterEllipsis" />
+                                                </Border>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+
+                                    <DataGridTemplateColumn Header="Vie" Width="*">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Border Background="{Binding Viernes.Background}" CornerRadius="4" Padding="4,2" Margin="1">
+                                                    <TextBlock Text="{Binding Viernes.Text}" Foreground="{Binding Viernes.Foreground}" FontSize="10" TextTrimming="CharacterEllipsis" />
+                                                </Border>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+
+                                    <DataGridTemplateColumn Header="Sab" Width="*">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Border Background="{Binding Sabado.Background}" CornerRadius="4" Padding="4,2" Margin="1">
+                                                    <TextBlock Text="{Binding Sabado.Text}" Foreground="{Binding Sabado.Foreground}" FontSize="10" TextTrimming="CharacterEllipsis" />
+                                                </Border>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+
+                                    <DataGridTemplateColumn Header="Dom" Width="*">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Border Background="{Binding Domingo.Background}" CornerRadius="4" Padding="4,2" Margin="1">
+                                                    <TextBlock Text="{Binding Domingo.Text}" Foreground="{Binding Domingo.Foreground}" FontSize="10" TextTrimming="CharacterEllipsis" />
+                                                </Border>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
                                 </DataGrid.Columns>
                             </DataGrid>
                         </Grid>
@@ -1216,6 +1301,7 @@
         </Border>
     </Grid>
 </Window>
+
 
 
 
