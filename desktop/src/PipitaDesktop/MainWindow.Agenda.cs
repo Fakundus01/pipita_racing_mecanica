@@ -19,6 +19,9 @@ public partial class MainWindow
     private string _agendaDiaPrimerTurno = "--";
     private string _agendaDiaHorasAsignadas = "0 h";
     private string _agendaSemanaTotalCitas = "0";
+    private string _agendaMesTotalCitas = "0";
+    private string _agendaMesDiasConCitas = "0";
+    private string _agendaMesDiaMasCargado = "--";
 
     public ObservableCollection<CitaGridRow> CitasDiaSeleccionado { get; } = new();
     public ObservableCollection<AgendaDayCell> AgendaDiasMes { get; } = new();
@@ -64,6 +67,24 @@ public partial class MainWindow
     {
         get => _agendaSemanaTotalCitas;
         private set => SetField(ref _agendaSemanaTotalCitas, value);
+    }
+
+    public string AgendaMesTotalCitas
+    {
+        get => _agendaMesTotalCitas;
+        private set => SetField(ref _agendaMesTotalCitas, value);
+    }
+
+    public string AgendaMesDiasConCitas
+    {
+        get => _agendaMesDiasConCitas;
+        private set => SetField(ref _agendaMesDiasConCitas, value);
+    }
+
+    public string AgendaMesDiaMasCargado
+    {
+        get => _agendaMesDiaMasCargado;
+        private set => SetField(ref _agendaMesDiaMasCargado, value);
     }
 
     private Task LoadAgendaAsync()
@@ -150,6 +171,24 @@ public partial class MainWindow
             .GroupBy(x => x.FechaHoraInicio.Date)
             .ToDictionary(x => x.Key, x => x.OrderBy(y => y.FechaHoraInicio).ToList());
 
+        var citasDelMes = filtered
+            .Where(x => x.FechaHoraInicio.Year == firstDayOfMonth.Year && x.FechaHoraInicio.Month == firstDayOfMonth.Month)
+            .ToList();
+        AgendaMesTotalCitas = citasDelMes.Count.ToString(CultureInfo.InvariantCulture);
+        var diasConCitas = citasDelMes
+            .Select(x => x.FechaHoraInicio.Date)
+            .Distinct()
+            .Count();
+        AgendaMesDiasConCitas = diasConCitas.ToString(CultureInfo.InvariantCulture);
+        var diaMasCargado = citasDelMes
+            .GroupBy(x => x.FechaHoraInicio.Date)
+            .OrderByDescending(x => x.Count())
+            .ThenBy(x => x.Key)
+            .FirstOrDefault();
+        AgendaMesDiaMasCargado = diaMasCargado is null
+            ? "--"
+            : $"{diaMasCargado.Key:dd/MM} ({diaMasCargado.Count()})";
+
         var cells = new List<AgendaDayCell>(42);
         for (var i = 0; i < 42; i++)
         {
@@ -158,7 +197,8 @@ public partial class MainWindow
             citasDia ??= new List<CitaGridRow>();
 
             var hasCitas = citasDia.Count > 0;
-            var dayBadge = hasCitas ? BuildStatusBadge(citasDia[0].Estado) : null;
+            var firstCita = hasCitas ? citasDia[0] : null;
+            var dayBadge = hasCitas ? BuildStatusBadge(firstCita!.Estado) : null;
 
             cells.Add(
                 new AgendaDayCell
@@ -172,6 +212,12 @@ public partial class MainWindow
                     DayNumberBackground = hasCitas ? dayBadge!.Background : CreateBrush("#FFF7FAFF"),
                     DayNumberForeground = hasCitas ? dayBadge!.Foreground : CreateBrush("#FF344861"),
                     TotalCitas = citasDia.Count,
+                    PreviewPrimary = firstCita is null ? string.Empty : $"{firstCita.FechaHoraInicio:HH:mm} {Shorten(firstCita.ClienteNombre, 12)}",
+                    PreviewSecondary = citasDia.Count > 1
+                        ? $"+{citasDia.Count - 1} mas"
+                        : dayBadge?.Text ?? string.Empty,
+                    PreviewBadgeBackground = hasCitas ? dayBadge!.Background : Brushes.Transparent,
+                    PreviewBadgeForeground = hasCitas ? dayBadge!.Foreground : Brushes.Transparent,
                 });
         }
 
@@ -412,6 +458,10 @@ public sealed class AgendaDayCell
     public Brush DayNumberBackground { get; init; } = Brushes.Transparent;
     public Brush DayNumberForeground { get; init; } = Brushes.Black;
     public int TotalCitas { get; init; }
+    public string PreviewPrimary { get; init; } = string.Empty;
+    public string PreviewSecondary { get; init; } = string.Empty;
+    public Brush PreviewBadgeBackground { get; init; } = Brushes.Transparent;
+    public Brush PreviewBadgeForeground { get; init; } = Brushes.Black;
 }
 
 public sealed class AgendaBadge

@@ -1060,10 +1060,39 @@
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
                                 <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
 
-                            <DockPanel Grid.Row="0" Margin="2,2,2,12">
+                            <UniformGrid Grid.Row="0" Columns="4" Margin="0,0,0,14">
+                                <Border Margin="0,0,10,0" Padding="14" Background="#FFF8FBFF" BorderBrush="#FFD4DFEC" BorderThickness="1" CornerRadius="12">
+                                    <StackPanel>
+                                        <TextBlock Foreground="{StaticResource MutedTextBrush}" Text="Citas del mes" />
+                                        <TextBlock Margin="0,8,0,0" FontSize="28" FontWeight="Bold" Text="{Binding AgendaMesTotalCitas}" />
+                                    </StackPanel>
+                                </Border>
+                                <Border Margin="0,0,10,0" Padding="14" Background="#FFF3F9FF" BorderBrush="#FFD4DFEC" BorderThickness="1" CornerRadius="12">
+                                    <StackPanel>
+                                        <TextBlock Foreground="{StaticResource MutedTextBrush}" Text="Dias ocupados" />
+                                        <TextBlock Margin="0,8,0,0" FontSize="28" FontWeight="Bold" Text="{Binding AgendaMesDiasConCitas}" />
+                                    </StackPanel>
+                                </Border>
+                                <Border Margin="0,0,10,0" Padding="14" Background="#FFFFF9ED" BorderBrush="#FFE9D9A3" BorderThickness="1" CornerRadius="12">
+                                    <StackPanel>
+                                        <TextBlock Foreground="{StaticResource MutedTextBrush}" Text="Dia mas cargado" />
+                                        <TextBlock Margin="0,8,0,0" FontSize="24" FontWeight="Bold" Text="{Binding AgendaMesDiaMasCargado}" />
+                                    </StackPanel>
+                                </Border>
+                                <Border Padding="14" Background="#FFF4FBF7" BorderBrush="#FFD5E9DC" BorderThickness="1" CornerRadius="12">
+                                    <StackPanel>
+                                        <TextBlock Foreground="{StaticResource MutedTextBrush}" Text="Seleccionado" />
+                                        <TextBlock Margin="0,8,0,0" FontSize="24" FontWeight="Bold" Text="{Binding AgendaDiaTotalCitas, StringFormat={}{0} cita(s)}" />
+                                    </StackPanel>
+                                </Border>
+                            </UniformGrid>
+
+                            <DockPanel Grid.Row="1" Margin="2,2,2,12">
                                 <WrapPanel DockPanel.Dock="Left">
                                     <Button Content="&lt;" Width="42" Click="AgendaMesAnteriorButton_Click" />
                                     <Button Content="Hoy" Click="AgendaHoyButton_Click" />
@@ -1075,13 +1104,31 @@
                                 </WrapPanel>
                             </DockPanel>
 
-                            <Border Grid.Row="1" CornerRadius="10,10,0,0" Background="#FF1676E6" Padding="0,12,0,10">
+                            <WrapPanel Grid.Row="2" Margin="0,0,0,12">
+                                <Border Margin="0,0,10,0" Padding="10,5" Background="#FFD9F1FF" CornerRadius="999">
+                                    <TextBlock Foreground="#FF0B5276" FontWeight="SemiBold" Text="Confirmada" />
+                                </Border>
+                                <Border Margin="0,0,10,0" Padding="10,5" Background="#FFFDF0C4" CornerRadius="999">
+                                    <TextBlock Foreground="#FF7A4F00" FontWeight="SemiBold" Text="Pendiente" />
+                                </Border>
+                                <Border Margin="0,0,10,0" Padding="10,5" Background="#FFFEDFCF" CornerRadius="999">
+                                    <TextBlock Foreground="#FF8A3F00" FontWeight="SemiBold" Text="En proceso" />
+                                </Border>
+                                <Border Margin="0,0,10,0" Padding="10,5" Background="#FFDDF7E5" CornerRadius="999">
+                                    <TextBlock Foreground="#FF166B2F" FontWeight="SemiBold" Text="Completada" />
+                                </Border>
+                                <Border Padding="10,5" Background="#FFF1D9DC" CornerRadius="999">
+                                    <TextBlock Foreground="#FF8E2430" FontWeight="SemiBold" Text="Cancelada" />
+                                </Border>
+                            </WrapPanel>
+
+                            <Border Grid.Row="3" CornerRadius="10,10,0,0" Background="#FF1676E6" Padding="0,12,0,10">
                                 <Grid>
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto" />
                                         <RowDefinition Height="Auto" />
                                     </Grid.RowDefinitions>
-                                    <TextBlock Grid.Row="0" HorizontalAlignment="Center" FontSize="46" FontWeight="Bold" Foreground="White" Text="{Binding AgendaMesTitulo}" />
+                                    <TextBlock Grid.Row="0" HorizontalAlignment="Center" FontSize="42" FontWeight="Bold" Foreground="White" Text="{Binding AgendaMesTitulo}" />
                                     <UniformGrid Grid.Row="1" Columns="7" Margin="0,10,0,0">
                                         <TextBlock HorizontalAlignment="Center" FontWeight="SemiBold" Foreground="White" Text="Dom" />
                                         <TextBlock HorizontalAlignment="Center" FontWeight="SemiBold" Foreground="White" Text="Lun" />
@@ -1094,7 +1141,7 @@
                                 </Grid>
                             </Border>
 
-                            <Border Grid.Row="2" BorderBrush="#FFD2DEEE" BorderThickness="1" Background="White" Padding="0">
+                            <Border Grid.Row="4" BorderBrush="#FFD2DEEE" BorderThickness="1" Background="White" Padding="0">
                                 <ItemsControl ItemsSource="{Binding AgendaDiasMes}">
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
@@ -1104,17 +1151,50 @@
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
                                             <Button Click="AgendaDiaButton_Click" Style="{x:Null}" Margin="0" Padding="0" BorderThickness="0" Background="Transparent">
-                                                <Border x:Name="DayCellBorder" BorderBrush="#FFD5DCE6" BorderThickness="0.5" Background="White" MinHeight="110" Padding="10">
+                                                <Border x:Name="DayCellBorder" BorderBrush="#FFD5DCE6" BorderThickness="0.5" Background="White" MinHeight="132" Padding="10">
                                                     <Grid>
-                                                        <TextBlock x:Name="DayNumberText"
-                                                                   HorizontalAlignment="Right"
-                                                                   VerticalAlignment="Top"
-                                                                   FontSize="34"
-                                                                   FontWeight="SemiBold"
-                                                                   Foreground="#FF1A2A3E"
-                                                                   Text="{Binding DayNumber}" />
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition Height="Auto" />
+                                                            <RowDefinition Height="*" />
+                                                            <RowDefinition Height="Auto" />
+                                                        </Grid.RowDefinitions>
+
+                                                        <Border x:Name="DayNumberBadge"
+                                                                HorizontalAlignment="Right"
+                                                                Padding="10,4"
+                                                                CornerRadius="999"
+                                                                Background="{Binding DayNumberBackground}">
+                                                            <TextBlock x:Name="DayNumberText"
+                                                                       FontSize="24"
+                                                                       FontWeight="Bold"
+                                                                       Foreground="{Binding DayNumberForeground}"
+                                                                       Text="{Binding DayNumber}" />
+                                                        </Border>
+
+                                                        <StackPanel Grid.Row="1" Margin="0,14,0,0" VerticalAlignment="Top">
+                                                            <TextBlock x:Name="DayPreviewPrimary"
+                                                                       FontWeight="SemiBold"
+                                                                       Foreground="#FF203040"
+                                                                       TextWrapping="Wrap"
+                                                                       Visibility="Collapsed"
+                                                                       Text="{Binding PreviewPrimary}" />
+                                                            <Border x:Name="DayPreviewSecondaryBorder"
+                                                                    Margin="0,8,0,0"
+                                                                    Padding="8,3"
+                                                                    CornerRadius="999"
+                                                                    Background="{Binding PreviewBadgeBackground}"
+                                                                    HorizontalAlignment="Left"
+                                                                    Visibility="Collapsed">
+                                                                <TextBlock x:Name="DayPreviewSecondary"
+                                                                           FontSize="10"
+                                                                           FontWeight="SemiBold"
+                                                                           Foreground="{Binding PreviewBadgeForeground}"
+                                                                           Text="{Binding PreviewSecondary}" />
+                                                            </Border>
+                                                        </StackPanel>
 
                                                         <TextBlock x:Name="DayCountText"
+                                                                   Grid.Row="2"
                                                                    HorizontalAlignment="Left"
                                                                    VerticalAlignment="Bottom"
                                                                    FontSize="11"
@@ -1129,6 +1209,8 @@
                                                 <DataTrigger Binding="{Binding HasCitas}" Value="True">
                                                     <Setter TargetName="DayCellBorder" Property="Background" Value="#FFEDF4FF" />
                                                     <Setter TargetName="DayCountText" Property="Visibility" Value="Visible" />
+                                                    <Setter TargetName="DayPreviewPrimary" Property="Visibility" Value="Visible" />
+                                                    <Setter TargetName="DayPreviewSecondaryBorder" Property="Visibility" Value="Visible" />
                                                 </DataTrigger>
                                                 <DataTrigger Binding="{Binding IsCurrentMonth}" Value="False">
                                                     <Setter TargetName="DayCellBorder" Property="Opacity" Value="0.35" />
@@ -1138,7 +1220,7 @@
                                                     <Setter TargetName="DayCellBorder" Property="BorderThickness" Value="2" />
                                                 </DataTrigger>
                                                 <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                                                    <Setter TargetName="DayCellBorder" Property="Background" Value="#FFF4D74C" />
+                                                    <Setter TargetName="DayCellBorder" Property="Background" Value="#FFF6E27A" />
                                                     <Setter TargetName="DayCellBorder" Property="BorderBrush" Value="#FFE1BE28" />
                                                     <Setter TargetName="DayCellBorder" Property="BorderThickness" Value="2" />
                                                 </DataTrigger>
