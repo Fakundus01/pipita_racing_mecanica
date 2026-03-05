@@ -1,4 +1,4 @@
-﻿<Window x:Class="PipitaDesktop.MainWindow"
+<Window x:Class="PipitaDesktop.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -132,6 +132,7 @@
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="*" />
+                                <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
                             <TextBlock Margin="8,4,8,10" Text="Clientes cargados" FontSize="16" FontWeight="SemiBold" />
                             <StackPanel Grid.Row="1" Margin="8,0,8,10">
@@ -148,16 +149,24 @@
                                       IsReadOnly="True"
                                       SelectionMode="Single"
                                       SelectionChanged="ClientesGrid_SelectionChanged"
+                                      Sorting="ClientesGrid_Sorting"
                                       HeadersVisibility="Column"
                                       GridLinesVisibility="Horizontal"
                                       BorderThickness="0">
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn Header="Nombre" Binding="{Binding Nombre}" Width="2*" />
-                                    <DataGridTextColumn Header="Telefono" Binding="{Binding Telefono}" Width="*" />
-                                    <DataGridTextColumn Header="Email" Binding="{Binding Email}" Width="2*" />
-                                    <DataGridTextColumn Header="Estado" Binding="{Binding Estado}" Width="*" />
+                                    <DataGridTextColumn Header="Nombre" Binding="{Binding Nombre}" Width="2*" SortMemberPath="Nombre" />
+                                    <DataGridTextColumn Header="Telefono" Binding="{Binding Telefono}" Width="*" SortMemberPath="Telefono" />
+                                    <DataGridTextColumn Header="Email" Binding="{Binding Email}" Width="2*" SortMemberPath="Email" />
+                                    <DataGridTextColumn Header="Estado" Binding="{Binding Estado}" Width="*" SortMemberPath="Estado" />
                                 </DataGrid.Columns>
                             </DataGrid>
+                            <DockPanel Grid.Row="3" Margin="8,10,8,0">
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" DockPanel.Dock="Right">
+                                    <Button Content="Anterior" IsEnabled="{Binding PuedeRetrocederClientes}" Click="ClientesPaginaAnteriorButton_Click" />
+                                    <Button Content="Siguiente" IsEnabled="{Binding PuedeAvanzarClientes}" Click="ClientesPaginaSiguienteButton_Click" />
+                                </StackPanel>
+                                <TextBlock VerticalAlignment="Center" Foreground="#FF4A6075" Text="{Binding ClientesPaginacionTexto}" />
+                            </DockPanel>
                         </Grid>
                     </Border>
                 </Grid>
@@ -216,6 +225,7 @@
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="*" />
+                                <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
                             <TextBlock Margin="8,4,8,10" Text="Vehiculos cargados" FontSize="16" FontWeight="SemiBold" />
                             <StackPanel Grid.Row="1" Margin="8,0,8,10">
@@ -233,19 +243,27 @@
                                       IsReadOnly="True"
                                       SelectionMode="Single"
                                       SelectionChanged="VehiculosGrid_SelectionChanged"
+                                      Sorting="VehiculosGrid_Sorting"
                                       HeadersVisibility="Column"
                                       GridLinesVisibility="Horizontal"
                                       BorderThickness="0">
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn Header="Patente" Binding="{Binding Patente}" Width="*" />
-                                    <DataGridTextColumn Header="Marca" Binding="{Binding Marca}" Width="*" />
-                                    <DataGridTextColumn Header="Modelo" Binding="{Binding Modelo}" Width="*" />
-                                    <DataGridTextColumn Header="Version" Binding="{Binding Version}" Width="*" />
-                                    <DataGridTextColumn Header="Anio" Binding="{Binding Anio}" Width="*" />
-                                    <DataGridTextColumn Header="Estado" Binding="{Binding Estado}" Width="*" />
-                                    <DataGridTextColumn Header="Cliente" Binding="{Binding ClienteNombre}" Width="2*" />
+                                    <DataGridTextColumn Header="Patente" Binding="{Binding Patente}" Width="*" SortMemberPath="Patente" />
+                                    <DataGridTextColumn Header="Marca" Binding="{Binding Marca}" Width="*" SortMemberPath="Marca" />
+                                    <DataGridTextColumn Header="Modelo" Binding="{Binding Modelo}" Width="*" SortMemberPath="Modelo" />
+                                    <DataGridTextColumn Header="Version" Binding="{Binding Version}" Width="*" SortMemberPath="Version" />
+                                    <DataGridTextColumn Header="Anio" Binding="{Binding Anio}" Width="*" SortMemberPath="Anio" />
+                                    <DataGridTextColumn Header="Estado" Binding="{Binding Estado}" Width="*" SortMemberPath="Estado" />
+                                    <DataGridTextColumn Header="Cliente" Binding="{Binding ClienteNombre}" Width="2*" SortMemberPath="ClienteNombre" />
                                 </DataGrid.Columns>
                             </DataGrid>
+                            <DockPanel Grid.Row="3" Margin="8,10,8,0">
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" DockPanel.Dock="Right">
+                                    <Button Content="Anterior" IsEnabled="{Binding PuedeRetrocederVehiculos}" Click="VehiculosPaginaAnteriorButton_Click" />
+                                    <Button Content="Siguiente" IsEnabled="{Binding PuedeAvanzarVehiculos}" Click="VehiculosPaginaSiguienteButton_Click" />
+                                </StackPanel>
+                                <TextBlock VerticalAlignment="Center" Foreground="#FF4A6075" Text="{Binding VehiculosPaginacionTexto}" />
+                            </DockPanel>
                         </Grid>
                     </Border>
                 </Grid>
@@ -289,6 +307,7 @@
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="*" />
+                                <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
                             <TextBlock Margin="8,4,8,10" Text="Partes cargadas" FontSize="16" FontWeight="SemiBold" />
                             <StackPanel Grid.Row="1" Margin="8,0,8,10">
@@ -304,16 +323,24 @@
                                       IsReadOnly="True"
                                       SelectionMode="Single"
                                       SelectionChanged="PartesGrid_SelectionChanged"
+                                      Sorting="PartesGrid_Sorting"
                                       HeadersVisibility="Column"
                                       GridLinesVisibility="Horizontal"
                                       BorderThickness="0">
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn Header="Nombre" Binding="{Binding Nombre}" Width="2*" />
-                                    <DataGridTextColumn Header="Stock" Binding="{Binding Stock}" Width="*" />
-                                    <DataGridTextColumn Header="Costo" Binding="{Binding Costo, StringFormat={}{0:C2}}" Width="*" />
-                                    <DataGridTextColumn Header="Creado" Binding="{Binding CreatedAt, StringFormat={}{0:dd/MM/yyyy HH:mm}}" Width="*" />
+                                    <DataGridTextColumn Header="Nombre" Binding="{Binding Nombre}" Width="2*" SortMemberPath="Nombre" />
+                                    <DataGridTextColumn Header="Stock" Binding="{Binding Stock}" Width="*" SortMemberPath="Stock" />
+                                    <DataGridTextColumn Header="Costo" Binding="{Binding Costo, StringFormat={}{0:C2}}" Width="*" SortMemberPath="Costo" />
+                                    <DataGridTextColumn Header="Creado" Binding="{Binding CreatedAt, StringFormat={}{0:dd/MM/yyyy HH:mm}}" Width="*" SortMemberPath="CreatedAt" />
                                 </DataGrid.Columns>
                             </DataGrid>
+                            <DockPanel Grid.Row="3" Margin="8,10,8,0">
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" DockPanel.Dock="Right">
+                                    <Button Content="Anterior" IsEnabled="{Binding PuedeRetrocederPartes}" Click="PartesPaginaAnteriorButton_Click" />
+                                    <Button Content="Siguiente" IsEnabled="{Binding PuedeAvanzarPartes}" Click="PartesPaginaSiguienteButton_Click" />
+                                </StackPanel>
+                                <TextBlock VerticalAlignment="Center" Foreground="#FF4A6075" Text="{Binding PartesPaginacionTexto}" />
+                            </DockPanel>
                         </Grid>
                     </Border>
                 </Grid>
@@ -369,6 +396,7 @@
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="*" />
+                                <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
                             <TextBlock Margin="8,4,8,10" Text="Servicios cargados" FontSize="16" FontWeight="SemiBold" />
                             <StackPanel Grid.Row="1" Margin="8,0,8,10">
@@ -387,19 +415,27 @@
                                       IsReadOnly="True"
                                       SelectionMode="Single"
                                       SelectionChanged="ServiciosGrid_SelectionChanged"
+                                      Sorting="ServiciosGrid_Sorting"
                                       HeadersVisibility="Column"
                                       GridLinesVisibility="Horizontal"
                                       BorderThickness="0">
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn Header="Fecha" Binding="{Binding Fecha, StringFormat={}{0:dd/MM/yyyy}}" Width="*" />
-                                    <DataGridTextColumn Header="Patente" Binding="{Binding Patente}" Width="*" />
-                                    <DataGridTextColumn Header="Vehiculo" Binding="{Binding VehiculoNombre}" Width="2*" />
-                                    <DataGridTextColumn Header="Cliente" Binding="{Binding ClienteNombre}" Width="2*" />
-                                    <DataGridTextColumn Header="Descripcion" Binding="{Binding Descripcion}" Width="2*" />
-                                    <DataGridTextColumn Header="KM" Binding="{Binding Kilometraje}" Width="*" />
-                                    <DataGridTextColumn Header="Costo" Binding="{Binding Costo, StringFormat={}{0:C2}}" Width="*" />
+                                    <DataGridTextColumn Header="Fecha" Binding="{Binding Fecha, StringFormat={}{0:dd/MM/yyyy}}" Width="*" SortMemberPath="Fecha" />
+                                    <DataGridTextColumn Header="Patente" Binding="{Binding Patente}" Width="*" SortMemberPath="Patente" />
+                                    <DataGridTextColumn Header="Vehiculo" Binding="{Binding VehiculoNombre}" Width="2*" SortMemberPath="VehiculoNombre" />
+                                    <DataGridTextColumn Header="Cliente" Binding="{Binding ClienteNombre}" Width="2*" SortMemberPath="ClienteNombre" />
+                                    <DataGridTextColumn Header="Descripcion" Binding="{Binding Descripcion}" Width="2*" SortMemberPath="Descripcion" />
+                                    <DataGridTextColumn Header="KM" Binding="{Binding Kilometraje}" Width="*" SortMemberPath="Kilometraje" />
+                                    <DataGridTextColumn Header="Costo" Binding="{Binding Costo, StringFormat={}{0:C2}}" Width="*" SortMemberPath="Costo" />
                                 </DataGrid.Columns>
                             </DataGrid>
+                            <DockPanel Grid.Row="3" Margin="8,10,8,0">
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" DockPanel.Dock="Right">
+                                    <Button Content="Anterior" IsEnabled="{Binding PuedeRetrocederServicios}" Click="ServiciosPaginaAnteriorButton_Click" />
+                                    <Button Content="Siguiente" IsEnabled="{Binding PuedeAvanzarServicios}" Click="ServiciosPaginaSiguienteButton_Click" />
+                                </StackPanel>
+                                <TextBlock VerticalAlignment="Center" Foreground="#FF4A6075" Text="{Binding ServiciosPaginacionTexto}" />
+                            </DockPanel>
                         </Grid>
                     </Border>
                 </Grid>
@@ -443,6 +479,7 @@
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="*" />
+                                <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
                             <TextBlock Margin="8,4,8,10" Text="Reportes cargados" FontSize="16" FontWeight="SemiBold" />
                             <StackPanel Grid.Row="1" Margin="8,0,8,10">
@@ -460,18 +497,86 @@
                                       IsReadOnly="True"
                                       SelectionMode="Single"
                                       SelectionChanged="ReportesGrid_SelectionChanged"
+                                      Sorting="ReportesGrid_Sorting"
                                       HeadersVisibility="Column"
                                       GridLinesVisibility="Horizontal"
                                       BorderThickness="0">
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn Header="Titulo" Binding="{Binding Titulo}" Width="2*" />
-                                    <DataGridTextColumn Header="Periodo" Binding="{Binding Periodo}" Width="*" />
-                                    <DataGridTextColumn Header="Generado" Binding="{Binding GeneradoEl, StringFormat={}{0:dd/MM/yyyy}}" Width="*" />
-                                    <DataGridTextColumn Header="Creado" Binding="{Binding CreatedAt, StringFormat={}{0:dd/MM/yyyy HH:mm}}" Width="*" />
+                                    <DataGridTextColumn Header="Titulo" Binding="{Binding Titulo}" Width="2*" SortMemberPath="Titulo" />
+                                    <DataGridTextColumn Header="Periodo" Binding="{Binding Periodo}" Width="*" SortMemberPath="Periodo" />
+                                    <DataGridTextColumn Header="Generado" Binding="{Binding GeneradoEl, StringFormat={}{0:dd/MM/yyyy}}" Width="*" SortMemberPath="GeneradoEl" />
+                                    <DataGridTextColumn Header="Creado" Binding="{Binding CreatedAt, StringFormat={}{0:dd/MM/yyyy HH:mm}}" Width="*" SortMemberPath="CreatedAt" />
                                 </DataGrid.Columns>
                             </DataGrid>
+                            <DockPanel Grid.Row="3" Margin="8,10,8,0">
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" DockPanel.Dock="Right">
+                                    <Button Content="Anterior" IsEnabled="{Binding PuedeRetrocederReportes}" Click="ReportesPaginaAnteriorButton_Click" />
+                                    <Button Content="Siguiente" IsEnabled="{Binding PuedeAvanzarReportes}" Click="ReportesPaginaSiguienteButton_Click" />
+                                </StackPanel>
+                                <TextBlock VerticalAlignment="Center" Foreground="#FF4A6075" Text="{Binding ReportesPaginacionTexto}" />
+                            </DockPanel>
                         </Grid>
                     </Border>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Dashboard">
+                <Grid Margin="14">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <Border Background="{StaticResource CardBrush}" BorderBrush="{StaticResource BorderBrushSoft}" BorderThickness="1" CornerRadius="10" Padding="14">
+                        <DockPanel>
+                            <WrapPanel DockPanel.Dock="Left">
+                                <TextBlock Margin="0,0,8,0" VerticalAlignment="Center" Text="Desde" FontWeight="SemiBold" />
+                                <DatePicker x:Name="DashboardDesdeInput" Width="140" Margin="0,0,14,0" />
+                                <TextBlock Margin="0,0,8,0" VerticalAlignment="Center" Text="Hasta" FontWeight="SemiBold" />
+                                <DatePicker x:Name="DashboardHastaInput" Width="140" Margin="0,0,14,0" />
+                                <Button Content="Actualizar" Click="DashboardActualizarButton_Click" />
+                            </WrapPanel>
+                            <TextBlock Margin="12,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Right" Foreground="#FF4A6075" Text="{Binding DashboardPeriodo}" />
+                        </DockPanel>
+                    </Border>
+
+                    <UniformGrid Grid.Row="1" Margin="0,14,0,0" Columns="3" Rows="2">
+                        <Border Margin="0,0,10,10" Background="White" BorderBrush="{StaticResource BorderBrushSoft}" BorderThickness="1" CornerRadius="10" Padding="14">
+                            <StackPanel>
+                                <TextBlock Text="Clientes activos" Foreground="#FF4A6075" />
+                                <TextBlock Margin="0,8,0,0" FontSize="30" FontWeight="Bold" Text="{Binding DashboardClientesActivos}" />
+                            </StackPanel>
+                        </Border>
+                        <Border Margin="0,0,10,10" Background="White" BorderBrush="{StaticResource BorderBrushSoft}" BorderThickness="1" CornerRadius="10" Padding="14">
+                            <StackPanel>
+                                <TextBlock Text="Vehiculos activos" Foreground="#FF4A6075" />
+                                <TextBlock Margin="0,8,0,0" FontSize="30" FontWeight="Bold" Text="{Binding DashboardVehiculosActivos}" />
+                            </StackPanel>
+                        </Border>
+                        <Border Margin="0,0,0,10" Background="White" BorderBrush="{StaticResource BorderBrushSoft}" BorderThickness="1" CornerRadius="10" Padding="14">
+                            <StackPanel>
+                                <TextBlock Text="Stock total de partes" Foreground="#FF4A6075" />
+                                <TextBlock Margin="0,8,0,0" FontSize="30" FontWeight="Bold" Text="{Binding DashboardStockPartes}" />
+                            </StackPanel>
+                        </Border>
+                        <Border Margin="0,0,10,0" Background="White" BorderBrush="{StaticResource BorderBrushSoft}" BorderThickness="1" CornerRadius="10" Padding="14">
+                            <StackPanel>
+                                <TextBlock Text="Servicios en periodo" Foreground="#FF4A6075" />
+                                <TextBlock Margin="0,8,0,0" FontSize="30" FontWeight="Bold" Text="{Binding DashboardServiciosPeriodo}" />
+                            </StackPanel>
+                        </Border>
+                        <Border Margin="0,0,10,0" Background="White" BorderBrush="{StaticResource BorderBrushSoft}" BorderThickness="1" CornerRadius="10" Padding="14">
+                            <StackPanel>
+                                <TextBlock Text="Costo total servicios" Foreground="#FF4A6075" />
+                                <TextBlock Margin="0,8,0,0" FontSize="30" FontWeight="Bold" Text="{Binding DashboardCostoServiciosPeriodo}" />
+                            </StackPanel>
+                        </Border>
+                        <Border Margin="0,0,0,0" Background="White" BorderBrush="{StaticResource BorderBrushSoft}" BorderThickness="1" CornerRadius="10" Padding="14">
+                            <StackPanel>
+                                <TextBlock Text="Reportes en periodo" Foreground="#FF4A6075" />
+                                <TextBlock Margin="0,8,0,0" FontSize="30" FontWeight="Bold" Text="{Binding DashboardReportesPeriodo}" />
+                            </StackPanel>
+                        </Border>
+                    </UniformGrid>
                 </Grid>
             </TabItem>
         </TabControl>

@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
 using System.IO;
@@ -28,6 +28,20 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private List<ServicioGridRow> _allServicios = new();
     private List<Reporte> _allReportes = new();
 
+    private readonly GridViewState _clientesState = new();
+    private readonly GridViewState _vehiculosState = new();
+    private readonly GridViewState _partesState = new();
+    private readonly GridViewState _serviciosState = new();
+    private readonly GridViewState _reportesState = new();
+
+    private string _dashboardPeriodo = "Ultimos 30 dias";
+    private string _dashboardClientesActivos = "0";
+    private string _dashboardVehiculosActivos = "0";
+    private string _dashboardStockPartes = "0";
+    private string _dashboardServiciosPeriodo = "0";
+    private string _dashboardCostoServiciosPeriodo = "$0.00";
+    private string _dashboardReportesPeriodo = "0";
+
     public ObservableCollection<Cliente> Clientes { get; } = new();
     public ObservableCollection<VehiculoGridRow> Vehiculos { get; } = new();
     public ObservableCollection<Parte> Partes { get; } = new();
@@ -40,6 +54,68 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     public ObservableCollection<string> EstadoVehiculos { get; } = new(new[] { "disponible", "reservado", "en_taller", "vendido" });
     public ObservableCollection<string> EstadoClientesConTodos { get; } = new(new[] { "Todos", "activo", "inactivo" });
     public ObservableCollection<string> EstadoVehiculosConTodos { get; } = new(new[] { "Todos", "disponible", "reservado", "en_taller", "vendido" });
+
+    public string DashboardPeriodo
+    {
+        get => _dashboardPeriodo;
+        private set => SetField(ref _dashboardPeriodo, value);
+    }
+
+    public string DashboardClientesActivos
+    {
+        get => _dashboardClientesActivos;
+        private set => SetField(ref _dashboardClientesActivos, value);
+    }
+
+    public string DashboardVehiculosActivos
+    {
+        get => _dashboardVehiculosActivos;
+        private set => SetField(ref _dashboardVehiculosActivos, value);
+    }
+
+    public string DashboardStockPartes
+    {
+        get => _dashboardStockPartes;
+        private set => SetField(ref _dashboardStockPartes, value);
+    }
+
+    public string DashboardServiciosPeriodo
+    {
+        get => _dashboardServiciosPeriodo;
+        private set => SetField(ref _dashboardServiciosPeriodo, value);
+    }
+
+    public string DashboardCostoServiciosPeriodo
+    {
+        get => _dashboardCostoServiciosPeriodo;
+        private set => SetField(ref _dashboardCostoServiciosPeriodo, value);
+    }
+
+    public string DashboardReportesPeriodo
+    {
+        get => _dashboardReportesPeriodo;
+        private set => SetField(ref _dashboardReportesPeriodo, value);
+    }
+
+    public string ClientesPaginacionTexto => _clientesState.PageText;
+    public bool PuedeRetrocederClientes => _clientesState.Page > 1;
+    public bool PuedeAvanzarClientes => _clientesState.Page < _clientesState.TotalPages;
+
+    public string VehiculosPaginacionTexto => _vehiculosState.PageText;
+    public bool PuedeRetrocederVehiculos => _vehiculosState.Page > 1;
+    public bool PuedeAvanzarVehiculos => _vehiculosState.Page < _vehiculosState.TotalPages;
+
+    public string PartesPaginacionTexto => _partesState.PageText;
+    public bool PuedeRetrocederPartes => _partesState.Page > 1;
+    public bool PuedeAvanzarPartes => _partesState.Page < _partesState.TotalPages;
+
+    public string ServiciosPaginacionTexto => _serviciosState.PageText;
+    public bool PuedeRetrocederServicios => _serviciosState.Page > 1;
+    public bool PuedeAvanzarServicios => _serviciosState.Page < _serviciosState.TotalPages;
+
+    public string ReportesPaginacionTexto => _reportesState.PageText;
+    public bool PuedeRetrocederReportes => _reportesState.Page > 1;
+    public bool PuedeAvanzarReportes => _reportesState.Page < _reportesState.TotalPages;
 
     public bool IsBusy
     {
@@ -94,6 +170,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         ServiciosFiltroHastaInput.SelectedDate = null;
         ReportesFiltroDesdeInput.SelectedDate = null;
         ReportesFiltroHastaInput.SelectedDate = null;
+        DashboardDesdeInput.SelectedDate = DateTime.Today.AddDays(-30);
+        DashboardHastaInput.SelectedDate = DateTime.Today;
 
         await RefreshAllAsync("Aplicacion lista.");
     }
@@ -117,6 +195,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             await LoadPartesAsync();
             await LoadServiciosAsync();
             await LoadReportesAsync();
+            UpdateDashboardMetrics();
             StatusMessage = status ?? $"Datos actualizados ({DateTime.Now:HH:mm:ss}).";
         }
         catch (Exception ex)
@@ -189,7 +268,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 new VehiculoLookupItem
                 {
                     Id = vehiculo.Id,
-                    Display = $"{patente} · {vehiculo.Marca} {vehiculo.Modelo} ({cliente})",
+                    Display = $"{patente} - {vehiculo.Marca} {vehiculo.Modelo} ({cliente})",
                 });
         }
 
@@ -256,11 +335,13 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void AnyFilter_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
     {
+        ResetAllPages();
         ApplyAllFilters();
     }
 
     private void AnyFilter_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
     {
+        ResetAllPages();
         ApplyAllFilters();
     }
 
@@ -340,7 +421,10 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             query = query.Where(x => string.Equals(x.Estado, estado, StringComparison.OrdinalIgnoreCase));
         }
 
-        ReplaceCollection(Clientes, query.OrderBy(x => x.Nombre));
+        query = ApplyClientesSort(query);
+        var pageItems = Paginate(query, _clientesState);
+        ReplaceCollection(Clientes, pageItems);
+        NotifyClientesPaginationChanged();
     }
 
     private void ApplyVehiculosFilters()
@@ -374,7 +458,10 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             query = query.Where(x => x.ClienteId == clienteId.Value);
         }
 
-        ReplaceCollection(Vehiculos, query.OrderByDescending(x => x.Id));
+        query = ApplyVehiculosSort(query);
+        var pageItems = Paginate(query, _vehiculosState);
+        ReplaceCollection(Vehiculos, pageItems);
+        NotifyVehiculosPaginationChanged();
     }
 
     private void ApplyPartesFilters()
@@ -392,7 +479,10 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             query = query.Where(x => ContainsIgnoreCase(x.Nombre, text));
         }
 
-        ReplaceCollection(Partes, query.OrderBy(x => x.Nombre));
+        query = ApplyPartesSort(query);
+        var pageItems = Paginate(query, _partesState);
+        ReplaceCollection(Partes, pageItems);
+        NotifyPartesPaginationChanged();
     }
 
     private void ApplyServiciosFilters()
@@ -428,7 +518,10 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             query = query.Where(x => x.Fecha.Date <= hasta.Value);
         }
 
-        ReplaceCollection(Servicios, query.OrderByDescending(x => x.Fecha).ThenByDescending(x => x.Id));
+        query = ApplyServiciosSort(query);
+        var pageItems = Paginate(query, _serviciosState);
+        ReplaceCollection(Servicios, pageItems);
+        NotifyServiciosPaginationChanged();
     }
 
     private void ApplyReportesFilters()
@@ -458,9 +551,378 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             query = query.Where(x => x.GeneradoEl.Date <= hasta.Value);
         }
 
-        ReplaceCollection(Reportes, query.OrderByDescending(x => x.GeneradoEl).ThenByDescending(x => x.Id));
+        query = ApplyReportesSort(query);
+        var pageItems = Paginate(query, _reportesState);
+        ReplaceCollection(Reportes, pageItems);
+        NotifyReportesPaginationChanged();
     }
 
+    private IEnumerable<Cliente> ApplyClientesSort(IEnumerable<Cliente> query)
+    {
+        return (_clientesState.SortMember, _clientesState.SortDirection) switch
+        {
+            ("Nombre", ListSortDirection.Descending) => query.OrderByDescending(x => x.Nombre),
+            ("Telefono", ListSortDirection.Ascending) => query.OrderBy(x => x.Telefono),
+            ("Telefono", ListSortDirection.Descending) => query.OrderByDescending(x => x.Telefono),
+            ("Email", ListSortDirection.Ascending) => query.OrderBy(x => x.Email),
+            ("Email", ListSortDirection.Descending) => query.OrderByDescending(x => x.Email),
+            ("Estado", ListSortDirection.Ascending) => query.OrderBy(x => x.Estado),
+            ("Estado", ListSortDirection.Descending) => query.OrderByDescending(x => x.Estado),
+            _ => query.OrderBy(x => x.Nombre),
+        };
+    }
+
+    private IEnumerable<VehiculoGridRow> ApplyVehiculosSort(IEnumerable<VehiculoGridRow> query)
+    {
+        return (_vehiculosState.SortMember, _vehiculosState.SortDirection) switch
+        {
+            ("Patente", ListSortDirection.Ascending) => query.OrderBy(x => x.Patente),
+            ("Patente", ListSortDirection.Descending) => query.OrderByDescending(x => x.Patente),
+            ("Marca", ListSortDirection.Ascending) => query.OrderBy(x => x.Marca),
+            ("Marca", ListSortDirection.Descending) => query.OrderByDescending(x => x.Marca),
+            ("Modelo", ListSortDirection.Ascending) => query.OrderBy(x => x.Modelo),
+            ("Modelo", ListSortDirection.Descending) => query.OrderByDescending(x => x.Modelo),
+            ("Version", ListSortDirection.Ascending) => query.OrderBy(x => x.Version),
+            ("Version", ListSortDirection.Descending) => query.OrderByDescending(x => x.Version),
+            ("Anio", ListSortDirection.Ascending) => query.OrderBy(x => x.Anio),
+            ("Anio", ListSortDirection.Descending) => query.OrderByDescending(x => x.Anio),
+            ("Estado", ListSortDirection.Ascending) => query.OrderBy(x => x.Estado),
+            ("Estado", ListSortDirection.Descending) => query.OrderByDescending(x => x.Estado),
+            ("ClienteNombre", ListSortDirection.Ascending) => query.OrderBy(x => x.ClienteNombre),
+            ("ClienteNombre", ListSortDirection.Descending) => query.OrderByDescending(x => x.ClienteNombre),
+            _ => query.OrderByDescending(x => x.Id),
+        };
+    }
+
+    private IEnumerable<Parte> ApplyPartesSort(IEnumerable<Parte> query)
+    {
+        return (_partesState.SortMember, _partesState.SortDirection) switch
+        {
+            ("Nombre", ListSortDirection.Descending) => query.OrderByDescending(x => x.Nombre),
+            ("Stock", ListSortDirection.Ascending) => query.OrderBy(x => x.Stock),
+            ("Stock", ListSortDirection.Descending) => query.OrderByDescending(x => x.Stock),
+            ("Costo", ListSortDirection.Ascending) => query.OrderBy(x => x.Costo),
+            ("Costo", ListSortDirection.Descending) => query.OrderByDescending(x => x.Costo),
+            ("CreatedAt", ListSortDirection.Ascending) => query.OrderBy(x => x.CreatedAt),
+            ("CreatedAt", ListSortDirection.Descending) => query.OrderByDescending(x => x.CreatedAt),
+            _ => query.OrderBy(x => x.Nombre),
+        };
+    }
+
+    private IEnumerable<ServicioGridRow> ApplyServiciosSort(IEnumerable<ServicioGridRow> query)
+    {
+        return (_serviciosState.SortMember, _serviciosState.SortDirection) switch
+        {
+            ("Fecha", ListSortDirection.Ascending) => query.OrderBy(x => x.Fecha),
+            ("Fecha", ListSortDirection.Descending) => query.OrderByDescending(x => x.Fecha),
+            ("Patente", ListSortDirection.Ascending) => query.OrderBy(x => x.Patente),
+            ("Patente", ListSortDirection.Descending) => query.OrderByDescending(x => x.Patente),
+            ("VehiculoNombre", ListSortDirection.Ascending) => query.OrderBy(x => x.VehiculoNombre),
+            ("VehiculoNombre", ListSortDirection.Descending) => query.OrderByDescending(x => x.VehiculoNombre),
+            ("ClienteNombre", ListSortDirection.Ascending) => query.OrderBy(x => x.ClienteNombre),
+            ("ClienteNombre", ListSortDirection.Descending) => query.OrderByDescending(x => x.ClienteNombre),
+            ("Descripcion", ListSortDirection.Ascending) => query.OrderBy(x => x.Descripcion),
+            ("Descripcion", ListSortDirection.Descending) => query.OrderByDescending(x => x.Descripcion),
+            ("Kilometraje", ListSortDirection.Ascending) => query.OrderBy(x => x.Kilometraje),
+            ("Kilometraje", ListSortDirection.Descending) => query.OrderByDescending(x => x.Kilometraje),
+            ("Costo", ListSortDirection.Ascending) => query.OrderBy(x => x.Costo),
+            ("Costo", ListSortDirection.Descending) => query.OrderByDescending(x => x.Costo),
+            _ => query.OrderByDescending(x => x.Fecha).ThenByDescending(x => x.Id),
+        };
+    }
+
+    private IEnumerable<Reporte> ApplyReportesSort(IEnumerable<Reporte> query)
+    {
+        return (_reportesState.SortMember, _reportesState.SortDirection) switch
+        {
+            ("Titulo", ListSortDirection.Ascending) => query.OrderBy(x => x.Titulo),
+            ("Titulo", ListSortDirection.Descending) => query.OrderByDescending(x => x.Titulo),
+            ("Periodo", ListSortDirection.Ascending) => query.OrderBy(x => x.Periodo),
+            ("Periodo", ListSortDirection.Descending) => query.OrderByDescending(x => x.Periodo),
+            ("GeneradoEl", ListSortDirection.Ascending) => query.OrderBy(x => x.GeneradoEl),
+            ("GeneradoEl", ListSortDirection.Descending) => query.OrderByDescending(x => x.GeneradoEl),
+            ("CreatedAt", ListSortDirection.Ascending) => query.OrderBy(x => x.CreatedAt),
+            ("CreatedAt", ListSortDirection.Descending) => query.OrderByDescending(x => x.CreatedAt),
+            _ => query.OrderByDescending(x => x.GeneradoEl).ThenByDescending(x => x.Id),
+        };
+    }
+
+    private IEnumerable<T> Paginate<T>(IEnumerable<T> source, GridViewState state)
+    {
+        var materialized = source.ToList();
+        state.TotalItems = materialized.Count;
+        state.TotalPages = Math.Max(1, (int)Math.Ceiling(state.TotalItems / (double)state.PageSize));
+
+        if (state.Page > state.TotalPages)
+        {
+            state.Page = state.TotalPages;
+        }
+
+        if (state.Page < 1)
+        {
+            state.Page = 1;
+        }
+
+        return materialized
+            .Skip((state.Page - 1) * state.PageSize)
+            .Take(state.PageSize);
+    }
+
+    private void NotifyClientesPaginationChanged()
+    {
+        OnPropertyChanged(nameof(ClientesPaginacionTexto));
+        OnPropertyChanged(nameof(PuedeRetrocederClientes));
+        OnPropertyChanged(nameof(PuedeAvanzarClientes));
+    }
+
+    private void NotifyVehiculosPaginationChanged()
+    {
+        OnPropertyChanged(nameof(VehiculosPaginacionTexto));
+        OnPropertyChanged(nameof(PuedeRetrocederVehiculos));
+        OnPropertyChanged(nameof(PuedeAvanzarVehiculos));
+    }
+
+    private void NotifyPartesPaginationChanged()
+    {
+        OnPropertyChanged(nameof(PartesPaginacionTexto));
+        OnPropertyChanged(nameof(PuedeRetrocederPartes));
+        OnPropertyChanged(nameof(PuedeAvanzarPartes));
+    }
+
+    private void NotifyServiciosPaginationChanged()
+    {
+        OnPropertyChanged(nameof(ServiciosPaginacionTexto));
+        OnPropertyChanged(nameof(PuedeRetrocederServicios));
+        OnPropertyChanged(nameof(PuedeAvanzarServicios));
+    }
+
+    private void NotifyReportesPaginationChanged()
+    {
+        OnPropertyChanged(nameof(ReportesPaginacionTexto));
+        OnPropertyChanged(nameof(PuedeRetrocederReportes));
+        OnPropertyChanged(nameof(PuedeAvanzarReportes));
+    }
+
+    private void ResetAllPages()
+    {
+        _clientesState.Page = 1;
+        _vehiculosState.Page = 1;
+        _partesState.Page = 1;
+        _serviciosState.Page = 1;
+        _reportesState.Page = 1;
+    }
+
+    private void HandleSorting(
+        System.Windows.Controls.DataGrid grid,
+        System.Windows.Controls.DataGridSortingEventArgs e,
+        GridViewState state,
+        Action applyFilters)
+    {
+        e.Handled = true;
+        var member = e.Column.SortMemberPath;
+        if (string.IsNullOrWhiteSpace(member))
+        {
+            return;
+        }
+
+        if (string.Equals(state.SortMember, member, StringComparison.OrdinalIgnoreCase))
+        {
+            state.SortDirection = state.SortDirection == ListSortDirection.Ascending
+                ? ListSortDirection.Descending
+                : ListSortDirection.Ascending;
+        }
+        else
+        {
+            state.SortMember = member;
+            state.SortDirection = ListSortDirection.Ascending;
+        }
+
+        state.Page = 1;
+        UpdateSortIndicators(grid, state.SortMember, state.SortDirection);
+        applyFilters();
+    }
+
+    private static void UpdateSortIndicators(
+        System.Windows.Controls.DataGrid grid,
+        string? member,
+        ListSortDirection direction)
+    {
+        foreach (var column in grid.Columns)
+        {
+            if (!string.IsNullOrWhiteSpace(member)
+                && string.Equals(column.SortMemberPath, member, StringComparison.OrdinalIgnoreCase))
+            {
+                column.SortDirection = direction;
+            }
+            else
+            {
+                column.SortDirection = null;
+            }
+        }
+    }
+
+    private void ClientesGrid_Sorting(object sender, System.Windows.Controls.DataGridSortingEventArgs e)
+    {
+        HandleSorting(ClientesGrid, e, _clientesState, ApplyClientesFilters);
+    }
+
+    private void VehiculosGrid_Sorting(object sender, System.Windows.Controls.DataGridSortingEventArgs e)
+    {
+        HandleSorting(VehiculosGrid, e, _vehiculosState, ApplyVehiculosFilters);
+    }
+
+    private void PartesGrid_Sorting(object sender, System.Windows.Controls.DataGridSortingEventArgs e)
+    {
+        HandleSorting(PartesGrid, e, _partesState, ApplyPartesFilters);
+    }
+
+    private void ServiciosGrid_Sorting(object sender, System.Windows.Controls.DataGridSortingEventArgs e)
+    {
+        HandleSorting(ServiciosGrid, e, _serviciosState, ApplyServiciosFilters);
+    }
+
+    private void ReportesGrid_Sorting(object sender, System.Windows.Controls.DataGridSortingEventArgs e)
+    {
+        HandleSorting(ReportesGrid, e, _reportesState, ApplyReportesFilters);
+    }
+
+    private void ClientesPaginaAnteriorButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (_clientesState.Page <= 1)
+        {
+            return;
+        }
+
+        _clientesState.Page--;
+        ApplyClientesFilters();
+    }
+
+    private void ClientesPaginaSiguienteButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (_clientesState.Page >= _clientesState.TotalPages)
+        {
+            return;
+        }
+
+        _clientesState.Page++;
+        ApplyClientesFilters();
+    }
+
+    private void VehiculosPaginaAnteriorButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (_vehiculosState.Page <= 1)
+        {
+            return;
+        }
+
+        _vehiculosState.Page--;
+        ApplyVehiculosFilters();
+    }
+
+    private void VehiculosPaginaSiguienteButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (_vehiculosState.Page >= _vehiculosState.TotalPages)
+        {
+            return;
+        }
+
+        _vehiculosState.Page++;
+        ApplyVehiculosFilters();
+    }
+
+    private void PartesPaginaAnteriorButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (_partesState.Page <= 1)
+        {
+            return;
+        }
+
+        _partesState.Page--;
+        ApplyPartesFilters();
+    }
+
+    private void PartesPaginaSiguienteButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (_partesState.Page >= _partesState.TotalPages)
+        {
+            return;
+        }
+
+        _partesState.Page++;
+        ApplyPartesFilters();
+    }
+
+    private void ServiciosPaginaAnteriorButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (_serviciosState.Page <= 1)
+        {
+            return;
+        }
+
+        _serviciosState.Page--;
+        ApplyServiciosFilters();
+    }
+
+    private void ServiciosPaginaSiguienteButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (_serviciosState.Page >= _serviciosState.TotalPages)
+        {
+            return;
+        }
+
+        _serviciosState.Page++;
+        ApplyServiciosFilters();
+    }
+
+    private void ReportesPaginaAnteriorButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (_reportesState.Page <= 1)
+        {
+            return;
+        }
+
+        _reportesState.Page--;
+        ApplyReportesFilters();
+    }
+
+    private void ReportesPaginaSiguienteButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (_reportesState.Page >= _reportesState.TotalPages)
+        {
+            return;
+        }
+
+        _reportesState.Page++;
+        ApplyReportesFilters();
+    }
+
+    private void DashboardActualizarButton_Click(object sender, RoutedEventArgs e)
+    {
+        UpdateDashboardMetrics();
+    }
+
+    private void UpdateDashboardMetrics()
+    {
+        var desde = DashboardDesdeInput.SelectedDate?.Date ?? DateTime.Today.AddDays(-30);
+        var hasta = DashboardHastaInput.SelectedDate?.Date ?? DateTime.Today;
+        if (desde > hasta)
+        {
+            (desde, hasta) = (hasta, desde);
+            DashboardDesdeInput.SelectedDate = desde;
+            DashboardHastaInput.SelectedDate = hasta;
+        }
+
+        var serviciosPeriodo = _allServicios.Where(x => x.Fecha.Date >= desde && x.Fecha.Date <= hasta).ToList();
+        var reportesPeriodo = _allReportes.Where(x => x.GeneradoEl.Date >= desde && x.GeneradoEl.Date <= hasta).ToList();
+
+        DashboardPeriodo = $"Periodo: {desde:dd/MM/yyyy} a {hasta:dd/MM/yyyy}";
+        DashboardClientesActivos = _allClientes.Count(x => string.Equals(x.Estado, "activo", StringComparison.OrdinalIgnoreCase)).ToString("N0");
+        DashboardVehiculosActivos = _allVehiculos.Count.ToString("N0");
+        DashboardStockPartes = _allPartes.Sum(x => x.Stock).ToString("N0");
+        DashboardServiciosPeriodo = serviciosPeriodo.Count.ToString("N0");
+        DashboardCostoServiciosPeriodo = serviciosPeriodo.Sum(x => x.Costo).ToString("C2");
+        DashboardReportesPeriodo = reportesPeriodo.Count.ToString("N0");
+    }
     private async void RefreshButton_Click(object sender, RoutedEventArgs e)
     {
         await RefreshAllAsync();
@@ -489,7 +951,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         }
 
         var confirm = MessageBox.Show(
-            "Esta accion reemplazara los datos actuales de la app desktop por los datos de la base seleccionada.\n\nQueres continuar?",
+            "Esta accion reemplazara los datos actuales de la app desktop por los datos de la base seleccionada.\n\nQueres continuar-",
             "Importar base legacy",
             MessageBoxButton.YesNo,
             MessageBoxImage.Warning);
@@ -620,7 +1082,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         }
 
         var confirm = MessageBox.Show(
-            "Se eliminara el cliente y sus vehiculos asociados. Queres continuar?",
+            "Se eliminara el cliente y sus vehiculos asociados. Queres continuar-",
             "Confirmar eliminacion",
             MessageBoxButton.YesNo,
             MessageBoxImage.Warning);
@@ -756,7 +1218,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         }
 
         var confirm = MessageBox.Show(
-            "Se eliminara el vehiculo seleccionado. Queres continuar?",
+            "Se eliminara el vehiculo seleccionado. Queres continuar-",
             "Confirmar eliminacion",
             MessageBoxButton.YesNo,
             MessageBoxImage.Warning);
@@ -887,7 +1349,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         }
 
         var confirm = MessageBox.Show(
-            "Se eliminara la parte seleccionada. Queres continuar?",
+            "Se eliminara la parte seleccionada. Queres continuar-",
             "Confirmar eliminacion",
             MessageBoxButton.YesNo,
             MessageBoxImage.Warning);
@@ -1022,7 +1484,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         }
 
         var confirm = MessageBox.Show(
-            "Se eliminara el servicio seleccionado. Queres continuar?",
+            "Se eliminara el servicio seleccionado. Queres continuar-",
             "Confirmar eliminacion",
             MessageBoxButton.YesNo,
             MessageBoxImage.Warning);
@@ -1138,7 +1600,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         }
 
         var confirm = MessageBox.Show(
-            "Se eliminara el reporte seleccionado. Queres continuar?",
+            "Se eliminara el reporte seleccionado. Queres continuar-",
             "Confirmar eliminacion",
             MessageBoxButton.YesNo,
             MessageBoxImage.Warning);
@@ -1391,6 +1853,17 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             MessageBoxImage.Error);
     }
 
+    private void SetField<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
+    {
+        if (EqualityComparer<T>.Default.Equals(field, value))
+        {
+            return;
+        }
+
+        field = value;
+        OnPropertyChanged(propertyName);
+    }
+
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
@@ -1438,6 +1911,27 @@ public sealed class ServicioGridRow
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+internal sealed class GridViewState
+{
+    public int Page { get; set; } = 1;
+    public int TotalPages { get; set; } = 1;
+    public int TotalItems { get; set; }
+    public int PageSize { get; } = 20;
+    public string? SortMember { get; set; }
+    public ListSortDirection SortDirection { get; set; } = ListSortDirection.Ascending;
+    public string PageText => $"Pagina {Page}/{TotalPages} - {TotalItems} registros";
+}
 
 
 
