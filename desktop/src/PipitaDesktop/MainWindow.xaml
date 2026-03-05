@@ -90,6 +90,31 @@
             </Style.Triggers>
         </Style>
 
+
+        <Style x:Key="HeaderActionButtonStyle" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+            <Setter Property="Padding" Value="16,10" />
+            <Setter Property="Margin" Value="0,0,10,0" />
+            <Setter Property="Background" Value="#F4F8FD" />
+            <Setter Property="BorderBrush" Value="#D1DEEE" />
+            <Setter Property="Foreground" Value="#20364E" />
+        </Style>
+
+        <Style x:Key="HeaderPrimaryActionButtonStyle" TargetType="Button" BasedOn="{StaticResource HeaderActionButtonStyle}">
+            <Setter Property="Background" Value="#1B6DDA" />
+            <Setter Property="BorderBrush" Value="#1B6DDA" />
+            <Setter Property="Foreground" Value="White" />
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#135DBC" />
+                    <Setter Property="BorderBrush" Value="#135DBC" />
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="#0F4E9F" />
+                    <Setter Property="BorderBrush" Value="#0F4E9F" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
         <Style TargetType="TextBox">
             <Setter Property="Margin" Value="0,0,0,10" />
             <Setter Property="Padding" Value="10,6" />
@@ -249,10 +274,10 @@
                 </StackPanel>
                 <StackPanel Grid.Column="1" VerticalAlignment="Center">
                     <WrapPanel HorizontalAlignment="Right">
-                        <Button Content="Importar DB vieja" Click="ImportarLegacyDbButton_Click" />
-                        <Button Content="Importar Excel" Click="ImportarExcelButton_Click" />
-                        <Button Style="{StaticResource PrimaryButtonStyle}" Content="Exportar Excel" Click="ExportarExcelButton_Click" />
-                        <Button Content="Actualizar" Click="RefreshButton_Click" />
+                        <Button Style="{StaticResource HeaderActionButtonStyle}" Content="Importar DB vieja" Click="ImportarLegacyDbButton_Click" />
+                        <Button Style="{StaticResource HeaderActionButtonStyle}" Content="Importar Excel" Click="ImportarExcelButton_Click" />
+                        <Button Style="{StaticResource HeaderPrimaryActionButtonStyle}" Content="Exportar Excel" Click="ExportarExcelButton_Click" />
+                        <Button Style="{StaticResource HeaderActionButtonStyle}" Content="Actualizar" Click="RefreshButton_Click" />
                     </WrapPanel>
                     <TextBlock Margin="0,10,0,0" HorizontalAlignment="Right" Foreground="#E5F2FF" Text="{Binding IsBusy, StringFormat=Cargando: {0}}" />
                 </StackPanel>
