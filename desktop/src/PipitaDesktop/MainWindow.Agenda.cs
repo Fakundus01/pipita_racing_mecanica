@@ -15,6 +15,10 @@ public partial class MainWindow
     private string _agendaMesTitulo = string.Empty;
     private string _agendaResumenDia = "Sin citas para el dia seleccionado.";
     private string _agendaSemanaRango = string.Empty;
+    private string _agendaDiaTotalCitas = "0";
+    private string _agendaDiaPrimerTurno = "--";
+    private string _agendaDiaHorasAsignadas = "0 h";
+    private string _agendaSemanaTotalCitas = "0";
 
     public ObservableCollection<CitaGridRow> CitasDiaSeleccionado { get; } = new();
     public ObservableCollection<AgendaDayCell> AgendaDiasMes { get; } = new();
@@ -36,6 +40,30 @@ public partial class MainWindow
     {
         get => _agendaSemanaRango;
         private set => SetField(ref _agendaSemanaRango, value);
+    }
+
+    public string AgendaDiaTotalCitas
+    {
+        get => _agendaDiaTotalCitas;
+        private set => SetField(ref _agendaDiaTotalCitas, value);
+    }
+
+    public string AgendaDiaPrimerTurno
+    {
+        get => _agendaDiaPrimerTurno;
+        private set => SetField(ref _agendaDiaPrimerTurno, value);
+    }
+
+    public string AgendaDiaHorasAsignadas
+    {
+        get => _agendaDiaHorasAsignadas;
+        private set => SetField(ref _agendaDiaHorasAsignadas, value);
+    }
+
+    public string AgendaSemanaTotalCitas
+    {
+        get => _agendaSemanaTotalCitas;
+        private set => SetField(ref _agendaSemanaTotalCitas, value);
     }
 
     private Task LoadAgendaAsync()
@@ -96,6 +124,11 @@ public partial class MainWindow
 
         var culture = CultureInfo.GetCultureInfo("es-AR");
         AgendaResumenDia = $"{selectedDate.ToString("dddd dd 'de' MMMM yyyy", culture)} - {dayItems.Count} cita(s)";
+        AgendaDiaTotalCitas = dayItems.Count.ToString(CultureInfo.InvariantCulture);
+        AgendaDiaPrimerTurno = dayItems.Count == 0
+            ? "--"
+            : dayItems.Min(x => x.FechaHoraInicio).ToString("HH:mm", CultureInfo.InvariantCulture);
+        AgendaDiaHorasAsignadas = $"{dayItems.Sum(x => x.DuracionMinutos) / 60.0:0.#} h";
 
         RefreshAgendaWeekView(filtered);
     }
@@ -151,6 +184,7 @@ public partial class MainWindow
         var weekStart = GetWeekStartMonday(_agendaFechaSeleccionada);
         var weekEnd = weekStart.AddDays(6);
         AgendaSemanaRango = $"Semana {weekStart:dd/MM} - {weekEnd:dd/MM}";
+        AgendaSemanaTotalCitas = filtered.Count(x => x.FechaHoraInicio.Date >= weekStart && x.FechaHoraInicio.Date <= weekEnd).ToString(CultureInfo.InvariantCulture);
 
         var citasPorDia = filtered
             .GroupBy(x => x.FechaHoraInicio.Date)
