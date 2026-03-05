@@ -1,4 +1,4 @@
-﻿using ClosedXML.Excel;
+using ClosedXML.Excel;
 using Microsoft.EntityFrameworkCore;
 using PipitaDesktop.Data;
 using PipitaDesktop.Models;
@@ -12,7 +12,10 @@ public static class ExcelExportService
         IReadOnlyList<Vehiculo> Vehiculos,
         IReadOnlyList<Parte> Partes,
         IReadOnlyList<Servicio> Servicios,
-        IReadOnlyList<Reporte> Reportes);
+        IReadOnlyList<Reporte> Reportes,
+        IReadOnlyList<SolicitudCliente> Solicitudes,
+        IReadOnlyList<Distribuidora> Distribuidoras,
+        IReadOnlyList<TrabajoDistribuidora> TrabajosDistribuidora);
 
     public static async Task<ExportData> LoadAsync(AppDbContext db)
     {
@@ -45,7 +48,37 @@ public static class ExcelExportService
             .OrderByDescending(x => x.GeneradoEl)
             .ToListAsync();
 
-        return new ExportData(clientes, vehiculos, partes, servicios, reportes);
+        var solicitudes = await db.SolicitudesCliente
+            .AsNoTracking()
+            .Include(x => x.Cliente)
+            .Include(x => x.Vehiculo)
+            .OrderByDescending(x => x.FechaSolicitud)
+            .ThenByDescending(x => x.CreatedAt)
+            .ToListAsync();
+
+        var distribuidoras = await db.Distribuidoras
+            .AsNoTracking()
+            .OrderBy(x => x.Nombre)
+            .ToListAsync();
+
+        var trabajosDistribuidora = await db.TrabajosDistribuidora
+            .AsNoTracking()
+            .Include(x => x.Distribuidora)
+            .Include(x => x.Cliente)
+            .Include(x => x.Vehiculo)
+            .OrderByDescending(x => x.Fecha)
+            .ThenByDescending(x => x.CreatedAt)
+            .ToListAsync();
+
+        return new ExportData(
+            clientes,
+            vehiculos,
+            partes,
+            servicios,
+            reportes,
+            solicitudes,
+            distribuidoras,
+            trabajosDistribuidora);
     }
 
     public static void ExportToFile(ExportData data, string filePath)
@@ -58,6 +91,9 @@ public static class ExcelExportService
         BuildPartesSheet(workbook, data.Partes);
         BuildServiciosSheet(workbook, data.Servicios);
         BuildReportesSheet(workbook, data.Reportes);
+        BuildSolicitudesSheet(workbook, data.Solicitudes);
+        BuildDistribuidorasSheet(workbook, data.Distribuidoras, data.TrabajosDistribuidora);
+        BuildTrabajosDistribuidoraSheet(workbook, data.TrabajosDistribuidora);
 
         workbook.SaveAs(filePath);
     }
@@ -78,6 +114,9 @@ public static class ExcelExportService
         ws.Cell(2, 2).Value = DateTime.Now;
         ws.Cell(2, 2).Style.DateFormat.Format = "dd/MM/yyyy HH:mm";
 
+        var valorInventario = data.Partes.Sum(x => x.Stock * x.Costo);
+        var gastoDistribuidoras = data.TrabajosDistribuidora.Sum(x => x.Costo);
+
         var metrics = new List<object[]>
         {
             new object[] { "Clientes", data.Clientes.Count },
@@ -85,9 +124,14 @@ public static class ExcelExportService
             new object[] { "Partes", data.Partes.Count },
             new object[] { "Servicios", data.Servicios.Count },
             new object[] { "Reportes", data.Reportes.Count },
+            new object[] { "Solicitudes de clientes", data.Solicitudes.Count },
+            new object[] { "Distribuidoras", data.Distribuidoras.Count },
+            new object[] { "Trabajos tercerizados", data.TrabajosDistribuidora.Count },
             new object[] { "Stock total de partes", data.Partes.Sum(x => x.Stock) },
-            new object[] { "Costo total de partes", data.Partes.Sum(x => x.Costo) },
+            new object[] { "Precio total de partes", data.Partes.Sum(x => x.Costo) },
+            new object[] { "Valor inventario (stock x precio c/u)", valorInventario },
             new object[] { "Costo total de servicios", data.Servicios.Sum(x => x.Costo) },
+            new object[] { "Gasto total distribuidoras", gastoDistribuidoras },
         };
 
         const int headerRow = 4;
@@ -181,6 +225,7 @@ public static class ExcelExportService
                 x.Nombre,
                 x.Stock,
                 x.Costo,
+                x.Stock * x.Costo,
                 x.CreatedAt.ToLocalTime(),
             })
             .ToList();
@@ -189,13 +234,14 @@ public static class ExcelExportService
             workbook,
             "Partes",
             "Partes y accesorios",
-            new[] { "ID", "Nombre", "Stock", "Costo", "Creado" },
+            new[] { "ID", "Nombre", "Stock", "Precio c/u", "Total estimado", "Creado" },
             rows,
             new Dictionary<int, string>
             {
                 [3] = "#,##0",
                 [4] = "$ #,##0.00",
-                [5] = "dd/MM/yyyy HH:mm",
+                [5] = "$ #,##0.00",
+                [6] = "dd/MM/yyyy HH:mm",
             });
     }
 
@@ -253,6 +299,111 @@ public static class ExcelExportService
             {
                 [4] = "dd/MM/yyyy",
                 [5] = "dd/MM/yyyy HH:mm",
+            });
+    }
+
+    private static void BuildSolicitudesSheet(XLWorkbook workbook, IReadOnlyList<SolicitudCliente> solicitudes)
+    {
+        var rows = solicitudes
+            .Select(x => new object?[]
+            {
+                x.Id,
+                x.FechaSolicitud,
+                x.Estado,
+                x.Prioridad,
+                x.Canal,
+                x.Cliente?.Nombre,
+                x.Vehiculo?.Patente,
+                x.Descripcion,
+                x.Notas,
+                x.CreatedAt.ToLocalTime(),
+            })
+            .ToList();
+
+        BuildDataSheet(
+            workbook,
+            "Solicitudes",
+            "Historial de solicitudes de clientes",
+            new[] { "ID", "Fecha", "Estado", "Prioridad", "Canal", "Cliente", "Patente", "Descripcion", "Notas", "Creado" },
+            rows,
+            new Dictionary<int, string>
+            {
+                [2] = "dd/MM/yyyy",
+                [10] = "dd/MM/yyyy HH:mm",
+            });
+    }
+
+    private static void BuildDistribuidorasSheet(
+        XLWorkbook workbook,
+        IReadOnlyList<Distribuidora> distribuidoras,
+        IReadOnlyList<TrabajoDistribuidora> trabajos)
+    {
+        var gastoPorDistribuidora = trabajos
+            .GroupBy(x => x.DistribuidoraId)
+            .ToDictionary(x => x.Key, x => x.Sum(y => y.Costo));
+
+        var trabajosPorDistribuidora = trabajos
+            .GroupBy(x => x.DistribuidoraId)
+            .ToDictionary(x => x.Key, x => x.Count());
+
+        var rows = distribuidoras
+            .Select(x => new object?[]
+            {
+                x.Id,
+                x.Nombre,
+                x.Rubro,
+                x.Telefono,
+                x.Email,
+                x.Estado,
+                gastoPorDistribuidora.GetValueOrDefault(x.Id, 0m),
+                trabajosPorDistribuidora.GetValueOrDefault(x.Id, 0),
+                x.CreatedAt.ToLocalTime(),
+            })
+            .ToList();
+
+        BuildDataSheet(
+            workbook,
+            "Distribuidoras",
+            "Proveedores externos y gasto acumulado",
+            new[] { "ID", "Nombre", "Rubro", "Telefono", "Email", "Estado", "Gasto total", "Trabajos", "Creado" },
+            rows,
+            new Dictionary<int, string>
+            {
+                [7] = "$ #,##0.00",
+                [8] = "#,##0",
+                [9] = "dd/MM/yyyy HH:mm",
+            });
+    }
+
+    private static void BuildTrabajosDistribuidoraSheet(XLWorkbook workbook, IReadOnlyList<TrabajoDistribuidora> trabajos)
+    {
+        var rows = trabajos
+            .Select(x => new object?[]
+            {
+                x.Id,
+                x.Fecha,
+                x.Distribuidora?.Nombre,
+                x.Cliente?.Nombre,
+                x.Vehiculo?.Patente,
+                x.Descripcion,
+                x.Costo,
+                x.EstadoPago,
+                x.Notas,
+                x.CreatedAt.ToLocalTime(),
+            })
+            .ToList();
+
+        BuildDataSheet(
+            workbook,
+            "Trabajos Dist.",
+            "Historial de trabajos tercerizados",
+            new[] { "ID", "Fecha", "Distribuidora", "Cliente", "Patente", "Descripcion", "Costo", "Estado pago", "Notas", "Creado" },
+            rows,
+            new Dictionary<int, string>
+            {
+                [2] = "dd/MM/yyyy",
+                [7] = "$ #,##0.00",
+                [10] = "dd/MM/yyyy HH:mm",
             });
     }
 
@@ -328,7 +479,6 @@ public static class ExcelExportService
         ws.SheetView.FreezeRows(headerRow);
     }
 
-
     private static void SetCellValue(IXLCell cell, object? value)
     {
         switch (value)
@@ -371,6 +521,7 @@ public static class ExcelExportService
                 return;
         }
     }
+
     private static void StyleHeader(IXLRange headerRange)
     {
         headerRange.Style.Font.Bold = true;
@@ -379,4 +530,3 @@ public static class ExcelExportService
         headerRange.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
     }
 }
-

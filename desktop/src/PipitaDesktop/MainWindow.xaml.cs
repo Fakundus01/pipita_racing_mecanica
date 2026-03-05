@@ -170,6 +170,17 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         ServiciosFiltroHastaInput.SelectedDate = null;
         ReportesFiltroDesdeInput.SelectedDate = null;
         ReportesFiltroHastaInput.SelectedDate = null;
+        SolicitudesFiltroEstadoCombo.SelectedItem = "Todos";
+        DistribuidorasFiltroEstadoCombo.SelectedItem = "Todos";
+        TrabajosDistribuidoraFiltroDistribuidoraCombo.SelectedValue = null;
+
+        SolicitudFechaInput.SelectedDate = DateTime.Today;
+        SolicitudEstadoCombo.SelectedItem = "pendiente";
+        SolicitudPrioridadCombo.SelectedItem = "media";
+        SolicitudCanalCombo.SelectedItem = "telefono";
+        DistribuidoraEstadoCombo.SelectedItem = "activa";
+        TrabajoFechaInput.SelectedDate = DateTime.Today;
+        TrabajoEstadoPagoCombo.SelectedItem = "pagado";
         DashboardDesdeInput.SelectedDate = DateTime.Today.AddDays(-30);
         DashboardHastaInput.SelectedDate = DateTime.Today;
 
@@ -195,6 +206,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             await LoadPartesAsync();
             await LoadServiciosAsync();
             await LoadReportesAsync();
+            await LoadSolicitudesAsync();
+            await LoadDistribuidorasModuleAsync();
             UpdateDashboardMetrics();
             StatusMessage = status ?? $"Datos actualizados ({DateTime.Now:HH:mm:ss}).";
         }
@@ -260,6 +273,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             .ToList();
 
         VehiculoOptions.Clear();
+        VehiculoOptions.Add(new VehiculoLookupItem { Id = null, Display = "Sin vehiculo asignado" });
         foreach (var vehiculo in vehiculos.OrderBy(x => x.Patente).ThenBy(x => x.Marca).ThenBy(x => x.Modelo))
         {
             var patente = string.IsNullOrWhiteSpace(vehiculo.Patente) ? "Sin patente" : vehiculo.Patente;
@@ -395,6 +409,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         ApplyPartesFilters();
         ApplyServiciosFilters();
         ApplyReportesFilters();
+        ApplySolicitudesFilters();
+        ApplyDistribuidorasFilters();
+        ApplyTrabajosDistribuidoraFilters();
     }
 
     private void ApplyClientesFilters()
@@ -951,7 +968,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         }
 
         var confirm = MessageBox.Show(
-            "Esta accion reemplazara los datos actuales de la app desktop por los datos de la base seleccionada.\n\nQueres continuar-",
+            "Esta accion reemplazara los datos actuales de la app desktop por los datos de la base seleccionada.\n\nQueres continuar?",
             "Importar base legacy",
             MessageBoxButton.YesNo,
             MessageBoxImage.Warning);
@@ -1082,7 +1099,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         }
 
         var confirm = MessageBox.Show(
-            "Se eliminara el cliente y sus vehiculos asociados. Queres continuar-",
+            "Se eliminara el cliente y sus vehiculos asociados. Queres continuar?",
             "Confirmar eliminacion",
             MessageBoxButton.YesNo,
             MessageBoxImage.Warning);
@@ -1218,7 +1235,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         }
 
         var confirm = MessageBox.Show(
-            "Se eliminara el vehiculo seleccionado. Queres continuar-",
+            "Se eliminara el vehiculo seleccionado. Queres continuar?",
             "Confirmar eliminacion",
             MessageBoxButton.YesNo,
             MessageBoxImage.Warning);
@@ -1299,7 +1316,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
         if (!TryParseDecimal(ParteCostoInput.Text, out var costo))
         {
-            MessageBox.Show("El costo debe ser numerico.", "Validacion", MessageBoxButton.OK, MessageBoxImage.Warning);
+            MessageBox.Show("El precio unitario debe ser numerico.", "Validacion", MessageBoxButton.OK, MessageBoxImage.Warning);
             return;
         }
 
@@ -1349,7 +1366,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         }
 
         var confirm = MessageBox.Show(
-            "Se eliminara la parte seleccionada. Queres continuar-",
+            "Se eliminara la parte seleccionada. Queres continuar?",
             "Confirmar eliminacion",
             MessageBoxButton.YesNo,
             MessageBoxImage.Warning);
@@ -1484,7 +1501,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         }
 
         var confirm = MessageBox.Show(
-            "Se eliminara el servicio seleccionado. Queres continuar-",
+            "Se eliminara el servicio seleccionado. Queres continuar?",
             "Confirmar eliminacion",
             MessageBoxButton.YesNo,
             MessageBoxImage.Warning);
@@ -1600,7 +1617,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         }
 
         var confirm = MessageBox.Show(
-            "Se eliminara el reporte seleccionado. Queres continuar-",
+            "Se eliminara el reporte seleccionado. Queres continuar?",
             "Confirmar eliminacion",
             MessageBoxButton.YesNo,
             MessageBoxImage.Warning);
@@ -1872,7 +1889,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
 public sealed class VehiculoGridRow
 {
-    public int Id { get; init; }
+    public int? Id { get; init; }
     public string? Patente { get; init; }
     public string Marca { get; init; } = string.Empty;
     public string Modelo { get; init; } = string.Empty;
@@ -1891,7 +1908,7 @@ public sealed class ClienteLookupItem
 
 public sealed class VehiculoLookupItem
 {
-    public int Id { get; init; }
+    public int? Id { get; init; }
     public string Display { get; init; } = string.Empty;
 }
 
@@ -1932,6 +1949,9 @@ internal sealed class GridViewState
     public ListSortDirection SortDirection { get; set; } = ListSortDirection.Ascending;
     public string PageText => $"Pagina {Page}/{TotalPages} - {TotalItems} registros";
 }
+
+
+
 
 
 

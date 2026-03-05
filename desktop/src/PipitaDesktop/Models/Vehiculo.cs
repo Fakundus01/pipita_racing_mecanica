@@ -1,4 +1,4 @@
-﻿namespace PipitaDesktop.Models;
+namespace PipitaDesktop.Models;
 
 public sealed class Vehiculo : BaseEntity
 {
@@ -13,4 +13,6 @@ public sealed class Vehiculo : BaseEntity
     public Cliente? Cliente { get; set; }
 
     public ICollection<Servicio> Servicios { get; set; } = new List<Servicio>();
+    public ICollection<SolicitudCliente> Solicitudes { get; set; } = new List<SolicitudCliente>();
+    public ICollection<TrabajoDistribuidora> TrabajosDistribuidora { get; set; } = new List<TrabajoDistribuidora>();
 }
