@@ -38,6 +38,7 @@ $shortcutScript = @"
 Write-Host 'Acceso directo creado en el escritorio:' `$shortcutPath
 "@
 Set-Content -Path (Join-Path $appPath 'Crear acceso directo.ps1') -Value $shortcutScript -Encoding UTF8
+Copy-Item -Path (Join-Path $root 'desktop\reset-local-data.ps1') -Destination (Join-Path $appPath 'Reiniciar datos locales.ps1') -Force
 
 $readme = @"
 Pipita Garage Desktop
@@ -50,6 +51,7 @@ Nota:
 - Este paquete publicado ya incluye el runtime de .NET; no hace falta instalar .NET en la PC del cliente.
 - El acceso directo se crea despues de extraer, porque un .lnk dentro del ZIP no conoce la ruta final del usuario.
 - El acceso directo toma automaticamente el icono del PipitaDesktop.exe publicado.
+- El ZIP no incluye tu base local; los datos viven en AppData del usuario. Se agrega tambien 'Reiniciar datos locales.ps1' para pruebas limpias.
 "@
 Set-Content -Path (Join-Path $appPath 'LEEME.txt') -Value $readme -Encoding UTF8
 

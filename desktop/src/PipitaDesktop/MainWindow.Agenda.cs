@@ -198,7 +198,7 @@ public partial class MainWindow
 
             var hasCitas = citasDia.Count > 0;
             var firstCita = hasCitas ? citasDia[0] : null;
-            var dayBadge = hasCitas ? BuildStatusBadge(firstCita!.Estado) : null;
+            var dayBadge = hasCitas ? ResolveDayBadge(citasDia) : null;
 
             cells.Add(
                 new AgendaDayCell
@@ -310,6 +310,30 @@ public partial class MainWindow
             .ToList();
     }
 
+    private static AgendaBadge ResolveDayBadge(IEnumerable<CitaGridRow> citasDia)
+    {
+        var dominantEstado = citasDia
+            .OrderBy(cita => GetStatusPriority(cita.Estado))
+            .ThenBy(cita => cita.FechaHoraInicio)
+            .Select(cita => cita.Estado)
+            .FirstOrDefault();
+
+        return BuildStatusBadge(dominantEstado);
+    }
+
+    private static int GetStatusPriority(string? estado)
+    {
+        var key = estado?.Trim().ToLowerInvariant();
+        return key switch
+        {
+            "en_proceso" => 0,
+            "pendiente" => 1,
+            "confirmada" => 2,
+            "cancelada" => 3,
+            "completada" => 4,
+            _ => 5,
+        };
+    }
     private static AgendaBadge BuildStatusBadge(string? estado)
     {
         var key = estado?.Trim().ToLowerInvariant();
@@ -494,4 +518,5 @@ public sealed class AgendaWeekCell
     public Brush Background { get; init; } = Brushes.Transparent;
     public Brush Foreground { get; init; } = Brushes.Transparent;
 }
+
 
