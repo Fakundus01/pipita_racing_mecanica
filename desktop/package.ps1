@@ -47,8 +47,9 @@ Pipita Garage Desktop
 3. Si se quiere acceso directo en el escritorio, ejecutar 'Crear acceso directo.ps1'.
 
 Nota:
+- Este paquete publicado ya incluye el runtime de .NET; no hace falta instalar .NET en la PC del cliente.
 - El acceso directo se crea despues de extraer, porque un .lnk dentro del ZIP no conoce la ruta final del usuario.
-- Si luego definimos un icono propio, se puede aplicar tanto al .exe como al acceso directo.
+- El acceso directo toma automaticamente el icono del PipitaDesktop.exe publicado.
 "@
 Set-Content -Path (Join-Path $appPath 'LEEME.txt') -Value $readme -Encoding UTF8
 
