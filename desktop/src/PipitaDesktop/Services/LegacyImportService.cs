@@ -1,4 +1,4 @@
-using System.IO;
+﻿using System.IO;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using PipitaDesktop.Data;
@@ -69,7 +69,6 @@ public static class LegacyImportService
         await db.TrabajosDistribuidora.ExecuteDeleteAsync();
         await db.Distribuidoras.ExecuteDeleteAsync();
         await db.SolicitudesCliente.ExecuteDeleteAsync();
-        await db.Citas.ExecuteDeleteAsync();
         await db.Servicios.ExecuteDeleteAsync();
         await db.Reportes.ExecuteDeleteAsync();
         await db.Partes.ExecuteDeleteAsync();
@@ -334,6 +333,8 @@ internal static class SqliteDataReaderExtensions
         };
     }
 }
+
+
 
 
 

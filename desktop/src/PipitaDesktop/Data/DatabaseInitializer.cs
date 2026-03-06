@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Data;
 using System.IO;
 using Microsoft.EntityFrameworkCore;
@@ -93,26 +93,15 @@ public static class DatabaseInitializer
         db.Database.ExecuteSqlRaw("CREATE INDEX IF NOT EXISTS IX_trabajos_distribuidora_VehiculoId ON trabajos_distribuidora (VehiculoId);");
         db.Database.ExecuteSqlRaw("CREATE INDEX IF NOT EXISTS IX_trabajos_distribuidora_Fecha ON trabajos_distribuidora (Fecha);");
 
-        db.Database.ExecuteSqlRaw(
-            @"CREATE TABLE IF NOT EXISTS citas (
-                Id INTEGER NOT NULL CONSTRAINT PK_citas PRIMARY KEY AUTOINCREMENT,
-                ClienteId INTEGER NULL,
-                VehiculoId INTEGER NULL,
-                FechaHoraInicio TEXT NOT NULL,
-                DuracionMinutos INTEGER NOT NULL,
-                Estado TEXT NOT NULL,
-                Motivo TEXT NOT NULL,
-                Notas TEXT NULL,
-                CreatedAt TEXT NOT NULL,
-                UpdatedAt TEXT NOT NULL,
-                CONSTRAINT FK_citas_clientes_ClienteId FOREIGN KEY (ClienteId) REFERENCES clientes (Id) ON DELETE SET NULL,
-                CONSTRAINT FK_citas_vehiculos_VehiculoId FOREIGN KEY (VehiculoId) REFERENCES vehiculos (Id) ON DELETE SET NULL
-            );");
+        MigrateLegacyCitasIfPresent(db);
+    }
 
-        db.Database.ExecuteSqlRaw("CREATE INDEX IF NOT EXISTS IX_citas_ClienteId ON citas (ClienteId);");
-        db.Database.ExecuteSqlRaw("CREATE INDEX IF NOT EXISTS IX_citas_VehiculoId ON citas (VehiculoId);");
-        db.Database.ExecuteSqlRaw("CREATE INDEX IF NOT EXISTS IX_citas_FechaHoraInicio ON citas (FechaHoraInicio);");
-        db.Database.ExecuteSqlRaw("CREATE INDEX IF NOT EXISTS IX_citas_Estado ON citas (Estado);");
+    private static void MigrateLegacyCitasIfPresent(AppDbContext db)
+    {
+        if (!TableExists(db, "citas"))
+        {
+            return;
+        }
 
         db.Database.ExecuteSqlRaw(
             @"INSERT INTO solicitudes_cliente (
@@ -153,6 +142,8 @@ public static class DatabaseInitializer
                   AND s.FechaHoraCita = c.FechaHoraInicio
                   AND s.Descripcion = c.Motivo
               );");
+
+        db.Database.ExecuteSqlRaw("DROP TABLE IF EXISTS citas;");
     }
 
     private static void EnsureColumnExists(AppDbContext db, string tableName, string columnName, string definition)
@@ -179,5 +170,23 @@ public static class DatabaseInitializer
         using var alterCommand = connection.CreateCommand();
         alterCommand.CommandText = $"ALTER TABLE {tableName} ADD COLUMN {columnName} {definition};";
         alterCommand.ExecuteNonQuery();
+    }
+
+    private static bool TableExists(AppDbContext db, string tableName)
+    {
+        using var connection = db.Database.GetDbConnection();
+        if (connection.State != ConnectionState.Open)
+        {
+            connection.Open();
+        }
+
+        using var command = connection.CreateCommand();
+        command.CommandText = "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = $name LIMIT 1";
+        var parameter = command.CreateParameter();
+        parameter.ParameterName = "$name";
+        parameter.Value = tableName;
+        command.Parameters.Add(parameter);
+
+        return command.ExecuteScalar() is not null;
     }
 }
