@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Data;
 using System.IO;
 using Microsoft.EntityFrameworkCore;
@@ -37,6 +37,9 @@ public static class DatabaseInitializer
                 Prioridad TEXT NOT NULL,
                 Canal TEXT NULL,
                 Notas TEXT NULL,
+                UltimoAvisoTipo TEXT NULL,
+                UltimoAvisoCanal TEXT NULL,
+                UltimoAvisoAt TEXT NULL,
                 CreatedAt TEXT NOT NULL,
                 UpdatedAt TEXT NOT NULL,
                 CONSTRAINT FK_solicitudes_cliente_clientes_ClienteId FOREIGN KEY (ClienteId) REFERENCES clientes (Id) ON DELETE SET NULL,
@@ -50,6 +53,9 @@ public static class DatabaseInitializer
 
         EnsureColumnExists(db, "solicitudes_cliente", "FechaHoraCita", "TEXT NULL");
         EnsureColumnExists(db, "solicitudes_cliente", "DuracionMinutos", "INTEGER NOT NULL DEFAULT 60");
+        EnsureColumnExists(db, "solicitudes_cliente", "UltimoAvisoTipo", "TEXT NULL");
+        EnsureColumnExists(db, "solicitudes_cliente", "UltimoAvisoCanal", "TEXT NULL");
+        EnsureColumnExists(db, "solicitudes_cliente", "UltimoAvisoAt", "TEXT NULL");
 
         db.Database.ExecuteSqlRaw("UPDATE solicitudes_cliente SET FechaHoraCita = COALESCE(FechaHoraCita, FechaSolicitud);");
         db.Database.ExecuteSqlRaw("UPDATE solicitudes_cliente SET DuracionMinutos = COALESCE(DuracionMinutos, 60) WHERE DuracionMinutos IS NULL OR DuracionMinutos <= 0;");
@@ -115,6 +121,9 @@ public static class DatabaseInitializer
                 Prioridad,
                 Canal,
                 Notas,
+                UltimoAvisoTipo,
+                UltimoAvisoCanal,
+                UltimoAvisoAt,
                 CreatedAt,
                 UpdatedAt)
               SELECT
@@ -131,6 +140,9 @@ public static class DatabaseInitializer
                 'media',
                 NULL,
                 c.Notas,
+                NULL,
+                NULL,
+                NULL,
                 COALESCE(c.CreatedAt, CURRENT_TIMESTAMP),
                 COALESCE(c.UpdatedAt, CURRENT_TIMESTAMP)
               FROM citas c

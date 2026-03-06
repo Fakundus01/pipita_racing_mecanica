@@ -16,4 +16,7 @@ public sealed class SolicitudCliente : BaseEntity
     public string Prioridad { get; set; } = "media";
     public string? Canal { get; set; }
     public string? Notas { get; set; }
+    public string? UltimoAvisoTipo { get; set; }
+    public string? UltimoAvisoCanal { get; set; }
+    public DateTime? UltimoAvisoAt { get; set; }
 }

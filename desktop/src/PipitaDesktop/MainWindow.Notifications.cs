@@ -1,4 +1,4 @@
-﻿
+
 using System.Diagnostics;
 using System.Windows;
 using Microsoft.EntityFrameworkCore;
@@ -26,6 +26,7 @@ public partial class MainWindow
         var body = Uri.EscapeDataString(notification.Message);
         var mailto = "mailto:" + notification.Email + "?subject=" + subject + "&body=" + body;
         OpenExternalUri(mailto);
+        await RecordAgendaNotificationAsync(notification.CitaId, notification.Tipo, "email");
         StatusMessage = "Email preparado para " + notification.ClienteNombre + ".";
     }
 
@@ -48,7 +49,22 @@ public partial class MainWindow
 
         var url = "https://wa.me/" + phone + "?text=" + Uri.EscapeDataString(notification.Message);
         OpenExternalUri(url);
+        await RecordAgendaNotificationAsync(notification.CitaId, notification.Tipo, "whatsapp");
         StatusMessage = "WhatsApp preparado para " + notification.ClienteNombre + ".";
+    }
+
+    private async void CopiarMensajeAgendaButton_Click(object sender, RoutedEventArgs e)
+    {
+        var cita = (sender as FrameworkElement)?.DataContext as CitaGridRow;
+        var notification = await BuildAgendaNotificationAsync(cita);
+        if (notification is null)
+        {
+            return;
+        }
+
+        Clipboard.SetText(notification.Message);
+        await RecordAgendaNotificationAsync(notification.CitaId, notification.Tipo, "copia");
+        StatusMessage = "Mensaje copiado para " + notification.ClienteNombre + ".";
     }
 
     private async Task<AgendaNotification?> BuildAgendaNotificationAsync(CitaGridRow? cita)
@@ -77,7 +93,24 @@ public partial class MainWindow
         var tipo = GetAgendaNotificationType();
         var asunto = BuildAgendaNotificationSubject(tipo);
         var mensaje = BuildAgendaNotificationMessage(tipo, cliente.Nombre, cita);
-        return new AgendaNotification(cliente.Nombre, cliente.Telefono, cliente.Email, asunto, mensaje);
+        return new AgendaNotification(cita.Id, tipo, cliente.Nombre, cliente.Telefono, cliente.Email, asunto, mensaje);
+    }
+
+    private async Task RecordAgendaNotificationAsync(int citaId, string tipo, string canal)
+    {
+        using var db = CreateDbContext();
+        var solicitud = await db.SolicitudesCliente.FirstOrDefaultAsync(x => x.Id == citaId);
+        if (solicitud is null)
+        {
+            await RefreshAllAsync();
+            return;
+        }
+
+        solicitud.UltimoAvisoTipo = tipo;
+        solicitud.UltimoAvisoCanal = canal;
+        solicitud.UltimoAvisoAt = DateTime.Now;
+        await db.SaveChangesAsync();
+        await RefreshAllAsync($"Aviso registrado por {canal}.");
     }
 
     private string GetAgendaNotificationType()
@@ -147,4 +180,7 @@ public partial class MainWindow
     }
 }
 
-internal sealed record AgendaNotification(string ClienteNombre, string? Telefono, string? Email, string Subject, string Message);
+internal sealed record AgendaNotification(int CitaId, string Tipo, string ClienteNombre, string? Telefono, string? Email, string Subject, string Message);
+
+
+

@@ -1,4 +1,4 @@
-﻿<Window x:Class="PipitaDesktop.MainWindow"
+<Window x:Class="PipitaDesktop.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -1372,9 +1372,11 @@
                                                             <TextBlock Margin="0,4,0,0" Foreground="{StaticResource MutedTextBrush}" Text="{Binding Patente, StringFormat=Patente: {0}}" />
                                                             <TextBlock Margin="0,8,0,0" TextWrapping="Wrap" Text="{Binding Motivo}" />
                                                             <TextBlock Margin="0,6,0,0" Foreground="{StaticResource MutedTextBrush}" TextWrapping="Wrap" Text="{Binding Notas}" />
+                                                            <TextBlock Margin="0,10,0,0" Foreground="{StaticResource MutedTextBrush}" FontSize="11" Text="{Binding AvisoResumen}" />
                                                             <WrapPanel Margin="0,12,0,0">
                                                                 <Button Style="{StaticResource NotifyWhatsAppButtonStyle}" Content="WhatsApp" Click="AvisoWhatsAppAgendaButton_Click" />
                                                                 <Button Style="{StaticResource NotifyEmailButtonStyle}" Content="Email" Click="AvisoEmailAgendaButton_Click" />
+                                                                <Button Style="{StaticResource FormActionButtonStyle}" Padding="12,6" Content="Copiar mensaje" Click="CopiarMensajeAgendaButton_Click" />
                                                             </WrapPanel>
                                                         </StackPanel>
 
@@ -1504,6 +1506,9 @@
         </Border>
     </Grid>
 </Window>
+
+
+
 
 
 

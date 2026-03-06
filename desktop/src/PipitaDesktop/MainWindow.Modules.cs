@@ -71,6 +71,9 @@ public partial class MainWindow
                     Prioridad = solicitud.Prioridad,
                     Canal = solicitud.Canal,
                     Notas = solicitud.Notas,
+                    UltimoAvisoTipo = solicitud.UltimoAvisoTipo,
+                    UltimoAvisoCanal = solicitud.UltimoAvisoCanal,
+                    UltimoAvisoAt = solicitud.UltimoAvisoAt,
                 })
             .ToList();
 
@@ -767,6 +770,9 @@ public sealed class SolicitudGridRow
     public string Prioridad { get; init; } = string.Empty;
     public string? Canal { get; init; }
     public string? Notas { get; init; }
+    public string? UltimoAvisoTipo { get; init; }
+    public string? UltimoAvisoCanal { get; init; }
+    public DateTime? UltimoAvisoAt { get; init; }
 }
 
 public sealed class DistribuidoraGridRow
@@ -804,3 +810,6 @@ public sealed class DistribuidoraLookupItem
     public int? Id { get; init; }
     public string Display { get; init; } = string.Empty;
 }
+
+
+

@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using PipitaDesktop.Models;
 
 namespace PipitaDesktop.Data;
@@ -82,6 +82,8 @@ public sealed class AppDbContext : DbContext
             entity.Property(x => x.Prioridad).HasMaxLength(20).HasDefaultValue("media");
             entity.Property(x => x.Canal).HasMaxLength(40);
             entity.Property(x => x.Notas).HasMaxLength(4000);
+            entity.Property(x => x.UltimoAvisoTipo).HasMaxLength(40);
+            entity.Property(x => x.UltimoAvisoCanal).HasMaxLength(20);
             entity.HasIndex(x => x.FechaSolicitud);
             entity.HasIndex(x => x.FechaHoraCita);
             entity.HasIndex(x => x.Estado);
@@ -161,3 +163,6 @@ public sealed class AppDbContext : DbContext
         });
     }
 }
+
+
+

@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
@@ -109,6 +109,9 @@ public partial class MainWindow
                         Estado = solicitud.Estado,
                         Motivo = solicitud.Descripcion,
                         Notas = solicitud.Notas,
+                        UltimoAvisoTipo = solicitud.UltimoAvisoTipo,
+                        UltimoAvisoCanal = solicitud.UltimoAvisoCanal,
+                        UltimoAvisoAt = solicitud.UltimoAvisoAt,
                         EstadoBadgeText = badge.Text,
                         EstadoBadgeBackground = badge.Background,
                         EstadoBadgeForeground = badge.Foreground,
@@ -395,6 +398,27 @@ public partial class MainWindow
         return text.Length <= max ? text : $"{text[..max]}...";
     }
 
+    internal static string FormatAvisoCanal(string? canal)
+    {
+        return canal?.Trim().ToLowerInvariant() switch
+        {
+            "whatsapp" => "WhatsApp",
+            "email" => "Email",
+            "copia" => "Copia",
+            _ => "Aviso",
+        };
+    }
+
+    internal static string FormatAvisoTipo(string? tipo)
+    {
+        if (string.IsNullOrWhiteSpace(tipo))
+        {
+            return "Sin tipo";
+        }
+
+        return tipo;
+    }
+
     private void AgendaMesAnteriorButton_Click(object sender, RoutedEventArgs e)
     {
         _agendaMesActual = _agendaMesActual.AddMonths(-1);
@@ -465,6 +489,10 @@ public sealed class CitaGridRow
     public string Estado { get; init; } = string.Empty;
     public string Motivo { get; init; } = string.Empty;
     public string? Notas { get; init; }
+    public string? UltimoAvisoTipo { get; init; }
+    public string? UltimoAvisoCanal { get; init; }
+    public DateTime? UltimoAvisoAt { get; init; }
+    public string AvisoResumen => UltimoAvisoAt.HasValue ? string.Concat(MainWindow.FormatAvisoCanal(UltimoAvisoCanal), " | ", MainWindow.FormatAvisoTipo(UltimoAvisoTipo), " | ", UltimoAvisoAt.Value.ToString("dd/MM HH:mm", CultureInfo.InvariantCulture)) : "Sin avisos registrados";
     public string EstadoBadgeText { get; init; } = string.Empty;
     public Brush EstadoBadgeBackground { get; init; } = Brushes.Transparent;
     public Brush EstadoBadgeForeground { get; init; } = Brushes.Black;
@@ -518,5 +546,9 @@ public sealed class AgendaWeekCell
     public Brush Background { get; init; } = Brushes.Transparent;
     public Brush Foreground { get; init; } = Brushes.Transparent;
 }
+
+
+
+
 
 
