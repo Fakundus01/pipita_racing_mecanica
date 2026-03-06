@@ -311,9 +311,9 @@
                                 <ComboBox x:Name="ClienteEstadoCombo" ItemsSource="{Binding EstadoClientes}" />
 
                                 <WrapPanel Margin="0,8,0,0">
-                                    <Button Style="{StaticResource PrimaryButtonStyle}" Content="Guardar cliente" Click="GuardarClienteButton_Click" />
-                                    <Button Content="Nuevo" Click="NuevoClienteButton_Click" />
-                                    <Button Content="Eliminar" Click="EliminarClienteButton_Click" />
+                                    <Button Style="{StaticResource FormPrimaryActionButtonStyle}" Content="Guardar cliente" Click="GuardarClienteButton_Click" />
+                                    <Button Style="{StaticResource FormActionButtonStyle}" Content="Nuevo" Click="NuevoClienteButton_Click" />
+                                    <Button Style="{StaticResource FormActionButtonStyle}" Content="Eliminar" Click="EliminarClienteButton_Click" />
                                 </WrapPanel>
                             </StackPanel>
                         </ScrollViewer>
@@ -526,9 +526,9 @@
                                           SelectedValuePath="Id" />
 
                                 <WrapPanel Margin="0,8,0,0">
-                                    <Button Style="{StaticResource PrimaryButtonStyle}" Content="Guardar vehiculo" Click="GuardarVehiculoButton_Click" />
-                                    <Button Content="Nuevo" Click="NuevoVehiculoButton_Click" />
-                                    <Button Content="Eliminar" Click="EliminarVehiculoButton_Click" />
+                                    <Button Style="{StaticResource FormPrimaryActionButtonStyle}" Content="Guardar vehiculo" Click="GuardarVehiculoButton_Click" />
+                                    <Button Style="{StaticResource FormActionButtonStyle}" Content="Nuevo" Click="NuevoVehiculoButton_Click" />
+                                    <Button Style="{StaticResource FormActionButtonStyle}" Content="Eliminar" Click="EliminarVehiculoButton_Click" />
                                 </WrapPanel>
                             </StackPanel>
                         </ScrollViewer>
@@ -608,9 +608,9 @@
                                 <TextBox x:Name="ParteCostoInput" />
 
                                 <WrapPanel Margin="0,8,0,0">
-                                    <Button Style="{StaticResource PrimaryButtonStyle}" Content="Guardar parte" Click="GuardarParteButton_Click" />
-                                    <Button Content="Nuevo" Click="NuevoParteButton_Click" />
-                                    <Button Content="Eliminar" Click="EliminarParteButton_Click" />
+                                    <Button Style="{StaticResource FormPrimaryActionButtonStyle}" Content="Guardar parte" Click="GuardarParteButton_Click" />
+                                    <Button Style="{StaticResource FormActionButtonStyle}" Content="Nuevo" Click="NuevoParteButton_Click" />
+                                    <Button Style="{StaticResource FormActionButtonStyle}" Content="Eliminar" Click="EliminarParteButton_Click" />
                                 </WrapPanel>
                             </StackPanel>
                         </ScrollViewer>
@@ -697,9 +697,9 @@
                                 <TextBox x:Name="ServicioNotasInput" Height="96" AcceptsReturn="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" />
 
                                 <WrapPanel Margin="0,8,0,0">
-                                    <Button Style="{StaticResource PrimaryButtonStyle}" Content="Guardar servicio" Click="GuardarServicioButton_Click" />
-                                    <Button Content="Nuevo" Click="NuevoServicioButton_Click" />
-                                    <Button Content="Eliminar" Click="EliminarServicioButton_Click" />
+                                    <Button Style="{StaticResource FormPrimaryActionButtonStyle}" Content="Guardar servicio" Click="GuardarServicioButton_Click" />
+                                    <Button Style="{StaticResource FormActionButtonStyle}" Content="Nuevo" Click="NuevoServicioButton_Click" />
+                                    <Button Style="{StaticResource FormActionButtonStyle}" Content="Eliminar" Click="EliminarServicioButton_Click" />
                                 </WrapPanel>
                             </StackPanel>
                         </ScrollViewer>
@@ -780,9 +780,9 @@
                                 <DatePicker x:Name="ReporteGeneradoElInput" />
 
                                 <WrapPanel Margin="0,8,0,0">
-                                    <Button Style="{StaticResource PrimaryButtonStyle}" Content="Guardar reporte" Click="GuardarReporteButton_Click" />
-                                    <Button Content="Nuevo" Click="NuevoReporteButton_Click" />
-                                    <Button Content="Eliminar" Click="EliminarReporteButton_Click" />
+                                    <Button Style="{StaticResource FormPrimaryActionButtonStyle}" Content="Guardar reporte" Click="GuardarReporteButton_Click" />
+                                    <Button Style="{StaticResource FormActionButtonStyle}" Content="Nuevo" Click="NuevoReporteButton_Click" />
+                                    <Button Style="{StaticResource FormActionButtonStyle}" Content="Eliminar" Click="EliminarReporteButton_Click" />
                                 </WrapPanel>
                             </StackPanel>
                         </ScrollViewer>
@@ -894,8 +894,8 @@
 
                                 <WrapPanel Margin="0,8,0,0">
                                     <Button Style="{StaticResource PrimaryButtonStyle}" Content="Guardar request" Click="GuardarSolicitudButton_Click" />
-                                    <Button Content="Nuevo" Click="NuevoSolicitudButton_Click" />
-                                    <Button Content="Eliminar" Click="EliminarSolicitudButton_Click" />
+                                    <Button Style="{StaticResource FormActionButtonStyle}" Content="Nuevo" Click="NuevoSolicitudButton_Click" />
+                                    <Button Style="{StaticResource FormActionButtonStyle}" Content="Eliminar" Click="EliminarSolicitudButton_Click" />
                                 </WrapPanel>
                             </StackPanel>
                         </ScrollViewer>
@@ -978,9 +978,9 @@
                                 <TextBox x:Name="DistribuidoraNotasInput" Height="70" AcceptsReturn="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" />
 
                                 <WrapPanel Margin="0,8,0,0">
-                                    <Button Style="{StaticResource PrimaryButtonStyle}" Content="Guardar distribuidora" Click="GuardarDistribuidoraButton_Click" />
-                                    <Button Content="Nuevo" Click="NuevoDistribuidoraButton_Click" />
-                                    <Button Content="Eliminar" Click="EliminarDistribuidoraButton_Click" />
+                                    <Button Style="{StaticResource FormPrimaryActionButtonStyle}" Content="Guardar distribuidora" Click="GuardarDistribuidoraButton_Click" />
+                                    <Button Style="{StaticResource FormActionButtonStyle}" Content="Nuevo" Click="NuevoDistribuidoraButton_Click" />
+                                    <Button Style="{StaticResource FormActionButtonStyle}" Content="Eliminar" Click="EliminarDistribuidoraButton_Click" />
                                 </WrapPanel>
 
                                 <Border Margin="0,16,0,14" BorderBrush="{StaticResource BorderBrushSoft}" BorderThickness="0,1,0,0" />
@@ -1022,9 +1022,9 @@
                                 <TextBox x:Name="TrabajoNotasInput" Height="70" AcceptsReturn="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" />
 
                                 <WrapPanel Margin="0,8,0,0">
-                                    <Button Style="{StaticResource PrimaryButtonStyle}" Content="Guardar trabajo" Click="GuardarTrabajoDistribuidoraButton_Click" />
-                                    <Button Content="Nuevo" Click="NuevoTrabajoDistribuidoraButton_Click" />
-                                    <Button Content="Eliminar" Click="EliminarTrabajoDistribuidoraButton_Click" />
+                                    <Button Style="{StaticResource FormPrimaryActionButtonStyle}" Content="Guardar trabajo" Click="GuardarTrabajoDistribuidoraButton_Click" />
+                                    <Button Style="{StaticResource FormActionButtonStyle}" Content="Nuevo" Click="NuevoTrabajoDistribuidoraButton_Click" />
+                                    <Button Style="{StaticResource FormActionButtonStyle}" Content="Eliminar" Click="EliminarTrabajoDistribuidoraButton_Click" />
                                 </WrapPanel>
                             </StackPanel>
                         </ScrollViewer>
@@ -1523,5 +1523,6 @@
         </Border>
     </Grid>
 </Window>
+
 
 

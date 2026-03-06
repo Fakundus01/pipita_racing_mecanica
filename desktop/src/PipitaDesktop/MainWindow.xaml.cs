@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.ComponentModel;
 using System.Globalization;
 using System.IO;
@@ -2218,6 +2219,8 @@ internal sealed class GridViewState
     public ListSortDirection SortDirection { get; set; } = ListSortDirection.Ascending;
     public string PageText => $"Pagina {Page}/{TotalPages} - {TotalItems} registros";
 }
+
+
 
 
 
