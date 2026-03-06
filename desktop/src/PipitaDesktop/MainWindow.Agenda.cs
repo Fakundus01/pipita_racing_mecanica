@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
@@ -494,3 +494,4 @@ public sealed class AgendaWeekCell
     public Brush Background { get; init; } = Brushes.Transparent;
     public Brush Foreground { get; init; } = Brushes.Transparent;
 }
+

@@ -1165,20 +1165,20 @@
                             </DockPanel>
 
                             <WrapPanel Grid.Row="2" Margin="0,0,0,12">
-                                <Border Margin="0,0,10,0" Padding="10,5" Background="#FFD9F1FF" CornerRadius="999">
-                                    <TextBlock Foreground="#FF0B5276" FontWeight="SemiBold" Text="Confirmada" />
+                                <Border Margin="0,0,10,0" Padding="12,6" Background="#FFD9F1FF" BorderBrush="#FF8BC9E8" BorderThickness="1" CornerRadius="8">
+                                    <TextBlock Foreground="#FF0B5276" FontSize="12" FontWeight="SemiBold" Text="Confirmada" />
                                 </Border>
-                                <Border Margin="0,0,10,0" Padding="10,5" Background="#FFFDF0C4" CornerRadius="999">
-                                    <TextBlock Foreground="#FF7A4F00" FontWeight="SemiBold" Text="Pendiente" />
+                                <Border Margin="0,0,10,0" Padding="12,6" Background="#FFFDF0C4" BorderBrush="#FFE0C15A" BorderThickness="1" CornerRadius="8">
+                                    <TextBlock Foreground="#FF7A4F00" FontSize="12" FontWeight="SemiBold" Text="Pendiente" />
                                 </Border>
-                                <Border Margin="0,0,10,0" Padding="10,5" Background="#FFFEDFCF" CornerRadius="999">
-                                    <TextBlock Foreground="#FF8A3F00" FontWeight="SemiBold" Text="En proceso" />
+                                <Border Margin="0,0,10,0" Padding="12,6" Background="#FFFEDFCF" BorderBrush="#FFE5B695" BorderThickness="1" CornerRadius="8">
+                                    <TextBlock Foreground="#FF8A3F00" FontSize="12" FontWeight="SemiBold" Text="En proceso" />
                                 </Border>
-                                <Border Margin="0,0,10,0" Padding="10,5" Background="#FFDDF7E5" CornerRadius="999">
-                                    <TextBlock Foreground="#FF166B2F" FontWeight="SemiBold" Text="Completada" />
+                                <Border Margin="0,0,10,0" Padding="12,6" Background="#FFDDF7E5" BorderBrush="#FF9ED0AC" BorderThickness="1" CornerRadius="8">
+                                    <TextBlock Foreground="#FF166B2F" FontSize="12" FontWeight="SemiBold" Text="Completada" />
                                 </Border>
-                                <Border Padding="10,5" Background="#FFF1D9DC" CornerRadius="999">
-                                    <TextBlock Foreground="#FF8E2430" FontWeight="SemiBold" Text="Cancelada" />
+                                <Border Padding="12,6" Background="#FFF1D9DC" BorderBrush="#FFD5A0A7" BorderThickness="1" CornerRadius="8">
+                                    <TextBlock Foreground="#FF8E2430" FontSize="12" FontWeight="SemiBold" Text="Cancelada" />
                                 </Border>
                             </WrapPanel>
 
@@ -1210,68 +1210,34 @@
                                     </ItemsControl.ItemsPanel>
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
-                                            <Button Click="AgendaDiaButton_Click" Style="{x:Null}" Margin="0" Padding="0" BorderThickness="0" Background="Transparent">
-                                                <Border x:Name="DayCellBorder" BorderBrush="#FFD5DCE6" BorderThickness="0.5" Background="White" MinHeight="132" Padding="10">
+                                            <Button Click="AgendaDiaButton_Click" Margin="0" Padding="0" BorderThickness="0" Background="Transparent" FocusVisualStyle="{x:Null}" OverridesDefaultStyle="True">
+                                                <Button.Template>
+                                                    <ControlTemplate TargetType="Button">
+                                                        <ContentPresenter />
+                                                    </ControlTemplate>
+                                                </Button.Template>
+                                                <Border x:Name="DayCellBorder" BorderBrush="{Binding CellBorderBrush}" BorderThickness="0.5" Background="{Binding CellBackground}" MinHeight="132" Padding="10">
                                                     <Grid>
-                                                        <Grid.RowDefinitions>
-                                                            <RowDefinition Height="Auto" />
-                                                            <RowDefinition Height="*" />
-                                                            <RowDefinition Height="Auto" />
-                                                        </Grid.RowDefinitions>
-
                                                         <Border x:Name="DayNumberBadge"
                                                                 HorizontalAlignment="Right"
-                                                                Padding="10,4"
-                                                                CornerRadius="999"
+                                                                VerticalAlignment="Top"
+                                                                Padding="11,5"
+                                                                BorderBrush="{Binding CellBorderBrush}"
+                                                                BorderThickness="1"
+                                                                CornerRadius="12"
                                                                 Background="{Binding DayNumberBackground}">
                                                             <TextBlock x:Name="DayNumberText"
+                                                                       MinWidth="18"
+                                                                       TextAlignment="Center"
                                                                        FontSize="24"
                                                                        FontWeight="Bold"
                                                                        Foreground="{Binding DayNumberForeground}"
                                                                        Text="{Binding DayNumber}" />
                                                         </Border>
-
-                                                        <StackPanel Grid.Row="1" Margin="0,14,0,0" VerticalAlignment="Top">
-                                                            <TextBlock x:Name="DayPreviewPrimary"
-                                                                       FontWeight="SemiBold"
-                                                                       Foreground="#FF203040"
-                                                                       TextWrapping="Wrap"
-                                                                       Visibility="Collapsed"
-                                                                       Text="{Binding PreviewPrimary}" />
-                                                            <Border x:Name="DayPreviewSecondaryBorder"
-                                                                    Margin="0,8,0,0"
-                                                                    Padding="8,3"
-                                                                    CornerRadius="999"
-                                                                    Background="{Binding PreviewBadgeBackground}"
-                                                                    HorizontalAlignment="Left"
-                                                                    Visibility="Collapsed">
-                                                                <TextBlock x:Name="DayPreviewSecondary"
-                                                                           FontSize="10"
-                                                                           FontWeight="SemiBold"
-                                                                           Foreground="{Binding PreviewBadgeForeground}"
-                                                                           Text="{Binding PreviewSecondary}" />
-                                                            </Border>
-                                                        </StackPanel>
-
-                                                        <TextBlock x:Name="DayCountText"
-                                                                   Grid.Row="2"
-                                                                   HorizontalAlignment="Left"
-                                                                   VerticalAlignment="Bottom"
-                                                                   FontSize="11"
-                                                                   Foreground="#FF2C5E9D"
-                                                                   FontWeight="SemiBold"
-                                                                   Visibility="Collapsed"
-                                                                   Text="{Binding TotalCitas, StringFormat={}{0} cita(s)}" />
                                                     </Grid>
                                                 </Border>
                                             </Button>
                                             <DataTemplate.Triggers>
-                                                <DataTrigger Binding="{Binding HasCitas}" Value="True">
-                                                    <Setter TargetName="DayCellBorder" Property="Background" Value="#FFEDF4FF" />
-                                                    <Setter TargetName="DayCountText" Property="Visibility" Value="Visible" />
-                                                    <Setter TargetName="DayPreviewPrimary" Property="Visibility" Value="Visible" />
-                                                    <Setter TargetName="DayPreviewSecondaryBorder" Property="Visibility" Value="Visible" />
-                                                </DataTrigger>
                                                 <DataTrigger Binding="{Binding IsCurrentMonth}" Value="False">
                                                     <Setter TargetName="DayCellBorder" Property="Opacity" Value="0.35" />
                                                 </DataTrigger>
@@ -1283,6 +1249,8 @@
                                                     <Setter TargetName="DayCellBorder" Property="Background" Value="#FFF6E27A" />
                                                     <Setter TargetName="DayCellBorder" Property="BorderBrush" Value="#FFE1BE28" />
                                                     <Setter TargetName="DayCellBorder" Property="BorderThickness" Value="2" />
+                                                    <Setter TargetName="DayNumberBadge" Property="Background" Value="#FFFCEBA4" />
+                                                    <Setter TargetName="DayNumberBadge" Property="BorderBrush" Value="#FFE1BE28" />
                                                 </DataTrigger>
                                             </DataTemplate.Triggers>
                                         </DataTemplate>
@@ -1373,8 +1341,8 @@
                                                             <TextBlock Margin="0,6,0,0" Foreground="{StaticResource MutedTextBrush}" TextWrapping="Wrap" Text="{Binding Notas}" />
                                                         </StackPanel>
 
-                                                        <Border Grid.Column="3" Background="{Binding EstadoBadgeBackground}" CornerRadius="999" Padding="10,4" VerticalAlignment="Top">
-                                                            <TextBlock Text="{Binding EstadoBadgeText}" Foreground="{Binding EstadoBadgeForeground}" FontSize="11" FontWeight="SemiBold" />
+                                                        <Border Grid.Column="3" Background="{Binding EstadoBadgeBackground}" BorderBrush="{Binding EstadoBadgeBorder}" BorderThickness="1" CornerRadius="8" Padding="12,6" MinWidth="104" VerticalAlignment="Top">
+                                                            <TextBlock Text="{Binding EstadoBadgeText}" Foreground="{Binding EstadoBadgeForeground}" FontSize="12" FontWeight="SemiBold" TextAlignment="Center" HorizontalAlignment="Center" />
                                                         </Border>
                                                     </Grid>
                                                 </Border>
@@ -1555,4 +1523,5 @@
         </Border>
     </Grid>
 </Window>
+
 
