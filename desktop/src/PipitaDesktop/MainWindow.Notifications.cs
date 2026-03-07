@@ -24,12 +24,11 @@ public partial class MainWindow
 
         var subject = Uri.EscapeDataString(notification.Subject);
         var body = Uri.EscapeDataString(notification.Message);
-        var mailto = "mailto:" + notification.Email + "?subject=" + subject + "&body=" + body;
-        OpenExternalUri(mailto);
+        var gmailUrl = "https://mail.google.com/mail/?view=cm&fs=1&to=" + Uri.EscapeDataString(notification.Email) + "&su=" + subject + "&body=" + body;
+        OpenExternalUri(gmailUrl);
         await RecordAgendaNotificationAsync(notification.CitaId, notification.Tipo, "email");
-        StatusMessage = "Email preparado para " + notification.ClienteNombre + ".";
+        StatusMessage = "Email preparado en Gmail para " + notification.ClienteNombre + ".";
     }
-
 
     private async void AvisoWhatsAppAgendaButton_Click(object sender, RoutedEventArgs e)
     {
@@ -47,8 +46,7 @@ public partial class MainWindow
             return;
         }
 
-        var url = "https://wa.me/" + phone + "?text=" + Uri.EscapeDataString(notification.Message);
-        OpenExternalUri(url);
+        OpenWhatsApp(phone, notification.Message);
         await RecordAgendaNotificationAsync(notification.CitaId, notification.Tipo, "whatsapp");
         StatusMessage = "WhatsApp preparado para " + notification.ClienteNombre + ".";
     }
@@ -110,7 +108,7 @@ public partial class MainWindow
         solicitud.UltimoAvisoCanal = canal;
         solicitud.UltimoAvisoAt = DateTime.Now;
         await db.SaveChangesAsync();
-        await RefreshAllAsync($"Aviso registrado por {canal}.");
+        await RefreshAllAsync("Aviso registrado por " + canal + ".");
     }
 
     private string GetAgendaNotificationType()
@@ -174,6 +172,20 @@ public partial class MainWindow
         return digits;
     }
 
+    private static void OpenWhatsApp(string phone, string message)
+    {
+        var encodedMessage = Uri.EscapeDataString(message);
+
+        try
+        {
+            OpenExternalUri("whatsapp://send?phone=" + phone + "&text=" + encodedMessage);
+        }
+        catch
+        {
+            OpenExternalUri("https://web.whatsapp.com/send?phone=" + phone + "&text=" + encodedMessage + "&app_absent=0");
+        }
+    }
+
     private static void OpenExternalUri(string uri)
     {
         Process.Start(new ProcessStartInfo(uri) { UseShellExecute = true });
@@ -181,6 +193,4 @@ public partial class MainWindow
 }
 
 internal sealed record AgendaNotification(int CitaId, string Tipo, string ClienteNombre, string? Telefono, string? Email, string Subject, string Message);
-
-
 
