@@ -13,6 +13,7 @@
         Background="{DynamicResource WindowBackgroundBrush}"
         FontFamily="Bahnschrift">
         <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         <LinearGradientBrush x:Key="WindowBackgroundBrush" StartPoint="0,0" EndPoint="1,1">
             <GradientStop Color="#FFF3F8FE" Offset="0" />
             <GradientStop Color="#FFE9F0FB" Offset="0.55" />
@@ -296,12 +297,11 @@
                 </StackPanel>
                 <StackPanel Grid.Column="1" VerticalAlignment="Center">
                     <WrapPanel HorizontalAlignment="Right">
-                        <Button Style="{StaticResource HeaderActionButtonStyle}" Content="Importar DB vieja" Click="ImportarLegacyDbButton_Click" />
                         <Button Style="{StaticResource HeaderActionButtonStyle}" Content="Importar Excel" Click="ImportarExcelButton_Click" />
                         <Button Style="{StaticResource HeaderPrimaryActionButtonStyle}" Content="Exportar Excel" Click="ExportarExcelButton_Click" />
                         <Button Style="{StaticResource HeaderActionButtonStyle}" Content="Actualizar" Click="RefreshButton_Click" />
                     </WrapPanel>
-                    <TextBlock Margin="0,10,0,0" HorizontalAlignment="Right" Foreground="#E5F2FF" Text="{Binding IsBusy, StringFormat=Cargando: {0}}" />
+                    <TextBlock Margin="0,10,0,0" HorizontalAlignment="Right" Foreground="#E5F2FF" FontWeight="SemiBold" Text="Actualizando datos..." Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}" />
                 </StackPanel>
             </Grid>
         </Border>
@@ -1506,6 +1506,8 @@
         </Border>
     </Grid>
 </Window>
+
+
 
 
 
