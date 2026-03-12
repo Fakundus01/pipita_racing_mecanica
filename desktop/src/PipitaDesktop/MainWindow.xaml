@@ -282,18 +282,22 @@
                 <StackPanel>
                     <TextBlock Text="PIPITA GARAGE" FontSize="12" Foreground="#D9FFFFFF" FontWeight="SemiBold" />
                     <TextBlock Margin="0,4,0,0" Text="Panel operativo del taller" FontSize="30" FontWeight="Bold" Foreground="White" />
-                    <TextBlock Margin="0,4,0,0" Text="Carga de clientes, autos, servicios, requests y distribuidoras. Sin login." FontSize="14" Foreground="#E6F3FF" />
+                    <TextBlock Margin="0,4,0,0" Text="Carga de clientes, autos, servicios, agenda y perfiles locales. Sync remoto opcional." FontSize="14" Foreground="#E6F3FF" />
                     <WrapPanel Margin="0,12,0,0">
                         <Border Style="{StaticResource HeaderChipBorderStyle}">
-                            <TextBlock Text="Exportacion Excel" Foreground="White" />
+                            <TextBlock Text="{Binding CurrentProfileHeaderText}" Foreground="White" />
                         </Border>
                         <Border Style="{StaticResource HeaderChipBorderStyle}">
-                            <TextBlock Text="Flujo simple de taller" Foreground="White" />
+                            <TextBlock Text="{Binding CurrentProfileRemoteHeaderText}" Foreground="White" />
+                        </Border>
+                        <Border Style="{StaticResource HeaderChipBorderStyle}">
+                            <TextBlock Text="Excel maestro y perfiles" Foreground="White" />
                         </Border>
                     </WrapPanel>
                 </StackPanel>
                 <StackPanel Grid.Column="1" VerticalAlignment="Center">
                     <WrapPanel HorizontalAlignment="Right">
+                        <Button Style="{StaticResource HeaderActionButtonStyle}" Content="Perfil y sync" Click="PerfilButton_Click" />
                         <Button Style="{StaticResource HeaderActionButtonStyle}" Content="Importar Excel" Click="ImportarExcelButton_Click" />
                         <Button Style="{StaticResource HeaderPrimaryActionButtonStyle}" Content="Exportar Excel" Click="ExportarExcelButton_Click" />
                         <Button Style="{StaticResource HeaderActionButtonStyle}" Content="Actualizar" Click="RefreshButton_Click" />

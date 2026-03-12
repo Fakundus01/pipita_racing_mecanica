@@ -1,0 +1,20 @@
+﻿services:
+  - type: web
+    name: pipita-sync-api
+    runtime: dotnet
+    plan: free
+    rootDir: server/PipitaSyncApi
+    healthCheckPath: /health
+    buildCommand: dotnet publish -c Release -o out
+    startCommand: dotnet out/PipitaSyncApi.dll
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: Jwt__Issuer
+        value: PipitaSyncApi
+      - key: Jwt__Audience
+        value: PipitaDesktop
+      - key: Jwt__SigningKey
+        sync: false
+      - key: Server__PublicBaseUrl
+        sync: false

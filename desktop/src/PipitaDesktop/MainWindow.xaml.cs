@@ -205,6 +205,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     {
         InitializeComponent();
         DataContext = this;
+        RefreshProfileHeader();
         Loaded += OnLoaded;
     }
 
