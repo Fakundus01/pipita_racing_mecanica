@@ -17,15 +17,23 @@ public static class ProfileSecurity
 
     public static bool VerifyPin(string pin, string? hash, string? salt)
     {
-        if (string.IsNullOrWhiteSpace(pin) || string.IsNullOrWhiteSpace(hash) || string.IsNullOrWhiteSpace(salt))
+        var normalizedPin = pin?.Trim();
+        if (string.IsNullOrWhiteSpace(normalizedPin) || string.IsNullOrWhiteSpace(hash) || string.IsNullOrWhiteSpace(salt))
         {
             return false;
         }
 
-        var saltBytes = Convert.FromBase64String(salt);
-        var expectedHash = Convert.FromBase64String(hash);
-        using var pbkdf2 = new Rfc2898DeriveBytes(pin, saltBytes, 100_000, HashAlgorithmName.SHA256);
-        var candidate = pbkdf2.GetBytes(32);
-        return CryptographicOperations.FixedTimeEquals(candidate, expectedHash);
+        try
+        {
+            var saltBytes = Convert.FromBase64String(salt);
+            var expectedHash = Convert.FromBase64String(hash);
+            using var pbkdf2 = new Rfc2898DeriveBytes(normalizedPin, saltBytes, 100_000, HashAlgorithmName.SHA256);
+            var candidate = pbkdf2.GetBytes(32);
+            return CryptographicOperations.FixedTimeEquals(candidate, expectedHash);
+        }
+        catch (FormatException)
+        {
+            return false;
+        }
     }
 }

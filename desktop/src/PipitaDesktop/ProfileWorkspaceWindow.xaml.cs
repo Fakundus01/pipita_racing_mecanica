@@ -17,8 +17,8 @@ public partial class ProfileWorkspaceWindow : Window
     private bool _isLoadingRemoteProfiles;
 
     public bool RequiresDataRefresh { get; private set; }
-    public bool RequiresAppRestart { get; private set; }
     public bool HeaderNeedsRefresh { get; private set; }
+    public string? RequestedProfileId { get; private set; }
 
     public ProfileWorkspaceWindow(AppProfilesState state, AppProfile currentProfile)
     {
@@ -142,7 +142,7 @@ public partial class ProfileWorkspaceWindow : Window
         }
 
         ProfileManager.SetLastProfile(_state, profile.Id);
-        RequiresAppRestart = true;
+        RequestedProfileId = profile.Id;
         HeaderNeedsRefresh = true;
         DialogResult = true;
     }
@@ -641,7 +641,7 @@ public partial class ProfileWorkspaceWindow : Window
         RemoteProfileNameInput.Text = profile.Name;
         SelectedProfileSummaryText.Text = profile.Id == _currentProfile.Id
             ? $"{profile.Name} es el perfil activo. Si restauras este perfil, la app refresca al cerrar esta ventana."
-            : $"{profile.Name} usa una base local separada y se puede abrir reiniciando la app.";
+            : $"{profile.Name} usa una base local separada y se puede abrir sin reiniciar la app.";
         ProfileFolderText.Text = ProfileManager.GetProfileDirectory(profile);
         ProfileDatabaseText.Text = ProfileManager.GetDatabasePath(profile);
         ProfileBackupsText.Text = ProfileManager.GetBackupDirectory(profile);

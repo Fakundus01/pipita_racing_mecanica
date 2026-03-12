@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using System.Windows;
 using PipitaDesktop.Data;
 
@@ -56,6 +55,12 @@ public partial class MainWindow
             dialog.ShowDialog();
 
             var refreshedState = ProfileManager.LoadState();
+            if (!string.IsNullOrWhiteSpace(dialog.RequestedProfileId))
+            {
+                await SwitchToProfileAsync(refreshedState, dialog.RequestedProfileId);
+                return;
+            }
+
             if (ActiveProfileContext.CurrentProfile is not null)
             {
                 var refreshedActive = refreshedState.Profiles.FirstOrDefault(x => x.Id == ActiveProfileContext.CurrentProfile.Id);
@@ -75,11 +80,6 @@ public partial class MainWindow
             {
                 ShowSuccessToast("Perfil actualizado.", "Perfiles");
             }
-
-            if (dialog.RequiresAppRestart)
-            {
-                RestartApplication();
-            }
         }
         catch (Exception ex)
         {
@@ -87,21 +87,69 @@ public partial class MainWindow
         }
     }
 
-    private static void RestartApplication()
+    private async Task SwitchToProfileAsync(AppProfilesState state, string profileId)
     {
-        var executablePath = Environment.ProcessPath;
-        if (string.IsNullOrWhiteSpace(executablePath))
+        var nextProfile = ProfileManager.GetProfile(state, profileId);
+        if (nextProfile.HasPin && !PromptForProfilePin(nextProfile))
         {
-            executablePath = Process.GetCurrentProcess().MainModule?.FileName;
-        }
-
-        if (string.IsNullOrWhiteSpace(executablePath))
-        {
-            Application.Current.Shutdown();
+            ShowWarningToast("No se abrio el perfil porque el PIN no pudo validarse.", "Perfiles");
+            RefreshProfileHeader();
             return;
         }
 
-        Process.Start(new ProcessStartInfo(executablePath) { UseShellExecute = true });
-        Application.Current.Shutdown();
+        ActiveProfileContext.SetCurrentProfile(nextProfile);
+        ProfileManager.SetLastProfile(state, nextProfile.Id);
+        DatabaseInitializer.EnsureCreated();
+        ResetUiForProfileSwitch();
+        RefreshProfileHeader();
+        await RefreshAllAsync($"Perfil cargado: {nextProfile.Name}.");
+    }
+
+    private bool PromptForProfilePin(AppProfile profile)
+    {
+        while (true)
+        {
+            var pinDialog = new ProfilePinWindow(profile)
+            {
+                Owner = this,
+            };
+
+            if (pinDialog.ShowDialog() != true)
+            {
+                return false;
+            }
+
+            if (ProfileSecurity.VerifyPin(pinDialog.EnteredPin, profile.PinHash, profile.PinSalt))
+            {
+                return true;
+            }
+
+            var retry = MessageBox.Show(
+                "El PIN no coincide. Podes reintentar o cancelar el cambio de perfil.",
+                "PIN incorrecto",
+                MessageBoxButton.OKCancel,
+                MessageBoxImage.Warning);
+
+            if (retry != MessageBoxResult.OK)
+            {
+                return false;
+            }
+        }
+    }
+
+    private void ResetUiForProfileSwitch()
+    {
+        ClearClienteForm();
+        ClearVehiculoForm();
+        ClearParteForm();
+        ClearServicioForm();
+        ClearReporteForm();
+        ClearSolicitudForm();
+        ClearDistribuidoraForm();
+        ClearTrabajoDistribuidoraForm();
+        ClienteHistorialVehiculos.Clear();
+        ClienteHistorialSolicitudes.Clear();
+        ClienteHistorialServicios.Clear();
+        ClienteHistorialTrabajosDistribuidora.Clear();
     }
 }
