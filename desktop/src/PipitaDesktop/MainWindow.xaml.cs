@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.ComponentModel;
 using System.Globalization;
@@ -240,7 +240,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         DashboardDesdeInput.SelectedDate = DateTime.Today.AddDays(-30);
         DashboardHastaInput.SelectedDate = DateTime.Today;
 
-        await RefreshAllAsync("Aplicacion lista.");
+        await RefreshAllAsync();
     }
 
     private static AppDbContext CreateDbContext()
@@ -267,7 +267,13 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             await LoadAgendaAsync();
             UpdateDashboardMetrics();
             RefreshClienteHistorial(_editingClienteId);
-            StatusMessage = status ?? $"Datos actualizados ({DateTime.Now:HH:mm:ss}).";
+            var effectiveStatus = status ?? $"Datos actualizados ({DateTime.Now:HH:mm:ss}).";
+            StatusMessage = effectiveStatus;
+
+            if (!string.IsNullOrWhiteSpace(status))
+            {
+                ShowSuccessToast(status, "Operacion completada");
+            }
         }
         catch (Exception ex)
         {
@@ -1088,22 +1094,14 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             StatusMessage = $"Excel exportado: {exportPath}";
 
             var extraMessage = generatedNewPath
-                ? "\n\nSe genero un archivo nuevo porque el nombre elegido ya existia."
-                : string.Empty;
+                ? "Se genero un archivo nuevo porque el nombre elegido ya existia."
+                : "Archivo actualizado correctamente.";
 
-            MessageBox.Show(
-                $"Exportacion completada.\n\nArchivo:\n{exportPath}{extraMessage}",
-                "Exportar Excel",
-                MessageBoxButton.OK,
-                MessageBoxImage.Information);
+            ShowSuccessToast($"{Path.GetFileName(exportPath)}. {extraMessage}", "Exportacion Excel");
         }
-        catch (IOException ioEx)
+        catch (IOException)
         {
-            MessageBox.Show(
-                $"No se pudo exportar el Excel porque el archivo esta en uso.\n\nCierra el archivo y reintenta.\n\nDetalle: {ioEx.Message}",
-                "Excel en uso",
-                MessageBoxButton.OK,
-                MessageBoxImage.Warning);
+            ShowWarningToast("Cierra el archivo Excel y reintenta la exportacion.", "Excel en uso");
         }
         catch (Exception ex)
         {
@@ -2133,6 +2131,7 @@ Queres continuar?";
 
     private void ShowError(string message, Exception ex)
     {
+        ShowErrorToast(message, "Error");
         MessageBox.Show(
             $"{message}\n\nDetalle: {ex.Message}",
             "Error",
@@ -2219,6 +2218,7 @@ internal sealed class GridViewState
     public ListSortDirection SortDirection { get; set; } = ListSortDirection.Ascending;
     public string PageText => $"Pagina {Page}/{TotalPages} - {TotalItems} registros";
 }
+
 
 
 
